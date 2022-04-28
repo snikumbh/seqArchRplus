@@ -1,0 +1,139 @@
+---
+title: "Using seqArchRplus for downstream analyses of promoter sequence architectures"
+author: "Sarvesh Nikumbh"
+date: "`r Sys.Date()`"
+package: seqArchRplus
+output:
+  BiocStyle::html_document:
+      toc: true
+vignette: >
+  %\VignetteIndexEntry{Example usage of _seqArchR_ on simulated DNA sequences}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+```
+
+
+# Introduction
+
+Promoter sequences are known to harbor many different sequence features.
+These features are often characterized as sequence motifs which are short words 
+at certain positions in the sequences.
+More broadly, they can also be stretches of CG/AT richness, AT periodicity etc.
+Promoters known to perform different functions have been observed to harbor 
+different features.
+For instance, consider the textbook example of the TATA-box. 
+The TATA-box, a short motif of 7-8 bp long, is identified 
+by the TATA-binding protein, and is very important for RNA PolII transcription.
+Promoters with a TATA-box are known for sharp transcription.
+In contrast, are the broad promoters.
+
+
+_seqArchRplus_ enables many steps in the downstream analyses of promoter 
+sequence architectures. These are:
+
+- Order the sequence architectures by the interquantile widths (IQWs) of the 
+tag clusters. See `CAGEr` vignette for more information on tag clusters.
+
+- Visualize distributions of IQW, TPM and conservation scores per cluster
+
+- Visualize the percentage annotations of promoter sequence per cluster
+
+- Ease of comparison across samples/stages: Visualize the above plots as 
+(publication ready) combined panels (also viewable as HTML reports)
+
+- Following per cluster visualizations:
+    - sequence logos of architectures
+    - strand-separated sequence logos of architectures
+    - distributions of promoters on different chromosomes/strands
+    - GO term enrichments
+
+- Produce BED track files of seqArchR clusters for visulization in a genome
+browser or IGV
+
+- Generate HTML reports that help you navigate this wealth of information
+with ease, and enable insights and hypotheses generation 
+
+
+We envisage that using seqArchRplus will be useful in swiftly but 
+comprehensively analyzing promoters identified using CAGE for any organism and 
+help in gaining insights and generate hypotheses.
+
+
+# Installation
+
+## When available on Bioconductor
+
+```{r seqArchRplus-install, echo=TRUE, eval=FALSE}
+
+## From Bioconductor
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("seqArchRplus")
+```
+
+## When available on GitHub
+
+
+```{r install-from-github, echo=TRUE, eval=FALSE}
+## From Github
+
+if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes")   
+}
+
+remotes::install_github("snikumbh/seqArchRplus", build_vignettes = FALSE)
+
+```
+
+
+In case of any errors or help required, please consider looking up:
+[https://github.com/snikumbh/seqArchRplus](https://github.com/snikumbh/seqArchRplus)
+and file a [new issue](https://github.com/snikumbh/seqArchRplus/issues/new).
+
+
+
+# Working with _seqArchRplus_
+```{r setup-two, echo=TRUE}
+# Load seqArchR
+library(seqArchRplus)
+library(Biostrings, quietly = TRUE)
+
+
+# Set seed for reproducibility
+set.seed(1234)
+
+```
+
+## Setting up
+
+To begin with seqArchRplus, you need two things:
+
+- the seqArchR result object
+- the CAGEr object or the tag clusters (promoter regions) from CAGEr
+- 
+
+## 
+
+
+# Conclusion
+
+seqArchRplus enables many of the downstream ananlyses steps for studying the 
+de novo identified sequence clusters/architectures using seqArchR.
+These promoter sequences can be identified using CAGE or variations of CAGE.
+
+
+# Session Info
+```{r session_info, include=TRUE, echo=TRUE, results='markup'}
+sessionInfo()
+```
