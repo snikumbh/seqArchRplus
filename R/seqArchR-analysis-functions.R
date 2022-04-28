@@ -146,8 +146,13 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
 ##==============================================================================
 
 
-.get_strand_plot_title <- function(this_id, nclust, this_n,
+.get_strand_plot_title <- function(this_id, nclust, this_n = NULL,
                                     tot_n, strand_val = "+"){
+    if(!is.null(strand_val)){
+        if(is.null(this_n))
+            stop("'this_n' cannot be NULL when strand_val is not NULL")
+    }
+
     clust_names <- sort(as.character(seq(nclust)))
 
     if(is.null(strand_val)){
@@ -1267,7 +1272,19 @@ get_ncolors <- function(n, palname = "Set1", clrs = NULL){
 }
 ## =============================================================================
 
-
+#' @title Visualize as barplots how promoters in each cluster are distributed
+#' on different chromosomes and strands
+#'
+#' @param sname The sample name
+#' @param clusts List of sequence ids in each cluster.
+#' @param info_df The information data.frame
+#' @param dir_path Specify the path to the directory on disk where plots
+#' will be saved
+#' @param colrs Specify colors used for two strands
+#'
+#' @importFrom ggplot2 theme_classic scale_fill_manual element_line
+#'
+#'
 per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
                                     colrs = "Paired"){
     cli::cli_h1(paste0("All clusters' strand distributions"))
@@ -1312,27 +1329,13 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
         filled_df$Frequency[fill_idx] <- df_strand_df$Freq
 
         ## Barplots
-        # pl <- ggpubr::ggbarplot(filled_df, x = "Chromosomes",
-        #                 y = "Frequency", fill = "Strand",
-        #                 position = ggplot2::position_dodge(0.4),
-        #                 width = 0.4, palette = colrs,
-        #                 legend = "right", xlab = "",
-        #                 title = .get_strand_plot_title(x,
-        #                                    nclust = length(clusts),
-        #                                    tot_n = length(clusts[[x]]),
-        #                                    strand_val = NULL),
-        #                 font.legend = c(12, "plain", "black"),
-        #                 ggtheme = ggpubr::theme_pubr())
-        # return(pl)
-        # print(head(filled_df))
-        ## Solution not using ggpubr, but custom ggplotting
         pl <- ggplot(filled_df) +
             ggplot2::geom_col(aes(x=Chromosomes, y = Frequency, fill = Strand,
                                   width = 0.5),
                               position = ggplot2::position_dodge(width = 0.5)) +
             scale_fill_manual(values=colrs) +
             xlab("") +
-            ggtitle(label = .get_strand_plot_title(x,
+            ggtitle(label = .get_strand_plot_title(this_id = x,
                                 nclust = length(clusts),
                                 tot_n = length(clusts[[x]]),
                                 strand_val = NULL)) +

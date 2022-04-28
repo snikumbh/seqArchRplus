@@ -10,6 +10,8 @@ sklearn <- NULL
             c(
                 "Feature",
                 "Frequency",
+                "Chromosomes",
+                "Strand",
                 "clust",
                 "clust_ID",
                 "start",

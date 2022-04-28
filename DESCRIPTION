@@ -28,11 +28,7 @@ Imports:
     GenomeInfoDb,
     forcats, 
     dplyr, 
-    ggpubr,
     cowplot,
-    svglite,
-    slickR,
-    pdftools,
     cli,
     RColorBrewer,
     heatmaps, 
@@ -41,6 +37,9 @@ Imports:
     grDevices,
     ggplot2 (>= 3.1.1)
 Suggests:
+    svglite,
+    slickR,
+    pdftools,
     xfun,
     BiocStyle,
     knitr (>= 1.22),
