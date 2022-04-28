@@ -1,0 +1,66 @@
+Type: Package
+Package: seqArchRplus
+Title: Downstream analyses of promoter sequence architectures and HTML report 
+    generation
+Version: 0.99.0
+Authors@R: 
+    person("Sarvesh", "Nikumbh", 
+    email = "sarvesh.nikumbh@gmail.com", 
+    role = c("aut", "cre", "cph"), 
+    comment = c(ORCID = "0000-0003-3163-4447"))
+Description: seqArchRplus enables downstream analyses of promoter sequences 
+    architectures/clusters identified by seqArchR.
+License: GPL-3 | file LICENSE
+URL: https://snikumbh.github.io/seqArchRplus/,
+    https://github.com/snikumbh/seqArchRplus
+BugReports: https://github.com/snikumbh/seqArchRplus/issues
+Depends:
+    R (>= 4.1.0), seqArchR
+Imports:
+    CAGEr (>= 2.0.2),
+    graphics,
+    ChIPseeker,
+    Biostrings,
+    BSgenome,
+    IRanges,
+    GenomicRanges,
+    S4Vectors,
+    GenomeInfoDb,
+    forcats, 
+    dplyr, 
+    ggpubr,
+    cowplot,
+    svglite,
+    slickR,
+    pdftools,
+    cli,
+    RColorBrewer,
+    heatmaps, 
+    scales,
+    factoextra,
+    grDevices,
+    ggplot2 (>= 3.1.1)
+Suggests:
+    xfun,
+    BiocStyle,
+    knitr (>= 1.22),
+    rmarkdown (>= 1.12),
+    testthat (>= 3.0.2),
+    covr,
+    vdiffr (>= 0.3.0)
+VignetteBuilder: 
+    knitr
+biocViews: 
+    MotifDiscovery, 
+    GeneRegulation, 
+    MathematicalBiology, 
+    SystemsBiology,
+    Transcriptomics,
+    Genetics,
+    Clustering,
+    DimensionReduction,
+    FeatureExtraction,
+    DNASeq
+Encoding: UTF-8
+LazyData: false
+RoxygenNote: 7.1.2
