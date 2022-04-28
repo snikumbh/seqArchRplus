@@ -52,6 +52,8 @@
 #' HTML report itself. This considerably increases the size of the HTML file,
 #' and can slow down loading of the HTML file in your browser.
 #'
+#' @export
+#'
 write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
                                 one_zip_all = TRUE, org_name = NULL,
                                 dir_path = NULL, include_in_report = TRUE,
@@ -328,6 +330,8 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
 #' @importFrom stats reorder
 #' @importFrom forcats fct_reorder
 #'
+#' @export
+#'
 iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
                           tpm = TRUE, cons = TRUE, txt_size = 12,
                           use_suffix = NULL, use_prefix = "C",
@@ -551,7 +555,7 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix){
 #' @param use_suffix,use_prefix Character. Specify any suffix and/or prefix
 #' you wish to add to the filename.
 #'
-#'
+#' @export
 #'
 per_cluster_annotations <- function(sname, clusts, tc_gr,
                                     cage_obj = NULL,
@@ -793,6 +797,7 @@ get_prop_anno_listplot <- function(anno_df, txt_size, colrs){
 #' @importFrom GenomeInfoDb seqlevels seqlevels<- seqinfo seqinfo<-
 #' @importFrom S4Vectors mcols
 #'
+#' @export
 ## Writes TCs as BED files via Granges and also as fasta files with a fixed
 ## flank size of +/- 500 bp
 ##
@@ -875,6 +880,7 @@ handle_tc_from_cage <- function(sname, cage_obj,
 #' @details Writes the provided `gr` to the file named `bed_fname`
 #'
 #' @importFrom utils write.table
+#'
 #'
 write_tc_bed <- function(gr, bed_fname){
     ##
@@ -965,6 +971,8 @@ write_tc_fasta <- function(prom, fl_size_up = 500, fl_size_down = 500,
 #' @importFrom seqArchR plot_ggseqlogo_of_seqs plot_arch_for_clusters
 #' collate_seqArchR_result get_seqs_clust_list seqs_str collate_clusters
 #' viz_seqs_acgt_mat
+#'
+#' @export
 #'
 per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
                                  pos_lab = -45:45, bits_yax = "max",
@@ -1189,6 +1197,8 @@ strand_sep_seqlogos <- function(sname, seqs, clusts, info_df, pos_lab,
 #'
 #' @importFrom Biostrings width
 #'
+#' @export
+#'
 plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
                             use_colors = NULL, motifs, dir_path,
                             fheight = 500, fwidth = 500, funits = "px"){
@@ -1298,6 +1308,7 @@ get_ncolors <- function(n, palname = "Set1", clrs = NULL){
 #'
 #' @importFrom ggplot2 theme_classic scale_fill_manual element_line
 #'
+#' @export
 #'
 per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
                                     colrs = "Paired"){
@@ -1560,6 +1571,7 @@ curate_clusters <- function(sname, use_aggl = "ward.D", use_dist = "euclid",
 #'
 #' @importFrom stats median
 #'
+#' @export
 #'
 order_clusters_iqw <- function(sname, clusts, info_df,
                                order_by_median = TRUE){
@@ -1745,7 +1757,7 @@ order_clusters_iqw <- function(sname, clusts, info_df,
 #' @param dir_path Specify the /path/to/directory to store results
 #'
 #'
-#'
+#' @export
 #'
 #'
 seqs_acgt_image <- function(sname, seqs, seqs_ord, pos_lab, xt_freq, yt_freq,
