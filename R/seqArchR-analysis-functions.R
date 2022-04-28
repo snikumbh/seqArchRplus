@@ -551,7 +551,6 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix){
 #' @param use_suffix,use_prefix Character. Specify any suffix and/or prefix
 #' you wish to add to the filename.
 #'
-#' @importFrom dplyr bind_rows
 #'
 #'
 per_cluster_annotations <- function(sname, clusts, tc_gr,
@@ -603,9 +602,24 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
     names(clustwise_anno) <- seq(1, length(clusts))
 
     colrs <- RColorBrewer::brewer.pal(n = 9, name = "Paired")
+    ## Note: Generally, speed is not an issue when the number of clusters is
+    ## around 40-50 or even up to 100.
+    ## So we can use the base::rbind instead of the dplyr::bind_rows which is
+    ## generally faster.
     ##
-    sam <- dplyr::bind_rows(lapply(clustwise_anno, function(x) x@annoStat),
-                            .id = "clust")
+
+    ## without dplyr?
+    df_list <- lapply(clustwise_anno, function(x) x@annoStat)
+    # print(df_list)
+    sam <- do.call("rbind", df_list)
+    per_df_nrows <- unlist(lapply(df_list, nrow))
+    ## Add a column clust that we need downstream
+    sam$clust <- rep(seq_along(df_list), times = per_df_nrows)
+
+    sam <- sam[, c(3,1,2)]
+    rownames(sam) <- seq_len(sum(per_df_nrows))
+    ##
+
     sam$Feature <- factor(sam$Feature,
                   levels = c("Promoter", "5' UTR", "1st Exon", "Other Exon",
                              "1st Intron", "Other Intron", "Downstream (<=300)",
