@@ -633,7 +633,7 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
     ##
     if(one_plot){
     ## Solution using custom plotting
-    clustwise_annobar <- get_prop_anno_oneplot(sam, txt_size = txt_size,
+    clustwise_annobar <- .get_prop_anno_oneplot(sam, txt_size = txt_size,
                                                colrs = colrs)
 
     ## Put in the cluster names when printing independently
@@ -656,7 +656,7 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
             ##
             anno_df$Feature <- factor(anno_df$Feature,
                                       levels = levels(sam$Feature))
-            anno_pl <- get_prop_anno_listplot(anno_df, txt_size = txt_size,
+            anno_pl <- .get_prop_anno_listplot(anno_df, txt_size = txt_size,
                                               colrs = colrs)
         })
         return(annobar_list)
@@ -665,7 +665,7 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
 }
 ##==============================================================================
 
-get_fixed_anno_ord <- function(){
+.get_fixed_anno_ord <- function(){
 
     anno_terms_ord <- c("Promoter", "5' UTR", "3' UTR", "1st Exon",
                         "Other Exon", "1st Intron", "Intron",
@@ -677,8 +677,8 @@ get_fixed_anno_ord <- function(){
 ##==============================================================================
 
 
-get_named_colors <- function(anno_terms_ord, palname = "Set1"){
-    use_colors <- get_ncolors(n=length(anno_terms_ord), palname=palname)
+.get_named_colors <- function(anno_terms_ord, palname = "Set1"){
+    use_colors <- .get_ncolors(n=length(anno_terms_ord), palname=palname)
     if(palname=="Set1") use_colors <- use_colors[c(2:length(use_colors),1)]
     names(use_colors) <- anno_terms_ord
     use_colors
@@ -690,7 +690,7 @@ get_named_colors <- function(anno_terms_ord, palname = "Set1"){
 ## Expected columns are 'Frequency', 'Feature', 'clust'.
 ##
 ##
-get_prop_anno_oneplot <- function(anno_df, txt_size, colrs){
+.get_prop_anno_oneplot <- function(anno_df, txt_size, colrs){
     clustwise_annobar <- ggplot(anno_df,
                                 aes(y = forcats::fct_rev(
                                     stats::reorder(clust, as.numeric(clust))),
@@ -719,7 +719,7 @@ get_prop_anno_oneplot <- function(anno_df, txt_size, colrs){
 ##==============================================================================
 
 
-get_prop_anno_listplot <- function(anno_df, txt_size, colrs){
+.get_prop_anno_listplot <- function(anno_df, txt_size, colrs){
     # message("text size is: ", txt_size)
     pl <- ggplot(anno_df, aes(y = clust, x = Frequency, fill = Feature)) +
         ggplot2::theme_bw() +
@@ -859,9 +859,9 @@ handle_tc_from_cage <- function(sname, cage_obj,
         this_gr_domCtss <- this_gr_domCtss[-omit_ids]
     }
 
-    if(write_to_disk) write_tc_bed(this_gr, bed_fname)
+    if(write_to_disk) .write_tc_bed(this_gr, bed_fname)
     cli::cli_alert_success("BED file written")
-    prom_seqs <- write_tc_fasta(this_prom, bsgenome = bsgenome,
+    prom_seqs <- .write_tc_fasta(this_prom, bsgenome = bsgenome,
                                 fasta_fname = fasta_fname,
                                 ret_val = ret_seqs,
                                 also_write = write_to_disk)
@@ -881,8 +881,9 @@ handle_tc_from_cage <- function(sname, cage_obj,
 #'
 #' @importFrom utils write.table
 #'
-#'
-write_tc_bed <- function(gr, bed_fname){
+#' @keywords internal
+#' @noRd
+.write_tc_bed <- function(gr, bed_fname){
     ##
     ## Write regions to BED file
     message("Writing tag cluster coordinates in BED file at: ", bed_fname)
@@ -905,7 +906,7 @@ write_tc_bed <- function(gr, bed_fname){
 #     saveRDS(myCAGEobject_thisSample, file = cage_tc_granges_fname)
 # }
 
-write_tc_fasta <- function(prom, fl_size_up = 500, fl_size_down = 500,
+.write_tc_fasta <- function(prom, fl_size_up = 500, fl_size_down = 500,
                         bsgenome, fasta_fname, ret_val = TRUE,
                         also_write = TRUE){
 
@@ -1032,7 +1033,7 @@ per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
 
         ## save PNGs
         if(save_png)
-            save_PNGs(dir_path = result_dir_path, plot_list = arch_list,
+            .save_PNGs(dir_path = result_dir_path, plot_list = arch_list,
                   txt_size = txt_size)
         ##
         return(arch_list)
@@ -1041,7 +1042,7 @@ per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
 }
 ##==============================================================================
 
-save_PNGs <- function(dir_path, plot_list, strand_sep = FALSE, txt_size = 10){
+.save_PNGs <- function(dir_path, plot_list, strand_sep = FALSE, txt_size = 10){
 
     use_res_path <- file.path(dir_path, "arch_png")
     if(strand_sep) use_res_path <- file.path(dir_path, "strand_sep_arch_png")
@@ -1158,7 +1159,7 @@ strand_sep_seqlogos <- function(sname, seqs, clusts, info_df, pos_lab,
 
     ## save PNGs
     if(save_png)
-        save_PNGs(dir_path = result_dir_path, plot_list = plots_p_n,
+        .save_PNGs(dir_path = result_dir_path, plot_list = plots_p_n,
               strand_sep = TRUE, txt_size = 10)
 
 
@@ -1208,7 +1209,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
     nClust <- length(clusts)
     if(is.null(use_colors)){
         message("Using default colors")
-        nClust_colors <- get_ncolors(n = nClust, palname = "Set1")
+        nClust_colors <- .get_ncolors(n = nClust, palname = "Set1")
     }
     ##
     all_motifs_str <- paste0(motifs, collapse="_")
@@ -1272,7 +1273,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 ## the colors are recycled and returned
 ## -- Can also specify a list of colors of choice < n, which are recycled and
 ## returned. Useful when random colors from a palette are required
-get_ncolors <- function(n, palname = "Set1", clrs = NULL){
+.get_ncolors <- function(n, palname = "Set1", clrs = NULL){
 
     ## Recycle color vector from RColorBrewer
     use_colors <- clrs
@@ -1450,6 +1451,9 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
 #' executed.
 #'
 #' @importFrom stats cutree median
+#'
+#' @export
+#'
 curate_clusters <- function(sname, use_aggl = "ward.D", use_dist = "euclid",
                             seqArchR_result, iter, pos_lab = NULL,
                             regularize = TRUE, topn = 50, use_cutk = 2,
