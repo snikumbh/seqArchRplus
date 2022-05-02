@@ -538,9 +538,9 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix){
 #' @param sname Sample name
 #' @param clusts List of sequence ids in each cluster.
 #' @param tc_gr Tag clusters as \code{\link[GenomicRanges]{GRanges}}. If
-#' `cage_obj` is not provided (is NULL), this argument is required.
-#' It will be ignored only if cage_obj is provided.
-#' @param cage_obj A CAGEexp object obtained from the CAGEr package, if and
+#' `cager_obj` is not provided (is NULL), this argument is required.
+#' It will be ignored only if cager_obj is provided.
+#' @param cager_obj A CAGEexp object obtained from the CAGEr package, if and
 #' when CAGEr was used to process the raw CAGE data
 #' @param qLow,qUp The interquantile boundaries to be considered for obtaining
 #' tag clusters from the CAGEexp object. See \code{\link[CAGEr]{tagClusters}}
@@ -558,7 +558,7 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix){
 #' @export
 #'
 per_cluster_annotations <- function(sname, clusts, tc_gr,
-                                    cage_obj = NULL,
+                                    cager_obj = NULL,
                                     qLow = 0.1,
                                     qUp = 0.9,
                                     txdb_obj = NULL,
@@ -568,7 +568,7 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
                                     dir_path = NULL,
                                     txt_size = 12,
                                     use_suffix = NULL, use_prefix = "C"){
-    message("Text size is: ", txt_size)
+
     cli::cli_h1(paste0("All clusters' genomic annotations"))
     cli::cli_h2(paste0("Sample: ", sname))
     result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
@@ -580,14 +580,14 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
     #                       }))
     clust_labels <- make_cluster_labels(clust = clusts, use_prefix, use_suffix)
     if(is.null(tc_gr)){
-        if(is.null(cage_obj)){
-            stop("If tc_gr is NULL, maybe you forgot to supply the `cage_obj`.",
-                 "Please also specify `qLow` and `qUp` with the `cage_obj`")
+        if(is.null(cager_obj)){
+            stop("`tc_gr` is NULL, did you forgot to supply the `cager_obj`?",
+                 "Please also specify `qLow` and `qUp` with the `cager_obj`")
         }else{
-            any_null <-any(unlist(lapply(list(qLow, qUp), is.null)))
+            any_null <- any(unlist(lapply(list(qLow, qUp), is.null)))
             if(any_null) stop("Please specify both `qLow` and `qUp`.")
             message("Using qLow = ", qLow, " and qUp = ", qUp)
-            tc_gr <- CAGEr::tagClustersGR(cage_obj, sample = sname,
+            tc_gr <- CAGEr::tagClustersGR(cager_obj, sample = sname,
                                 returnInterquantileWidth = TRUE,
                                 qLow = qLow, qUp = qUp)
 
@@ -649,6 +649,7 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
 
     return(clustwise_annobar)
     }else{
+        message("LIST OF PLOTS")
         ## return individual plots as a list
         sam_split <- split(sam,  f = factor(sam$clust,
                                            levels = seq_along(clusts)))
@@ -721,16 +722,21 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
 
 .get_prop_anno_listplot <- function(anno_df, txt_size, colrs){
     # message("text size is: ", txt_size)
+    print(anno_df)
     pl <- ggplot(anno_df, aes(y = clust, x = Frequency, fill = Feature)) +
+        # ggplot2::theme_bw() +
+        geom_bar(stat = "identity", width = 0.9,
+                 position = position_fill(reverse=TRUE)) +
+        # ggplot2::geom_col(aes(fill = Feature), width=0.98,
+        #                   position = position_fill(reverse=TRUE)) +
+        ggplot2::scale_fill_manual(values = colrs) +
         ggplot2::theme_bw() +
-        ggplot2::geom_col(aes(fill = Feature), width=0.98,
-                          position = position_fill(reverse=TRUE)) +
-        ggplot2::scale_fill_manual(values= colrs) +
         ggplot2::theme(
             axis.title.y = element_text(size = txt_size),
             axis.title = element_text(size = txt_size),
             axis.text = element_text(size = txt_size),
             axis.text.y = element_text(hjust = 1.0, size = txt_size),
+            axis.ticks.length.y.left = unit(0.1, units = "cm"),
             # axis.text.x = element_blank(),
             # axis.title.x = element_blank(),
             # axis.ticks.x = element_blank(),
@@ -739,6 +745,8 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
             legend.title = element_text(size = txt_size),
             legend.position = "bottom",
             legend.direction = "horizontal") +
+        ggplot2::scale_y_discrete( expand = expansion(add = c(0.1, 0.1))) +
+        ggplot2::scale_x_continuous(expand = expansion(mult = 0.01)) +
         ggplot2::guides(fill = guide_legend(ncol = 7, byrow = FALSE
         )) +
         ggplot2::labs(x = "Percentage (%)", y = "Cluster") +
@@ -755,7 +763,7 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
 #'
 #' @param sname The sample name.
 #'
-#' @param cage_obj The CAGEexp object from CAGEr.
+#' @param cager_obj The CAGEexp object from CAGEr.
 #'
 #' @param fl_size_up,fl_size_down Numeric. The size of the flanks in the
 #' upstream and downstream directions.
@@ -802,7 +810,7 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
 ## flank size of +/- 500 bp
 ##
 ##
-handle_tc_from_cage <- function(sname, cage_obj,
+handle_tc_from_cage <- function(sname, cager_obj,
                                 fl_size_up = 500, fl_size_down = 500,
                                 bsgenome, dir_path = NULL,
                                 fname_prefix = NULL, fname_suffix = NULL,
@@ -819,12 +827,14 @@ handle_tc_from_cage <- function(sname, cage_obj,
                             fname_suffix, ".fa"))
 
     ##
-    this_gr <- CAGEr::tagClustersGR(cage_obj, sample = sname,
+    this_gr <- CAGEr::tagClustersGR(cager_obj, sample = sname,
                                     returnInterquantileWidth = TRUE,
                                     qLow = 0.1, qUp = 0.9)
     ## At present CAGEr tagClusters loose this information, so add them
-    seqlevels(this_gr) <- GenomeInfoDb::seqlevels(CAGEr::CTSStagCountSE(cage_obj))
-    seqinfo(this_gr)   <- GenomeInfoDb::seqinfo(CAGEr::CTSStagCountSE(cage_obj))
+    seqlevels(this_gr) <- GenomeInfoDb::seqlevels(
+                                        CAGEr::CTSStagCountSE(cager_obj))
+    seqinfo(this_gr)   <- GenomeInfoDb::seqinfo(
+                                        CAGEr::CTSStagCountSE(cager_obj))
 
     if(any("score" == names(S4Vectors::mcols(this_gr)))){
         this_gr$tpm <- as.numeric(this_gr$score)
@@ -901,7 +911,7 @@ handle_tc_from_cage <- function(sname, cage_obj,
 }
 ##==============================================================================
 
-# write_cage_tc_to_disk <- function(cage_obj){
+# write_cage_tc_to_disk <- function(cager_obj){
 #     message("Saving CAGE TC for ", sname)
 #     saveRDS(myCAGEobject_thisSample, file = cage_tc_granges_fname)
 # }
@@ -1764,8 +1774,9 @@ order_clusters_iqw <- function(sname, clusts, info_df,
 #' @export
 #'
 #'
-seqs_acgt_image <- function(sname, seqs, seqs_ord, pos_lab, xt_freq, yt_freq,
-                            f_height, f_width, dir_path){
+seqs_acgt_image <- function(sname, seqs, seqs_ord, pos_lab, xt_freq = 5,
+                            yt_freq = 500, f_height = 1200,
+                            f_width = 600, dir_path){
 
     result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
         fname <- file.path(result_dir_path,
@@ -1780,7 +1791,244 @@ seqs_acgt_image <- function(sname, seqs, seqs_ord, pos_lab, xt_freq, yt_freq,
 }
 ## =============================================================================
 
+#' @title Generate all plots for a given sample
+#'
+#' @param sname The sample name
+#' @param bed_info_fname The BED filename with information on tag clusters. See
+#' details for expected columns (column names)/information
+#'
+#' @param seqArchR_clusts The seqArchR clusters' list
+#'
+#' @param raw_seqs The sequences corresponding to the cluster elements (also
+#' available from the seqArchR result object)
+#'
+#' @param cager_obj The CAGEr object. This expects that
+#' \code{\link[CAGEr]{clusterCTSS}} has been run beforehand
+#'
+#' @param tc_gr The tag clusters as a \code{\link[GenomicRanges]{GRanges}}
+#'
+#' @param order_by_iqw Logical. Set TRUE to order clusters by the IQW median
+#' or mean. Set argument `use_median_iqw`.to TRUE to use the median, else will
+#' use mean if FALSE
+#'
+#' @param use_median_iqw Logical. Set TRUE if the median IQW for each cluster
+#' is used to order the clusters. Otherwise, the mean IQW will be used when set
+#' to FALSE
+#'
+#' @param iqw,tpm,cons Logical. Specify TRUE when the corresponding plots
+#' should be included
+#'
+#' @param pos_lab The position labels
+#'
+#' @param txdb_obj The TranscriptsDB object
+#'
+#' @param org_name The organism name. This is used in the tracknames for tracks
+#' writte nas BED files
+#'
+#' @param qLow,qUp Numeric values between 0 and 1. These are required when
+#' cager_obj is provided instead of the tag clusters `tc_gr`
+#'
+#' @param tss_region For ChIPseeker, "region range of TSS"
+#'
+#' @param raw_seqs_mh Specify the sequences to be used for motif heatmaps, if
+#' they are different than the sequences clustered by seqArchr. Default is NULL,
+#' when `raw_seqs`` are used
+#'
+#' @param motifs Specify a character vector of motif words (using IUPAC
+#' notation) to be visualized as a heatmap
+#'
+#' @param motif_heatmaps_flanks Specify a vector of different flank values to
+#' be considered for visualization. Same size flanks are considered upstream
+#' as well as downstream, hence one value suffices for eac hvisualization.
+#' When a vector `c(50, 100, 200)` is specified, three motif heatmap files
+#' (three separate PNG files) are created, each with one flank size. The
+#' motif heatmap file will contain separate heatmaps for each of the specified
+#' motifs in the `motifs` argument
+#'
+#'
+#' @param dir_path The path to the directory where files are saved
+#'
+#' @param txt_size The text size to be used for the plots. This is
+#' some high value because the plots are written with `dpi=300` and are often
+#' large in size, especially the combined panel plots
+#'
+#' @details The expected columns (and column names) in the BED file are
+#' "chr", "start", "end", "width", "strand", "score", "nr_ctss",
+#' "dominant_ctss", "domTPM", "q_<qLow>", "q_<qUp>", "IQW", "tpm". Depending on
+#' the values for arguments qLow and qUp, the corresponding column names are
+#' formed. For example, if `qLow` and `qUp` are 0.1 and 0.9, the column names
+#' are "q_0.1" and "q_0.9". These columns are mostly present by default in the
+#' CAGEr tag clusters.
+#'
+#'
+#' @export
+#'
+#'
+generate_all_plots <- function(sname, bed_info_fname, seqArchR_clusts,
+                               raw_seqs,
+                               cager_obj,
+                               tc_gr = NULL,
+                               order_by_iqw = TRUE,
+                               use_median_iqw = TRUE,
+                               iqw = TRUE, tpm = TRUE, cons = FALSE,
+                               pos_lab = NULL,
+                               txdb_obj = NULL,
+                               org_name,
+                               qLow = 0.1, qUp = 0.9,
+                               tss_region = c(-500, 100),
+                               raw_seqs_mh = NULL,
+                               motifs = c("WW", "SS", "TATAA", "CG"),
+                               motif_heatmaps_flanks = c(50, 100, 200),
+                               dir_path,
+                               txt_size = 25
+                               ){
 
+    iqw_tpm_pl <-
+        annotations_oneplot_pl <-
+        annotations_list_pl <-
+        seqlogos_oneplot_pl <-
+        seqlogos_list_pl <-
+        stranded_seqlogos_pl <-
+        per_cl_strand_pl <- NULL
+    ##
+    if(is.null(tc_gr)){
+        tc_gr <- CAGEr::tagClustersGR(cager_obj, sample = sname)
+    }
+    ##
+    if(is.null(raw_seqs_mh))
+        raw_seqs_mh <- raw_seqs
+    ##
+    info_df <- utils::read.delim(file = bed_info_fname,
+                          sep = "\t", header = TRUE,
+                          col.names = c("chr", "start", "end", "width",
+                                        "strand", "score", "nr_ctss",
+                                        "dominant_ctss", "domTPM",
+                                        paste0("q_", c(qLow, qUp)),
+                                        # "q_0.1", "q_0.9",
+                                        "IQW", "tpm"))
+    ##
+    seqArchR_clusts_ord <- seqArchR_clusts
+    if(order_by_iqw){
+        ## get clusters ordered by median IQW values
+        seqArchR_clusts_ord <- order_clusters_iqw(
+            sname = sname, clusts = seqArchR_clusts,
+            info_df = info_df, order_by_median = TRUE)
+    }
+    ##
+    use_clusts <- seqArchR_clusts_ord
+    ##
+    seqs_acgt_image(sname = sname,
+                    seqs = raw_seqs,
+                    seqs_ord = unlist(use_clusts),
+                    pos_lab = pos_lab, dir_path = dir_path)
+    ##
+    write_seqArchR_cluster_track_bed(sname = sname,
+                                clusts = use_clusts,
+                                info_df = info_df,
+                                one_zip_all = TRUE,
+                                org_name = org_name,
+                                dir_path = dir_path,
+                                include_in_report = FALSE,
+                                strand_sep = FALSE)
+    ##
+
+    ##
+    iqw_tpm_pl <- iqw_tpm_plots(sname = sname,
+                                    dir_path = dir_path,
+                                    info_df = info_df,
+                                    iqw = iqw, tpm = tpm, cons = cons,
+                                    clusts = use_clusts,
+                                    txt_size = txt_size)
+
+
+    annotations_oneplot_pl <- per_cluster_annotations(
+                                sname = sname,
+                                clusts = use_clusts,
+                                tc_gr = tc_gr,
+                                cager_obj = NULL,
+                                qLow = qLow, qUp = qUp,
+                                txdb_obj = txdb_obj,
+                                tss_region = tss_region,
+                                orgdb_obj = NULL, dir_path = dir_path,
+                                one_plot = TRUE, txt_size = txt_size)
+
+
+    annotations_list_pl <-
+                    per_cluster_annotations(
+                            sname = sname,
+                            clusts = use_clusts,
+                            tc_gr = tc_gr,
+                            cager_obj = NULL,
+                            qLow = qLow, qUp = qUp,
+                            txdb_obj = txdb_obj,
+                            tss_region = tss_region,
+                            orgdb_obj = NULL, dir_path = dir_path,
+                            one_plot = FALSE,
+                            txt_size = 12)
+
+    seqlogos_oneplot_pl <-
+                    per_cluster_seqlogos(sname = sname,
+                                        seqs = raw_seqs,
+                                        clusts = use_clusts,
+                                        pos_lab = pos_lab, bits_yax = "max",
+                                        strand_sep = FALSE, one_plot = TRUE,
+                                        dir_path = dir_path,
+                                        txt_size = txt_size)
+    ## for combining later
+    seqlogos_list_pl <-
+                    per_cluster_seqlogos(sname = sname,
+                                       seqs = raw_seqs,
+                                       clusts = use_clusts,
+                                       pos_lab = pos_lab, bits_yax = "max",
+                                       strand_sep = FALSE, one_plot = FALSE,
+                                       dir_path = dir_path,
+                                       txt_size = 12)
+
+    stranded_seqlogos_pl <-
+                    per_cluster_seqlogos(sname = sname,
+                                       seqs = raw_seqs,
+                                       clusts = use_clusts,
+                                       pos_lab = pos_lab,
+                                       bits_yax = "max",
+                                       info_df = info_df,
+                                       strand_sep = TRUE, one_plot = FALSE,
+                                       dir_path = dir_path,
+                                       txt_size = 12)
+
+    ## Get larger flank FATSA sequences (larger than those used for seqArchR)
+    ## Use the raw_seqs_mh argument
+    # fname <- file.path(proc_data_path, "FASTA",
+    #                    paste0("Hvulgare_MorexV3_sample_", sn,
+    #                           "_promoters_SingletonsAbove5.fa"))
+    # use_seqs <- Biostrings::readDNAStringSet(filepath = fname,
+    #                                          format = "FASTA", use.names = TRUE)
+
+
+
+    plot_motif_heatmaps(sname = sname, seqs = raw_seqs_mh,
+                                      flanks = motif_heatmaps_flanks,
+                                      clusts = use_clusts,
+                                      motifs =  motifs,
+                                      dir_path = dir_path,
+                                      fheight = 800, fwidth = 1600)
+
+    pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")
+    per_cl_strand_pl <- per_cluster_strand_dist(sname = sname,
+                                    clusts = use_clusts,
+                                    info_df = info_df,
+                                    dir_path = dir_path,
+                                    colrs = pair_colrs[4:5])
+
+    return(list(iqw_tpm_pl,
+                annotations_oneplot_pl,
+                annotations_list_pl,
+                seqlogos_oneplot_pl,
+                seqlogos_list_pl,
+                stranded_seqlogos_pl,
+                per_cl_strand_pl)
+           )
+
+}
 
 ## 1. Get PFM matrix with custom background frequencies for the DNA_BASES
 ## 2. Use TFBSTools::toICM to convert to information content matrix
