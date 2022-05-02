@@ -6,7 +6,7 @@
 \usage{
 handle_tc_from_cage(
   sname,
-  cage_obj,
+  cager_obj,
   fl_size_up = 500,
   fl_size_down = 500,
   bsgenome,
@@ -20,7 +20,7 @@ handle_tc_from_cage(
 \arguments{
 \item{sname}{The sample name.}
 
-\item{cage_obj}{The CAGEexp object from CAGEr.}
+\item{cager_obj}{The CAGEexp object from CAGEr.}
 
 \item{fl_size_up, fl_size_down}{Numeric. The size of the flanks in the
 upstream and downstream directions.}

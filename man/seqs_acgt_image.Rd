@@ -9,10 +9,10 @@ seqs_acgt_image(
   seqs,
   seqs_ord,
   pos_lab,
-  xt_freq,
-  yt_freq,
-  f_height,
-  f_width,
+  xt_freq = 5,
+  yt_freq = 500,
+  f_height = 1200,
+  f_width = 600,
   dir_path
 )
 }

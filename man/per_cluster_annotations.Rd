@@ -8,7 +8,7 @@ per_cluster_annotations(
   sname,
   clusts,
   tc_gr,
-  cage_obj = NULL,
+  cager_obj = NULL,
   qLow = 0.1,
   qUp = 0.9,
   txdb_obj = NULL,
@@ -27,10 +27,10 @@ per_cluster_annotations(
 \item{clusts}{List of sequence ids in each cluster.}
 
 \item{tc_gr}{Tag clusters as \code{\link[GenomicRanges]{GRanges}}. If
-`cage_obj` is not provided (is NULL), this argument is required.
-It will be ignored only if cage_obj is provided.}
+`cager_obj` is not provided (is NULL), this argument is required.
+It will be ignored only if cager_obj is provided.}
 
-\item{cage_obj}{A CAGEexp object obtained from the CAGEr package, if and
+\item{cager_obj}{A CAGEexp object obtained from the CAGEr package, if and
 when CAGEr was used to process the raw CAGE data}
 
 \item{qLow, qUp}{The interquantile boundaries to be considered for obtaining
