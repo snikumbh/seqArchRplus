@@ -649,7 +649,6 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
 
     return(clustwise_annobar)
     }else{
-        message("LIST OF PLOTS")
         ## return individual plots as a list
         sam_split <- split(sam,  f = factor(sam$clust,
                                            levels = seq_along(clusts)))
@@ -721,32 +720,26 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
 
 
 .get_prop_anno_listplot <- function(anno_df, txt_size, colrs){
-    # message("text size is: ", txt_size)
-    print(anno_df)
+    ##
     pl <- ggplot(anno_df, aes(y = clust, x = Frequency, fill = Feature)) +
         # ggplot2::theme_bw() +
-        geom_bar(stat = "identity", width = 0.9,
+        ggplot2::geom_bar(stat = "identity", width = 0.9,
                  position = position_fill(reverse=TRUE)) +
-        # ggplot2::geom_col(aes(fill = Feature), width=0.98,
-        #                   position = position_fill(reverse=TRUE)) +
         ggplot2::scale_fill_manual(values = colrs) +
+        ggplot2::scale_y_discrete(expand = expansion(add = c(0.1, 0.1))) +
+        ggplot2::scale_x_continuous(expand = expansion(mult = 0.05)) +
         ggplot2::theme_bw() +
         ggplot2::theme(
             axis.title.y = element_text(size = txt_size),
             axis.title = element_text(size = txt_size),
             axis.text = element_text(size = txt_size),
             axis.text.y = element_text(hjust = 1.0, size = txt_size),
-            axis.ticks.length.y.left = unit(0.1, units = "cm"),
-            # axis.text.x = element_blank(),
-            # axis.title.x = element_blank(),
-            # axis.ticks.x = element_blank(),
+            axis.ticks.length.y.left = unit(0.2, units = "cm"),
             panel.grid = element_blank(),
             legend.text = element_text(size = txt_size),
             legend.title = element_text(size = txt_size),
             legend.position = "bottom",
             legend.direction = "horizontal") +
-        ggplot2::scale_y_discrete( expand = expansion(add = c(0.1, 0.1))) +
-        ggplot2::scale_x_continuous(expand = expansion(mult = 0.01)) +
         ggplot2::guides(fill = guide_legend(ncol = 7, byrow = FALSE
         )) +
         ggplot2::labs(x = "Percentage (%)", y = "Cluster") +
