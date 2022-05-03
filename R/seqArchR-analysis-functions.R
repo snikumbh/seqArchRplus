@@ -1419,8 +1419,7 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
 #' that needs to be put into a new, independent cluster of itself, use
 #' 0 (as numeric). Both `need_change` and `change_to` should be empty lists if
 #' no re-assignment is to be performed.
-#' #' TO-DO What if two elements from independent clusters are to
-#' be put into a totally new cluster, will using 0 work in this case?
+#' If any element is to be put into a new cluster, use a numeral 0 in change_to
 #'
 #' @param final Logical, set to TRUE or FALSE
 #'
@@ -1623,6 +1622,11 @@ order_clusters_iqw <- function(sname, clusts, info_df,
 ## change_to is a list of clusters they will be assigned to
 ## Both the lists have a one-to-one mapping, meaning that element 1 is list
 ## need_change is assigned to element 1 in changes_to list
+##
+## Use 0 for new, independent clusters
+## ??Use negative numbers for independent but same clusters for two different
+## elements
+##
 .handle_cl_reassignment <- function(need_change, change_to,
                                     temp_clusts){
     if(!all(lengths(list(need_change, change_to)) == 0)){
@@ -1638,8 +1642,8 @@ order_clusters_iqw <- function(sname, clusts, info_df,
         ## A. Some existing cluster can have all its elements re-assigned, then
         ## this cluster is empty
         ## B. Some elements can be re-assigned to completely independent
-        ## clusters, i.e., new clusters. This are marked by numeral 0 in
-        ## change_to. Instead of leting them create confusions, we first
+        ## clusters, i.e., new clusters. These are marked by numeral 0 in
+        ## change_to. Instead of letting them create confusions, we first
         ## implement all non-zero re-assignments, and handle resultant
         ## null sets as below. Only then implement type B re-assignments.
         ##

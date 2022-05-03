@@ -25,48 +25,44 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-Promoter sequences are known to harbor many different sequence features.
-These features are often characterized as sequence motifs which are short words 
-at certain positions in the sequences.
-More broadly, they can also be stretches of CG/AT richness, AT periodicity etc.
-Promoters known to perform different functions have been observed to harbor 
-different features.
-For instance, consider the textbook example of the TATA-box. 
-The TATA-box, a short motif of 7-8 bp long, is identified 
-by the TATA-binding protein, and is very important for RNA PolII transcription.
-Promoters with a TATA-box are known for sharp transcription.
-In contrast, are the broad promoters.
-
 
 _seqArchRplus_ enables many steps in the downstream analyses of promoter 
 sequence architectures. These are:
 
+- Curate the final set of clusters from seqArchR. 
+See the [`seqArchR` vignette](http://bioconductor.org/packages/release/bioc/vignettes/seqArchR/inst/doc/seqArchR.html), or the preprint to understand in detail why this is required 
+
 - Order the sequence architectures by the interquantile widths (IQWs) of the 
-tag clusters. See `CAGEr` vignette for more information on tag clusters.
+tag clusters.
+See 
+[`CAGEr` vignette](https://www.bioconductor.org/packages/release/bioc/vignettes/CAGEr/inst/doc/CAGEexp.html) 
+for more information on tag clusters
 
 - Visualize distributions of IQW, TPM and conservation scores per cluster
 
-- Visualize the percentage annotations of promoter sequence per cluster
+- Visualize the percentages of annotations of promoter sequences per cluster
 
 - Ease of comparison across samples/stages: Visualize the above plots as 
-(publication ready) combined panels (also viewable as HTML reports)
+(publication ready) combined panels, also viewable as HTML reports
 
-- Following per cluster visualizations:
-    - sequence logos of architectures
+- Many per cluster visualizations including:
+    - sequence logos of cluster architectures
     - strand-separated sequence logos of architectures
-    - distributions of promoters on different chromosomes/strands
-    - GO term enrichments
+    - distributions of promoters on different chromosomes and strands
+    - GO term enrichments [TO-DO]
 
-- Produce BED track files of seqArchR clusters for visulization in a genome
+- Produce BED track files of seqArchR clusters for visualization in a genome
 browser or IGV
 
 - Generate HTML reports that help you navigate this wealth of information
 with ease, and enable insights and hypotheses generation 
 
-
-We envisage that using seqArchRplus will be useful in swiftly but 
-comprehensively analyzing promoters identified using CAGE for any organism and 
-help in gaining insights and generate hypotheses.
+We hope that using seqArchRplus together with seqArchR will be useful in 
+swiftly, but comprehensively, analyzing promoters identified using CAGE for 
+any organism.
+We have tested seqArchR on promoters in drosophila (Schor et al. 2017 and 
+modENCODE), zebrafish (Nepal et al. 2013), mice (Fantom), humans (ENCODE) and 
+also in plants (barley so far).
 
 
 # Installation
@@ -104,8 +100,9 @@ and file a [new issue](https://github.com/snikumbh/seqArchRplus/issues/new).
 
 
 # Working with _seqArchRplus_
+
 ```{r setup-two, echo=TRUE}
-# Load seqArchR
+# Load seqArchRplus
 library(seqArchRplus)
 library(Biostrings, quietly = TRUE)
 
@@ -117,13 +114,318 @@ set.seed(1234)
 
 ## Setting up
 
-To begin with seqArchRplus, you need two things:
+To analyse all transcription events/promoter sequences identified using CAGE 
+data, the ideal setting for seqArchRplus is to use CAGEr first for pre-
+processing the CAGE data, and subsequently use seqArchRplus to generate 
+the numerous downstream visualisations. To begin with seqArchRplus, 
+you need:
 
-- the seqArchR result object
-- the CAGEr object or the tag clusters (promoter regions) from CAGEr
-- 
+- the CAGEr object or information on the tag clusters from [https://bioconductor.org/packages/release/bioc/html/CAGEr.html](CAGEr), 
+specifically the width of the tag clusters, total TPM value of the cluster + 
+that of the dominant CTSS
 
-## 
+- the seqArchR result object.
+
+
+## Curating raw clusters from seqArchR result
+
+Raw clusters from seqArchR result (say, the final iteration) often require 
+curation. 
+
+The seqArchR result does have a final `clustSol` (the clustering solution) where 
+the clusters from the final iteration are collated. 
+seqArchR uses hierarchical clustering for this purpose. 
+However, hierarchical clustering, with a chosen agglomeration and distance 
+method, does not necessarily output the best suitable collated set of clusters. 
+Therefore, some small amount of manual curation (re-assignments) may be required to reach the 
+ideal collated set of clusters as the final solution. 
+This is achieved with the help of the `seqArchRplus::curate_clusters` function.
+
+The basic idea of the curate_clusters function is available in `help(seqArchRplus::curate_clusters)`. 
+A more elaborate description is as follows.
+It takes as input an agglomeration method and also a distance method (see more arguments in help/documentation).
+On the first call to the function, a PDF file with the associated dendrogram resulting from 
+the hierarchical clustering is shown together with the per cluster sequence logos. 
+This should help in identifying if the chosen agglomeration and distance methods worked well (are clusters with similar sequence logos also together in the dendrogram?).
+If this is satisfactory (chosen agglomeration and distance method have done well already and only few curations will be required),
+count the number of overall clusters that you can visually see. 
+Generally, if (estimated) 3-4 (even 5-6) clusters out of 30-40 require curation, I would consider it as a satisfactory outcome from the hierarchical clustering output.
+Now, in the second call to `curate_clusters`, specify the number of clusters based on your count.
+View the resulting clustering in the new PDF file produced as output.
+This time the dendrogram shows this clustering with colors and grey-scaled boxes drawn around the clusters.
+Now you can exactly note which clusters need curation. 
+Say, sequence clusters 39, 41 and 47 are combined into one, and sequence clusters 36-38 are combined into another cluster. Then, you may want to move sequence cluster 39 to the cluster of 36-38.
+To do this, set the `need_change` argument of `curate_clusters` to `c(39)` and 
+`change_to` argument to `c(36)`. 
+Any one of the destination cluster members can be specified in `change_to`. 
+Similarly, any other such curations can be added. 
+Specify all such curations together in one go like this: `need_change <- list(c(39), c(24, 27), c(17))` and 
+`change_to <- list(36, 21, 0)` -- sequence cluster 39 is moved to the cluster containing sequence cluster 36, 24and 27 are moved to that of 21 and 17 to a totally new cluster of itself.
+
+```{r curation-example, echo=TRUE, eval=FALSE}
+
+## Using dummy sample names. Please replace with your sample names here
+## Suppose `merged_sample_names` holds the sample names
+
+
+sn <- merged_sample_names[1]
+use_aggl <- "complete"
+use_dist <- "euclid"
+
+## get seqArchR clusters custom curated
+seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(sname = sn, 
+                        use_aggl = use_aggl, use_dist = use_dist,
+                        seqArchR_result = results[[sn]], iter = 5, 
+                        use_cutk = 2, final = FALSE, dir_path = use_dir)
+
+## Suppose we identify K = 18 upon visual inspection.
+set_cutk <- 18
+
+
+## Form the lists need_change and change_to for re-assignments
+need_change <- list()
+change_to <- list()
+
+
+seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(sname = sn, 
+                        use_aggl = use_aggl, use_dist = use_dist,
+                        seqArchR_result = results[[sn]], iter = 5, 
+                    
+                        use_cutk = set_cutk, #*** 
+                        
+                        need_change = need_change, 
+                        change_to = change_to, 
+                        
+                        final = FALSE,  #*** 
+                        
+                        dir_path = use_dir)
+
+## Satisfied> now set final = TRUE
+seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(sname = sn, 
+                        use_aggl = use_aggl, use_dist = use_dist,
+                        seqArchR_result = results[[sn]], iter = 5, 
+                        
+                        use_cutk = set_cutk, #***  
+                        
+                        need_change = need_change, 
+                        change_to = change_to, 
+                        
+                        final = TRUE, #*** 
+                        
+                        dir_path = use_dir)
+## This fetches us clusters with custom/curated collation in _arbitrary_ order
+## See the next function call to order_clusters_iqw that orders these clusters
+## by their median/mean IQW
+
+
+```
+
+
+
+
+
+## Generating individual plots via individual functions
+
+One can use all the individual functions from seqArchRplus to generate all the plots.
+
+```{r call-individual-functions, eval=FALSE}
+
+
+
+## Need a large text size because plots are large with high DPI value 
+## for production quality
+use_txt_size <- 35
+
+iqw_tpm_pl <- 
+    annotations_oneplot_pl <- 
+    annotations_list_pl <- 
+    seqlogos_oneplot_pl <- 
+    seqlogos_list_pl <-  
+    stranded_seqlogos_pl <- 
+    per_cl_strand_pl <- 
+        vector("list", length(merged_sample_names))
+
+names(iqw_tpm_pl) <- 
+    names(annotations_oneplot_pl) <- 
+    names(annotations_list_pl) <- 
+    names(seqlogos_list_pl) <- 
+    names(seqlogos_oneplot_pl) <- 
+    names(stranded_seqlogos_pl) <- 
+    names(per_cl_strand_pl) <- 
+        merged_sample_names
+
+
+for(sn in merged_sample_names){
+    
+    ## Adjust the file path as suitable 
+    bed_info_fname <- file.path(proc_data_path, "BED",
+                      paste0(fname_prefix, "_TC_sample_", 
+                             sn, "_SingletonsAbove5.bed"))
+    ##
+    info_df <- read.delim(file = bed_info_fname,
+                        sep = "\t", header = TRUE,
+                        col.names = c("chr", "start", "end", "width", 
+                                      "strand",	"score", "nr_ctss", 
+                                      "dominant_ctss", "domTPM",
+                                      "q_0.1", "q_0.9", 
+                                      "IQW", "tpm"))
+                            
+    
+    ## get clusters ordered by median IQW values
+    seqArchR_clusts_ord[[sn]] <- seqArchRplus::order_clusters_iqw(
+                        sname = sn, clusts = seqArchR_clusts[[sn]],
+                        info_df = info_df, order_by_median = TRUE)
+    ##
+    use_clusts <- seqArchR_clusts_ord[[sn]]
+    ##
+    seqArchRplus::seqs_acgt_image(sname = sn, 
+                    seqs = results[[sn]]$rawSeqs, 
+                    seqs_ord = unlist(use_clusts), 
+                    pos_lab = -45:45, dir_path = use_dir)
+    ##
+    seqArchRplus::write_seqArchR_cluster_track_bed(sname = sn, 
+                                clusts = use_clusts, 
+                                info_df = info_df, 
+                                one_zip_all = TRUE,
+                                org_name = fname_prefix, 
+                                dir_path = use_dir,
+                                include_in_report = FALSE,
+                                strand_sep = FALSE)
+    ##
+    iqw_tpm_pl[[sn]] <- seqArchRplus::iqw_tpm_plots(sname = sn,
+                                dir_path = use_dir,
+                                info_df = info_df,
+                                iqw = TRUE, tpm = TRUE, cons = FALSE,
+                                clusts = use_clusts, 
+                                txt_size = use_txt_size)
+                    
+    
+    annotations_oneplot_pl[[sn]] <- 
+                    seqArchRplus::per_cluster_annotations(
+                            sname = sn,
+                            clusts = use_clusts,
+                            tc_gr = CAGEr::tagClustersGR(cager_obj,
+                                                          sample = sn),
+                            cage_obj = NULL,
+                            qLow = 0.1, qUp = 0.9,
+                            txdb_obj = TxDb.Hvulgare2.MorexV3.gene,
+                            tss_region = c(-500,100),
+                            orgdb_obj = NULL, dir_path = use_dir,
+                            one_plot = TRUE,
+                            txt_size = use_txt_size)
+    
+    annotations_list_pl[[sn]] <- 
+                    seqArchRplus::per_cluster_annotations(
+                            sname = sn,
+                            clusts = use_clusts,
+                            tc_gr = CAGEr::tagClustersGR(cager_obj,
+                                                          sample = sn),
+                            cage_obj = NULL,
+                            qLow = 0.1, qUp = 0.9,
+                            txdb_obj = TxDb.Hvulgare2.MorexV3.gene,
+                            tss_region = c(-500,100),
+                            orgdb_obj = NULL, dir_path = use_dir,
+                            one_plot = FALSE,
+                            txt_size = 12)
+    
+    seqlogos_oneplot_pl[[sn]] <- 
+                    seqArchRplus::per_cluster_seqlogos(
+                            sname = sn,
+                            seqs = results[[sn]]$rawSeqs,
+                            clusts = use_clusts,
+                            pos_lab = -45:45, bits_yax = "max",
+                            strand_sep = FALSE, one_plot = TRUE,
+                            dir_path = use_dir, 
+                            txt_size = use_txt_size)
+    ## for combining later
+    seqlogos_list_pl[[sn]] <- 
+                    seqArchRplus::per_cluster_seqlogos(sname = sn,
+                            seqs = results[[sn]]$rawSeqs,
+                            clusts = use_clusts,
+                            pos_lab = -45:45, bits_yax = "max",
+                            strand_sep = FALSE, one_plot = FALSE,
+                            dir_path = use_dir, 
+                            txt_size = 12)
+
+    stranded_seqlogos_pl[[sn]] <- 
+                    seqArchRplus::per_cluster_seqlogos(sname = sn,
+                            seqs = results[[sn]]$rawSeqs,
+                            clusts = use_clusts,
+                            pos_lab = -45:45, bits_yax = "max",
+                            info_df = info_df,
+                            strand_sep = TRUE, one_plot = FALSE,
+                            dir_path = use_dir, 
+                            txt_size = 12)
+    
+    ## Get larger flank FATSA sequences (larger than those used for seqArchR)
+    fname <- file.path(proc_data_path, "FASTA", 
+                       paste0("Hvulgare_MorexV3_sample_", sn,
+                        "_promoters_SingletonsAbove5.fa"))
+    use_seqs <- Biostrings::readDNAStringSet(filepath = fname, 
+                                format = "FASTA", use.names = TRUE)
+    
+    seqArchRplus::plot_motif_heatmaps(sname = sn, seqs = use_seqs,
+                        flanks = c(50, 100, 200),
+                        clusts = use_clusts,
+                        motifs = c("WW", "SS", "TATAA", "CG", "Y"),
+                        dir_path = use_dir,
+                        fheight = 800, fwidth = 1600)
+    
+    pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")
+    per_cl_strand_pl[[sn]] <- seqArchRplus::per_cluster_strand_dist(sname = sn,
+                                                clusts = use_clusts,
+                                                info_df = info_df,
+                                                dir_path = use_dir,
+                                                colrs = pair_colrs[4:5])
+
+    
+}
+
+
+```
+
+
+
+## Generating all plots at once
+
+You can let seqArchRplus generate all plots using default settings like so.
+
+```{r generate-all-plots, eval=FALSE}
+
+sample_names <- paste0("sample_", 1:3)
+sam <- lapply(sample_names, function(sn){
+    
+    result <- 
+    
+    bed_info_fname <- file.path(proc_data_path, "BED",
+                      paste0(fname_prefix, "_TC_sample_", 
+                             sn, "_SingletonsAbove5.bed"))
+    
+    seqArchRplus::generate_all_plots(sname = sn, 
+                            bed_info_fname = bed_info_fname, 
+                            seqArchR_clusts = use_clusts,
+                            raw_seqs = results,
+                            cager_obj,
+                            tc_gr = NULL,
+                            order_by_iqw = TRUE,
+                            use_median_iqw = TRUE,
+                            iqw = TRUE, tpm = TRUE, cons = FALSE,
+                            pos_lab = NULL,
+                            txdb_obj = NULL,
+                            org_name,
+                            qLow = 0.1, qUp = 0.9,
+                            tss_region = c(-500, 100),
+                            raw_seqs_mh = NULL,
+                            motifs = c("WW", "SS", "TATAA", "CG"),
+                            motif_heatmaps_flanks = c(50, 100, 200),
+                            use_dir,
+                            use_txt_size = 25
+                            )
+})
+
+
+```
+
 
 
 # Conclusion

@@ -58,8 +58,7 @@ to be assigned to those that need re-assignment. In case there is a candidate
 that needs to be put into a new, independent cluster of itself, use
 0 (as numeric). Both `need_change` and `change_to` should be empty lists if
 no re-assignment is to be performed.
-#' TO-DO What if two elements from independent clusters are to
-be put into a totally new cluster, will using 0 work in this case?}
+If any element is to be put into a new cluster, use a numeral 0 in change_to}
 
 \item{final}{Logical, set to TRUE or FALSE}
 
