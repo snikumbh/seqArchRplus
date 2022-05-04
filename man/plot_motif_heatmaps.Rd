@@ -14,7 +14,8 @@ plot_motif_heatmaps(
   dir_path,
   fheight = 500,
   fwidth = 500,
-  funits = "px"
+  funits = "px",
+  n_cores = 1
 )
 }
 \arguments{
@@ -38,7 +39,10 @@ For example, TATAA, CG, WW, SS etc.}
 \item{dir_path}{The path to the directory}
 
 \item{fheight, fwidth, funits}{Height and width of the PDF file, and the units
-in which they are specified.}
+in which they are specified}
+
+\item{n_cores}{Numeric. If you wish to parallelize annotation of peaks,
+specify the number of cores. Default is 1 (serial)}
 }
 \value{
 Nothing. PNG images are written to disk using the provided filenames.

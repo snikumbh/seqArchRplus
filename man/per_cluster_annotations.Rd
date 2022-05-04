@@ -18,7 +18,8 @@ per_cluster_annotations(
   dir_path = NULL,
   txt_size = 12,
   use_suffix = NULL,
-  use_prefix = "C"
+  use_prefix = "C",
+  n_cores = 1
 )
 }
 \arguments{
@@ -51,7 +52,10 @@ single plot}
 \item{txt_size}{Adjust text size for the plots}
 
 \item{use_suffix, use_prefix}{Character. Specify any suffix and/or prefix
-you wish to add to the filename.}
+you wish to add to the filename}
+
+\item{n_cores}{Numeric. If you wish to parallelize annotation of peaks,
+specify the number of cores. Default is 1 (serial)}
 }
 \description{
 per_cluster_annotations

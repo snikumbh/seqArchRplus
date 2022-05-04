@@ -9,6 +9,31 @@
 ## 6. Heatmaps arranged by IQW
 ## 7. Manual curation of clusters
 
+## Handle multicore bpparam object creation using BiocParallel
+##
+.handle_multicore <- function(crs = 1, parallelize = FALSE){
+
+    #### Start cluster only once -- using BiocParallel
+    if(parallelize){
+        if(.Platform$OS.type == "windows"){
+            if (is.null(crs)) crs <- BiocParallel::multicoreWorkers()
+            cl <- BiocParallel::SnowParam(workers = crs, tasks = crs,
+                                          exportglobals = TRUE)
+            # cli::cli_alert_info("Parallelization: Yes")
+        }else{
+            if (is.null(crs)) crs <- BiocParallel::multicoreWorkers()
+            cl <- BiocParallel::MulticoreParam(workers = crs, tasks = crs)
+            # cli::cli_alert_info("Parallelization: Yes")
+        }
+    }else{
+        cl <- BiocParallel::SerialParam()
+        # cli::cli_alert_info("Parallelization: No")
+    }
+    return(cl)
+
+}
+##==============================================================================
+
 ## 1. Files are written to disk
 ## 2. These on-disk files are embedded within the HTML and made available
 ## for download
@@ -553,9 +578,14 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix){
 #' @param dir_path Specify the /path/to/directory to store results
 #' @param txt_size Adjust text size for the plots
 #' @param use_suffix,use_prefix Character. Specify any suffix and/or prefix
-#' you wish to add to the filename.
+#' you wish to add to the filename
+#' @param n_cores Numeric. If you wish to parallelize annotation of peaks,
+#' specify the number of cores. Default is 1 (serial)
 #'
 #' @export
+#'
+#' @importFrom BiocParallel bplapply MulticoreParam SerialParam SnowParam
+#' multicoreWorkers
 #'
 per_cluster_annotations <- function(sname, clusts, tc_gr,
                                     cager_obj = NULL,
@@ -567,10 +597,16 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
                                     one_plot = TRUE,
                                     dir_path = NULL,
                                     txt_size = 12,
-                                    use_suffix = NULL, use_prefix = "C"){
+                                    use_suffix = NULL, use_prefix = "C",
+                                    n_cores = 1){
 
     cli::cli_h1(paste0("All clusters' genomic annotations"))
     cli::cli_h2(paste0("Sample: ", sname))
+    ##
+    parallelize <- FALSE
+    if(n_cores > 1) parallelize <- TRUE
+    bpparam <- .handle_multicore(crs = n_cores, parallelize = parallelize)
+    ##
     result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
     fname <- file.path(result_dir_path, paste0("Clusterwise_annotations.pdf"))
     ##
@@ -596,13 +632,13 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
     }
     stopifnot(!is.null(tc_gr))
 
-    clustwise_anno <- lapply(clusts, function(x){
+    clustwise_anno <- BiocParallel::bplapply(clusts, function(x){
         foo_anno <- ChIPseeker::annotatePeak(tc_gr[x,],
                                              tssRegion=tss_region,
                                              TxDb = txdb_obj,
                                              annoDb = orgdb_obj)
         foo_anno
-    })
+    }, BPPARAM=bpparam)
     names(clustwise_anno) <- seq(1, length(clusts))
 
     colrs <- RColorBrewer::brewer.pal(n = 9, name = "Paired")
@@ -652,13 +688,13 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
         ## return individual plots as a list
         sam_split <- split(sam,  f = factor(sam$clust,
                                            levels = seq_along(clusts)))
-        annobar_list <- lapply(sam_split, function(anno_df){
+        annobar_list <- BiocParallel::bplapply(sam_split, function(anno_df){
             ##
             anno_df$Feature <- factor(anno_df$Feature,
                                       levels = levels(sam$Feature))
             anno_pl <- .get_prop_anno_listplot(anno_df, txt_size = txt_size,
                                               colrs = colrs)
-        })
+        }, BPPARAM=bpparam)
         return(annobar_list)
     }
 
@@ -983,6 +1019,7 @@ per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
                                  strand_sep = FALSE, one_plot = TRUE,
                                  info_df = NULL, txt_size = 12,
                                  save_png = FALSE, dir_path){
+
     if(strand_sep){
         if(is.null(info_df)) stop("`info_df` cannot be NULL when ",
                                   "`strand_sep` is TRUE")
@@ -1075,6 +1112,7 @@ strand_sep_seqlogos <- function(sname, seqs, clusts, info_df, pos_lab,
                                 save_png = FALSE){
     cli::cli_h1(paste0("All clusters' strand-separated sequence logos"))
     cli::cli_h2(paste0("Sample: ", sname))
+    ##
     result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
     ##
 
@@ -1194,7 +1232,10 @@ strand_sep_seqlogos <- function(sname, seqs, clusts, info_df, pos_lab,
 #' @param dir_path The path to the directory
 #'
 #' @param fheight,fwidth,funits Height and width of the PDF file, and the units
-#'  in which they are specified.
+#'  in which they are specified
+#'
+#' @param n_cores Numeric. If you wish to parallelize annotation of peaks,
+#' specify the number of cores. Default is 1 (serial)
 #'
 #'
 #' @return Nothing. PNG images are written to disk using the provided filenames.
@@ -1205,9 +1246,14 @@ strand_sep_seqlogos <- function(sname, seqs, clusts, info_df, pos_lab,
 #'
 plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
                             use_colors = NULL, motifs, dir_path,
-                            fheight = 500, fwidth = 500, funits = "px"){
+                            fheight = 500, fwidth = 500, funits = "px",
+                            n_cores = 1){
     cli::cli_h1(paste0("Motif heatmaps"))
     cli::cli_h2(paste0("Sample: ", sname))
+    ##
+    parallelize <- FALSE
+    if(n_cores > 1) parallelize <- TRUE
+    bpparam <- .handle_multicore(crs = n_cores, parallelize = parallelize)
     ##
     nClust <- length(clusts)
     if(is.null(use_colors)){
@@ -1232,7 +1278,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
         ##
         seq_order <- unlist(clusts)
         #### Using heatmaps pkg
-        patt_hm_list500 <- lapply(motifs,
+        patt_hm_list500 <- BiocParallel::bplapply(motifs,
                           function(x){
                               hm <- heatmaps::PatternHeatmap(
                                   seq = seqs[seq_order],
@@ -1240,7 +1286,8 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
                                   coords = c(-1*fl_up, fl_down),
                                   label = x)
                               shm <- heatmaps::smoothHeatmap(hm, sigma=c(2,2))
-                          }
+                          },
+                          BPPARAM=bpparam
         )
         ##
         fname_suffix <- paste0(paste(fl_up, "up", fl_down, "down",
@@ -1318,7 +1365,7 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
                                     colrs = "Paired"){
     cli::cli_h1(paste0("All clusters' strand distributions"))
     cli::cli_h2(paste0("Sample: ", sname))
-
+    ##
     result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
 
 
@@ -1359,8 +1406,7 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
 
         ## Barplots
         pl <- ggplot(filled_df) +
-            ggplot2::geom_col(aes(x=Chromosomes, y = Frequency, fill = Strand,
-                                  width = 0.5),
+            ggplot2::geom_col(aes(x=Chromosomes, y = Frequency, fill = Strand),
                               position = ggplot2::position_dodge(width = 0.5)) +
             scale_fill_manual(values=colrs) +
             xlab("") +
@@ -1463,7 +1509,7 @@ curate_clusters <- function(sname, use_aggl = "ward.D", use_dist = "euclid",
                             final = FALSE, dir_path){
     cli::cli_h1(paste0("seqArchR result clusters curation"))
     cli::cli_h2(paste0("Sample: ", sname))
-
+    ##
     fname_suffix <- ""
     if(final){
         if(is.null(need_change) || is.null(change_to)){
@@ -1736,7 +1782,8 @@ order_clusters_iqw <- function(sname, clusts, info_df,
         ##
         sam_foo2 <- cowplot::plot_grid(dend_pl2, arch_plot, sam_foo,
                                        ncol = 3,
-                                       rel_widths = c(0.40,1,1), rel_heights = c(1,1,1),
+                                       rel_widths = c(0.40,1,1),
+                                       rel_heights = c(1,1,1),
                                        align = "hv")
         ## pdf
         cowplot::ggsave2(paste0(fname, ".pdf"), plot = sam_foo2,
