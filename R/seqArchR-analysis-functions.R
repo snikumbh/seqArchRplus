@@ -585,7 +585,7 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix){
 #' @export
 #'
 #' @importFrom BiocParallel bplapply MulticoreParam SerialParam SnowParam
-#' multicoreWorkers
+#' multicoreWorkers ipclock ipcunlock ipcremove
 #'
 per_cluster_annotations <- function(sname, clusts, tc_gr,
                                     cager_obj = NULL,
@@ -632,13 +632,18 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
     }
     stopifnot(!is.null(tc_gr))
 
-    clustwise_anno <- BiocParallel::bplapply(clusts, function(x){
+    ## Based on: https://support.bioconductor.org/p/110570/
+    id <- BiocParallel::ipcid()
+    clustwise_anno <- BiocParallel::bplapply(clusts, function(x, id){
+        BiocParallel::ipclock(id)
         foo_anno <- ChIPseeker::annotatePeak(tc_gr[x,],
-                                             tssRegion=tss_region,
+                                             tssRegion = tss_region,
                                              TxDb = txdb_obj,
                                              annoDb = orgdb_obj)
+        BiocParallel::ipcunlock(id)
         foo_anno
-    }, BPPARAM=bpparam)
+    }, id, BPPARAM=bpparam)
+    BiocParallel::ipcremove(id)
     names(clustwise_anno) <- seq(1, length(clusts))
 
     colrs <- RColorBrewer::brewer.pal(n = 9, name = "Paired")
