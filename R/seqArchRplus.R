@@ -33,7 +33,7 @@
 #'
 #'
 #' @docType package
-#' @name seqArchR
+#' @name seqArchRplus
 NULL
 
 

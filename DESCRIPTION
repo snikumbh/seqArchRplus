@@ -9,7 +9,13 @@ Authors@R:
     role = c("aut", "cre", "cph"), 
     comment = c(ORCID = "0000-0003-3163-4447"))
 Description: seqArchRplus enables downstream analyses of promoter sequences 
-    architectures/clusters identified by seqArchR.
+    architectures/clusters identified by seqArchR. Included features are:
+    ordering clusters by their shape (interquantile widths); plot panels showing
+    per cluster shape, TPM and conservation score distributions, sequence 
+    logos, and peak annotations; per cluster chromosome and strand 
+    distributions, motif occurrence heatmaps; writing cluster BED track files 
+    and more. seqArchRplus can also generate HTML reports for easy viewing and 
+    comparison of promoter architectures between samples/stages.
 License: GPL-3 | file LICENSE
 URL: https://snikumbh.github.io/seqArchRplus/,
     https://github.com/snikumbh/seqArchRplus
@@ -17,8 +23,8 @@ BugReports: https://github.com/snikumbh/seqArchRplus/issues
 Depends:
     R (>= 4.1.0), seqArchR
 Imports:
-    CAGEr (>= 2.0.2),
-    graphics,
+    stats,
+    utils,
     ChIPseeker,
     Biostrings,
     BSgenome,
@@ -37,6 +43,7 @@ Imports:
     ggplot2 (>= 3.1.1),
     BiocParallel
 Suggests:
+    CAGEr (>= 2.0.2),
     svglite,
     slickR,
     pdftools,
