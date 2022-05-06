@@ -1,5 +1,5 @@
 ---
-title: "Using seqArchRplus for downstream analyses of promoter sequence architectures"
+title: "Downstream analysis of clusters of promoter sequence architectures with seqArchRplus"
 author: "Sarvesh Nikumbh"
 date: "`r Sys.Date()`"
 package: seqArchRplus
@@ -7,7 +7,7 @@ output:
   BiocStyle::html_document:
       toc: true
 vignette: >
-  %\VignetteIndexEntry{Example usage of _seqArchR_ on simulated DNA sequences}
+  %\VignetteIndexEntry{Downstream analysis of clusters of promoter sequence architectures with seqArchRplus}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -30,7 +30,9 @@ _seqArchRplus_ enables many steps in the downstream analyses of promoter
 sequence architectures. These are:
 
 - Curate the final set of clusters from seqArchR. 
-See the [`seqArchR` vignette](http://bioconductor.org/packages/release/bioc/vignettes/seqArchR/inst/doc/seqArchR.html), or the preprint to understand in detail why this is required 
+See the 
+[`seqArchR` vignette](http://bioconductor.org/packages/release/bioc/vignettes/seqArchR/inst/doc/seqArchR.html)
+, or the preprint to understand in detail why this is required 
 
 - Order the sequence architectures by the interquantile widths (IQWs) of the 
 tag clusters.
@@ -99,13 +101,11 @@ and file a [new issue](https://github.com/snikumbh/seqArchRplus/issues/new).
 
 
 
-# Working with _seqArchRplus_
+# Using seqArchRplus for downstream analysis of promoter sequences
 
 ```{r setup-two, echo=TRUE}
 # Load seqArchRplus
 library(seqArchRplus)
-library(Biostrings, quietly = TRUE)
-
 
 # Set seed for reproducibility
 set.seed(1234)
@@ -120,7 +120,8 @@ processing the CAGE data, and subsequently use seqArchRplus to generate
 the numerous downstream visualisations. To begin with seqArchRplus, 
 you need:
 
-- the CAGEr object or information on the tag clusters from [https://bioconductor.org/packages/release/bioc/html/CAGEr.html](CAGEr), 
+- the CAGEr object or information on the tag clusters from 
+[https://bioconductor.org/packages/release/bioc/html/CAGEr.html](CAGEr), 
 specifically the width of the tag clusters, total TPM value of the cluster + 
 that of the dominant CTSS
 
@@ -132,35 +133,50 @@ that of the dominant CTSS
 Raw clusters from seqArchR result (say, the final iteration) often require 
 curation. 
 
-The seqArchR result does have a final `clustSol` (the clustering solution) where 
-the clusters from the final iteration are collated. 
+The seqArchR result does have a final `clustSol` (the clustering solution) 
+where the clusters from the final iteration are collated. 
 seqArchR uses hierarchical clustering for this purpose. 
 However, hierarchical clustering, with a chosen agglomeration and distance 
 method, does not necessarily output the best suitable collated set of clusters. 
-Therefore, some small amount of manual curation (re-assignments) may be required to reach the 
-ideal collated set of clusters as the final solution. 
+Therefore, some small amount of manual curation (re-assignments) may be 
+required to reach the ideal collated set of clusters as the final solution. 
 This is achieved with the help of the `seqArchRplus::curate_clusters` function.
 
-The basic idea of the curate_clusters function is available in `help(seqArchRplus::curate_clusters)`. 
+The basic idea of the curate_clusters function is available in 
+`help(seqArchRplus::curate_clusters)`. 
 A more elaborate description is as follows.
-It takes as input an agglomeration method and also a distance method (see more arguments in help/documentation).
-On the first call to the function, a PDF file with the associated dendrogram resulting from 
-the hierarchical clustering is shown together with the per cluster sequence logos. 
-This should help in identifying if the chosen agglomeration and distance methods worked well (are clusters with similar sequence logos also together in the dendrogram?).
-If this is satisfactory (chosen agglomeration and distance method have done well already and only few curations will be required),
-count the number of overall clusters that you can visually see. 
-Generally, if (estimated) 3-4 (even 5-6) clusters out of 30-40 require curation, I would consider it as a satisfactory outcome from the hierarchical clustering output.
-Now, in the second call to `curate_clusters`, specify the number of clusters based on your count.
+It takes as input an agglomeration method and also a distance method (see more 
+arguments in help/documentation). 
+On the first call to the function, a PDF file with the associated dendrogram 
+resulting from the hierarchical clustering is shown together with the per 
+cluster sequence logos. 
+This should help in identifying if the chosen agglomeration and distance 
+methods worked well (are clusters with similar sequence logos also together 
+in the dendrogram?).
+If this is satisfactory (chosen agglomeration and distance method have done 
+well already and only few curations will be required), count the number of 
+overall clusters that you can visually see. 
+Generally, if (estimated) 3-4 (even 5-6) clusters out of 30-40 require 
+curation, I would consider it as a satisfactory outcome from the hierarchical 
+clustering output.
+Now, in the second call to `curate_clusters`, specify the number of clusters 
+based on your count.
 View the resulting clustering in the new PDF file produced as output.
-This time the dendrogram shows this clustering with colors and grey-scaled boxes drawn around the clusters.
+This time the dendrogram shows this clustering with colors and grey-scaled 
+boxes drawn around the clusters.
 Now you can exactly note which clusters need curation. 
-Say, sequence clusters 39, 41 and 47 are combined into one, and sequence clusters 36-38 are combined into another cluster. Then, you may want to move sequence cluster 39 to the cluster of 36-38.
+Say, sequence clusters 39, 41 and 47 are combined into one, and sequence 
+clusters 36-38 are combined into another cluster. 
+Then, you may want to move sequence cluster 39 to the cluster of 36-38.
 To do this, set the `need_change` argument of `curate_clusters` to `c(39)` and 
 `change_to` argument to `c(36)`. 
 Any one of the destination cluster members can be specified in `change_to`. 
 Similarly, any other such curations can be added. 
-Specify all such curations together in one go like this: `need_change <- list(c(39), c(24, 27), c(17))` and 
-`change_to <- list(36, 21, 0)` -- sequence cluster 39 is moved to the cluster containing sequence cluster 36, 24and 27 are moved to that of 21 and 17 to a totally new cluster of itself.
+Specify all such curations together in one go like this: 
+`need_change <- list(c(39), c(24, 27), c(17))` and 
+`change_to <- list(36, 21, 0)` -- sequence cluster 39 is moved to the cluster 
+containing sequence cluster 36, 24and 27 are moved to that of 21 and 17 to a 
+totally new cluster of itself.
 
 ```{r curation-example, echo=TRUE, eval=FALSE}
 
@@ -226,7 +242,8 @@ seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(sname = sn,
 
 ## Generating individual plots via individual functions
 
-One can use all the individual functions from seqArchRplus to generate all the plots.
+One can use all the individual functions from seqArchRplus to generate all 
+the plots.
 
 ```{r call-individual-functions, eval=FALSE}
 
