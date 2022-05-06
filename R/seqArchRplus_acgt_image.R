@@ -17,17 +17,19 @@
 #'
 seqs_acgt_image <- function(sname, seqs, seqs_ord, pos_lab, xt_freq = 5,
                             yt_freq = 500, f_height = 1200,
-                            f_width = 600, dir_path){
-
+                            f_width = 600, dir_path) {
     result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
-    fname <- file.path(result_dir_path,
-                       paste0(sname, "_ClusteringImage.png"))
+    fname <- file.path(
+        result_dir_path,
+        paste0(sname, "_ClusteringImage.png")
+    )
     seqArchR::viz_seqs_acgt_mat(as.character(seqs[unlist(seqs_ord)]),
-                                pos_lab = pos_lab,
-                                xt_freq = 5,
-                                yt_freq = 500,
-                                f_height = 1200, f_width = 600,
-                                save_fname = fname,
-                                file_type = "png")
+        pos_lab = pos_lab,
+        xt_freq = 5,
+        yt_freq = 500,
+        f_height = 1200, f_width = 600,
+        save_fname = fname,
+        file_type = "png"
+    )
 }
 ## =============================================================================

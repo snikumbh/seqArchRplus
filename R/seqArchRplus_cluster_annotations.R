@@ -47,13 +47,12 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
                                     dir_path = NULL,
                                     txt_size = 12,
                                     use_suffix = NULL, use_prefix = "C",
-                                    n_cores = 1){
-
+                                    n_cores = 1) {
     cli::cli_h1(paste0("All clusters' genomic annotations"))
     cli::cli_h2(paste0("Sample: ", sname))
     ##
     parallelize <- FALSE
-    if(n_cores > 1) parallelize <- TRUE
+    if (n_cores > 1) parallelize <- TRUE
     bpparam <- .handle_multicore(crs = n_cores, parallelize = parallelize)
     ##
     result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
@@ -86,15 +85,16 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
 
     ## Based on: https://support.bioconductor.org/p/110570/
     id <- BiocParallel::ipcid()
-    clustwise_anno <- BiocParallel::bplapply(clusts, function(x, id){
+    clustwise_anno <- BiocParallel::bplapply(clusts, function(x, id) {
         BiocParallel::ipclock(id)
-        foo_anno <- ChIPseeker::annotatePeak(tc_gr[x,],
-                                             tssRegion = tss_region,
-                                             TxDb = txdb_obj,
-                                             annoDb = orgdb_obj)
+        foo_anno <- ChIPseeker::annotatePeak(tc_gr[x, ],
+            tssRegion = tss_region,
+            TxDb = txdb_obj,
+            annoDb = orgdb_obj
+        )
         BiocParallel::ipcunlock(id)
         foo_anno
-    }, id, BPPARAM=bpparam)
+    }, id, BPPARAM = bpparam)
     BiocParallel::ipcremove(id)
     names(clustwise_anno) <- seq(1, length(clusts))
 
@@ -113,50 +113,64 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
     ## Add a column clust that we need downstream
     sam$clust <- rep(seq_along(df_list), times = per_df_nrows)
 
-    sam <- sam[, c(3,1,2)]
+    sam <- sam[, c(3, 1, 2)]
     rownames(sam) <- seq_len(sum(per_df_nrows))
     ##
 
     sam$Feature <- factor(sam$Feature,
-                    levels = c("Promoter", "5' UTR", "1st Exon", "Other Exon",
-                             "1st Intron", "Other Intron", "Downstream (<=300)",
-                             "3' UTR", "Distal Intergenic"))
+        levels = c(
+            "Promoter", "5' UTR", "1st Exon", "Other Exon",
+            "1st Intron", "Other Intron", "Downstream (<=300)",
+            "3' UTR", "Distal Intergenic"
+        )
+    )
     ##
     names(colrs) <- levels(sam$Feature)
     ##
-    if(one_plot){
+    if (one_plot) {
         ## Solution using custom plotting
-        clustwise_annobar <- .get_prop_anno_oneplot(sam, txt_size = txt_size,
-                                                    colrs = colrs)
+        clustwise_annobar <- .get_prop_anno_oneplot(sam,
+            txt_size = txt_size,
+            colrs = colrs
+        )
 
         ## Put in the cluster names when printing independently
         ind_print_plot <- clustwise_annobar +
-            ggplot2::scale_y_discrete(labels = rev(clust_labels),
-                                      expand = expansion(add = c(0.5, 0.5))) +
-            ggplot2::theme(axis.text.y = element_text(size = txt_size,
-                                                      hjust = 0.85))
+            ggplot2::scale_y_discrete(
+                labels = rev(clust_labels),
+                expand = expansion(add = c(0.5, 0.5))
+            ) +
+            ggplot2::theme(axis.text.y = element_text(
+                size = txt_size,
+                hjust = 0.85
+            ))
         ##
-        ggplot2::ggsave(filename = fname, plot = ind_print_plot,
-                        device = "pdf", width = 15, height = 20, units = "in",
-                        dpi = 300)
+        ggplot2::ggsave(
+            filename = fname, plot = ind_print_plot,
+            device = "pdf", width = 15, height = 20, units = "in",
+            dpi = 300
+        )
 
         return(clustwise_annobar)
-    }else{
+    } else {
         ## return individual plots as a list
-        sam_split <- split(sam,  f = factor(sam$clust,
-                                            levels = seq_along(clusts)))
-        annobar_list <- BiocParallel::bplapply(sam_split, function(anno_df){
+        sam_split <- split(sam, f = factor(sam$clust,
+            levels = seq_along(clusts)
+        ))
+        annobar_list <- BiocParallel::bplapply(sam_split, function(anno_df) {
             ##
             anno_df$Feature <- factor(anno_df$Feature,
-                                      levels = levels(sam$Feature))
-            anno_pl <- .get_prop_anno_listplot(anno_df, txt_size = txt_size,
-                                               colrs = colrs)
-        }, BPPARAM=bpparam)
+                levels = levels(sam$Feature)
+            )
+            anno_pl <- .get_prop_anno_listplot(anno_df,
+                txt_size = txt_size,
+                colrs = colrs
+            )
+        }, BPPARAM = bpparam)
         return(annobar_list)
     }
-
 }
-##==============================================================================
+## =============================================================================
 
 
 ## anno_df holds information on the annoStats from the ChIPSeeker annotatePeak
@@ -164,41 +178,50 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
 ## Expected columns are 'Frequency', 'Feature', 'clust'.
 ##
 ##
-.get_prop_anno_oneplot <- function(anno_df, txt_size, colrs){
-    clustwise_annobar <- ggplot(anno_df,
-                                aes(y = forcats::fct_rev(
-                                    stats::reorder(clust, as.numeric(clust))),
-                                    x = Frequency, fill = Feature)) +
-        geom_bar(stat = "identity", width = 0.6,
-                 position = position_fill(reverse=TRUE)) +
+.get_prop_anno_oneplot <- function(anno_df, txt_size, colrs) {
+    clustwise_annobar <- ggplot(
+        anno_df,
+        aes(
+            y = forcats::fct_rev(
+                stats::reorder(clust, as.numeric(clust))
+            ),
+            x = Frequency, fill = Feature
+        )
+    ) +
+        geom_bar(
+            stat = "identity", width = 0.6,
+            position = position_fill(reverse = TRUE)
+        ) +
         ggplot2::scale_fill_manual(name = "", values = colrs) +
         ggplot2::theme_classic() +
-        ggplot2::theme(axis.text.y = element_blank(),
-                       axis.ticks.length.y.left = unit(0.1, units = "cm"),
-                       axis.ticks.length.x.bottom = unit(0.1, units = "cm"),
-                       axis.text.x.bottom = element_text(size = txt_size),
-                       axis.title.x.bottom = element_text(size = txt_size),
-                       legend.position = "bottom",
-                       legend.text = element_text(size = txt_size)
+        ggplot2::theme(
+            axis.text.y = element_blank(),
+            axis.ticks.length.y.left = unit(0.1, units = "cm"),
+            axis.ticks.length.x.bottom = unit(0.1, units = "cm"),
+            axis.text.x.bottom = element_text(size = txt_size),
+            axis.title.x.bottom = element_text(size = txt_size),
+            legend.position = "bottom",
+            legend.text = element_text(size = txt_size)
         ) +
         ggplot2::scale_y_discrete(expand = expansion(add = c(0.75, 0))) +
         ggplot2::scale_x_continuous(expand = expansion(mult = 0.01)) +
-        ggplot2::guides(fill = guide_legend(ncol = 7, byrow = FALSE
-        )) +
+        ggplot2::guides(fill = guide_legend(ncol = 7, byrow = FALSE)) +
         ggplot2::ylab(NULL) +
         ggplot2::xlab("Percentage (%)")
     ##
     clustwise_annobar
 }
-##==============================================================================
+## =============================================================================
 
 
-.get_prop_anno_listplot <- function(anno_df, txt_size, colrs){
+.get_prop_anno_listplot <- function(anno_df, txt_size, colrs) {
     ##
     pl <- ggplot(anno_df, aes(y = clust, x = Frequency, fill = Feature)) +
         # ggplot2::theme_bw() +
-        ggplot2::geom_bar(stat = "identity", width = 0.9,
-                          position = position_fill(reverse=TRUE)) +
+        ggplot2::geom_bar(
+            stat = "identity", width = 0.9,
+            position = position_fill(reverse = TRUE)
+        ) +
         ggplot2::scale_fill_manual(values = colrs) +
         ggplot2::scale_y_discrete(expand = expansion(add = c(0.1, 0.1))) +
         ggplot2::scale_x_continuous(expand = expansion(mult = 0.05)) +
@@ -213,32 +236,33 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
             legend.text = element_text(size = txt_size),
             legend.title = element_text(size = txt_size),
             legend.position = "bottom",
-            legend.direction = "horizontal") +
-        ggplot2::guides(fill = guide_legend(ncol = 7, byrow = FALSE
-        )) +
+            legend.direction = "horizontal"
+        ) +
+        ggplot2::guides(fill = guide_legend(ncol = 7, byrow = FALSE)) +
         ggplot2::labs(x = "Percentage (%)", y = "Cluster") +
         NULL
     return(pl)
 }
-##==============================================================================
+## =============================================================================
 
 
-.get_fixed_anno_ord <- function(){
-
-    anno_terms_ord <- c("Promoter", "5' UTR", "3' UTR", "1st Exon",
-                        "Other Exon", "1st Intron", "Intron",
-                        "Downstream",
-                        "Distal Intergenic")
+.get_fixed_anno_ord <- function() {
+    anno_terms_ord <- c(
+        "Promoter", "5' UTR", "3' UTR", "1st Exon",
+        "Other Exon", "1st Intron", "Intron",
+        "Downstream",
+        "Distal Intergenic"
+    )
 
     anno_terms_ord
 }
-##==============================================================================
+## =============================================================================
 
 
-.get_named_colors <- function(anno_terms_ord, palname = "Set1"){
-    use_colors <- .get_ncolors(n=length(anno_terms_ord), palname=palname)
-    if(palname=="Set1") use_colors <- use_colors[c(2:length(use_colors),1)]
+.get_named_colors <- function(anno_terms_ord, palname = "Set1") {
+    use_colors <- .get_ncolors(n = length(anno_terms_ord), palname = palname)
+    if (palname == "Set1") use_colors <- use_colors[c(2:length(use_colors), 1)]
     names(use_colors) <- anno_terms_ord
     use_colors
 }
-##==============================================================================
+## =============================================================================

@@ -74,17 +74,25 @@ handle_tc_from_cage <- function(sname, tc_gr, cager_obj, qLow = 0.1, qUp = 0.9,
                                 fl_size_up = 500, fl_size_down = 500,
                                 bsgenome, dir_path = NULL,
                                 fname_prefix = NULL, fname_suffix = NULL,
-                                write_to_disk = TRUE, ret_seqs = TRUE){
+                                write_to_disk = TRUE, ret_seqs = TRUE) {
     cli::cli_h1(paste0("Handling TCs from CAGE (BED and FASTA)"))
     cli::cli_h2(paste0("Sample: ", sname))
 
-    bed_fname <- file.path(dir_path, "BED",
-                           paste0(fname_prefix, "_TC_sample_",
-                                  sname, "_", fname_suffix, ".bed"))
-    fasta_fname <- file.path(dir_path, "FASTA",
-                             paste0(fname_prefix, "_sample_",
-                                    sname, "_promoters_",
-                                    fname_suffix, ".fa"))
+    bed_fname <- file.path(
+        dir_path, "BED",
+        paste0(
+            fname_prefix, "_TC_sample_",
+            sname, "_", fname_suffix, ".bed"
+        )
+    )
+    fasta_fname <- file.path(
+        dir_path, "FASTA",
+        paste0(
+            fname_prefix, "_sample_",
+            sname, "_promoters_",
+            fname_suffix, ".fa"
+        )
+    )
     ##
     this_gr <- .handle_tc_cager(tc_gr, cager_obj, sname, qLow, qUp)
     ##
@@ -97,9 +105,9 @@ handle_tc_from_cage <- function(sname, tc_gr, cager_obj, qLow = 0.1, qUp = 0.9,
     # seqinfo(this_gr)   <- GenomeInfoDb::seqinfo(
     #     CAGEr::CTSStagCountSE(cager_obj))
 
-    if(any("score" == names(S4Vectors::mcols(this_gr)))){
+    if (any("score" == names(S4Vectors::mcols(this_gr)))) {
         this_gr$tpm <- as.numeric(this_gr$score)
-    }else{
+    } else {
         stop("Expecting an mcol named 'score', did not find.")
     }
     this_gr_df <- as.data.frame(this_gr)
@@ -109,39 +117,46 @@ handle_tc_from_cage <- function(sname, tc_gr, cager_obj, qLow = 0.1, qUp = 0.9,
         seqnames = this_gr_df[, "seqnames"],
         ranges = IRanges::IRanges(
             start = this_gr_df[, "dominant_ctss"],
-            width = 1),
-        strand = this_gr_df[,"strand"])
+            width = 1
+        ),
+        strand = this_gr_df[, "strand"]
+    )
 
 
 
     this_prom <- GenomicRanges::promoters(this_gr_domCtss,
-                                          upstream = fl_size_up,
-                                          downstream = fl_size_down+1)
+        upstream = fl_size_up,
+        downstream = fl_size_down + 1
+    )
     this_prom <- GenomicRanges::trim(this_prom, use.names = TRUE)
     cli::cli_alert_success("Making promoters")
 
     ## Exclude indices where the sequences have been trimmed
-    omit_ids <- which(Biostrings::width(this_prom) != ((fl_size_up  +
-                                                            fl_size_down)+1))
+    omit_ids <- which(Biostrings::width(this_prom) != ((fl_size_up +
+        fl_size_down) + 1))
 
     message("Omitted IDs: ", length(omit_ids))
 
-    if(length(omit_ids) > 0){
+    if (length(omit_ids) > 0) {
         this_gr <- this_gr[-omit_ids, ]
         this_prom <- this_prom[-omit_ids]
         this_gr_domCtss <- this_gr_domCtss[-omit_ids]
     }
 
-    if(write_to_disk) .write_tc_bed(this_gr, bed_fname)
+    if (write_to_disk) .write_tc_bed(this_gr, bed_fname)
     cli::cli_alert_success("BED file written")
-    prom_seqs <- .write_tc_fasta(this_prom, bsgenome = bsgenome,
-                                 fasta_fname = fasta_fname,
-                                 ret_val = ret_seqs,
-                                 also_write = write_to_disk)
+    prom_seqs <- .write_tc_fasta(this_prom,
+        bsgenome = bsgenome,
+        fasta_fname = fasta_fname,
+        ret_val = ret_seqs,
+        also_write = write_to_disk
+    )
     cli::cli_alert_success("FASTA file written")
-    if(ret_seqs) return(prom_seqs)
+    if (ret_seqs) {
+        return(prom_seqs)
+    }
 }
-##==============================================================================
+## =============================================================================
 
 ##
 #' @title Write Tag Clusters to a BED file
@@ -156,7 +171,7 @@ handle_tc_from_cage <- function(sname, tc_gr, cager_obj, qLow = 0.1, qUp = 0.9,
 #'
 #' @keywords internal
 #' @noRd
-.write_tc_bed <- function(gr, bed_fname){
+.write_tc_bed <- function(gr, bed_fname) {
     ##
     ## Write regions to BED file
     message("Writing tag cluster coordinates in BED file at: ", bed_fname)
@@ -170,37 +185,42 @@ handle_tc_from_cage <- function(sname, tc_gr, cager_obj, qLow = 0.1, qUp = 0.9,
         sep = "\t",
         col.names = TRUE,
         quote = FALSE,
-        row.names = FALSE)
+        row.names = FALSE
+    )
 }
-##==============================================================================
+## =============================================================================
 
 
 .write_tc_fasta <- function(prom, fl_size_up = 500, fl_size_down = 500,
                             bsgenome, fasta_fname, ret_val = TRUE,
-                            also_write = TRUE){
-
+                            also_write = TRUE) {
     cli::cli_alert_info("Fetching sequences...")
 
-    fasta_names <- paste0("domCTSS=", seqnames(prom), ":",
-                          start(prom), ";strand=",
-                          strand(prom), ";",
-                          "up=", fl_size_up, ";",
-                          "down=", fl_size_down)
+    fasta_names <- paste0(
+        "domCTSS=", seqnames(prom), ":",
+        start(prom), ";strand=",
+        strand(prom), ";",
+        "up=", fl_size_up, ";",
+        "down=", fl_size_down
+    )
 
     prom_seqs <- BSgenome::getSeq(bsgenome,
-                                  names = seqnames(prom),
-                                  start = start(prom),
-                                  end = end(prom),
-                                  strand = strand(prom))
+        names = seqnames(prom),
+        start = start(prom),
+        end = end(prom),
+        strand = strand(prom)
+    )
     names(prom_seqs) <- fasta_names
     ##
-    if(also_write){
+    if (also_write) {
         cli::cli_alert_info(paste0("Writing FASTA file at: ", fasta_fname))
         Biostrings::writeXStringSet(prom_seqs,
-                                    filepath = fasta_fname,
-                                    format = "FASTA")
+            filepath = fasta_fname,
+            format = "FASTA"
+        )
     }
-    if(ret_val) return(prom_seqs)
-
+    if (ret_val) {
+        return(prom_seqs)
+    }
 }
-##==============================================================================
+## =============================================================================

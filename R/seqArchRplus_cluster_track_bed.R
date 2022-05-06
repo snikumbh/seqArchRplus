@@ -55,14 +55,18 @@
 #' @export
 #'
 write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
-                                     one_zip_all = TRUE, org_name = NULL,
-                                     dir_path = NULL, include_in_report = FALSE,
-                                     strand_sep = FALSE){
-    if(include_in_report){
-        if(!requireNamespace("xfun", quietly = TRUE)){
-            stop("Please install R package 'xfun' for ability to ",
-                 "embed downloadable links for cluster BED files ",
-                 "in your report.")
+                                                one_zip_all = TRUE,
+                                                org_name = NULL,
+                                                dir_path = NULL,
+                                                include_in_report = FALSE,
+                                                strand_sep = FALSE) {
+    if (include_in_report) {
+        if (!requireNamespace("xfun", quietly = TRUE)) {
+            stop(
+                "Please install R package 'xfun' for ability to ",
+                "embed downloadable links for cluster BED files ",
+                "in your report."
+            )
         }
     }
 
@@ -71,18 +75,22 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
     result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
     bedFilesPath <- file.path(result_dir_path, "Cluster_BED_tracks")
     stopifnot(.check_and_create_dir(bedFilesPath))
-    cli::cli_alert_info(paste0("Writing cluster BED track files at: ",
-                               bedFilesPath))
+    cli::cli_alert_info(paste0(
+        "Writing cluster BED track files at: ",
+        bedFilesPath
+    ))
 
     ## Write bed to disk -- each cluster in a separate bed file
-    if(include_in_report){
+    if (include_in_report) {
         prefix_str <- "Individual"
-        if(strand_sep) prefix_str <- "Strand-separated individual"
-        cat(paste0("\n\n### ", prefix_str, " cluster track BED files [",
-                   sname, "]\n\n"))
+        if (strand_sep) prefix_str <- "Strand-separated individual"
+        cat(paste0(
+            "\n\n### ", prefix_str, " cluster track BED files [",
+            sname, "]\n\n"
+        ))
     }
 
-    for(lo in seq_along(clusts)){
+    for (lo in seq_along(clusts)) {
         fname_prefix <- paste0(org_name, "_TC_sample_", sname, "_cluster")
         track.name_prefix <- paste(sname, org_name, "clust", sep = "_")
         pos_fname <- paste0(fname_prefix, lo, "_plus_strand.bed")
@@ -92,44 +100,54 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
         bedfname_p <- file.path(bedFilesPath, pos_fname)
         ##
         strands <- c("+", "-", "na")
-        strands <- strands[ifelse(strand_sep, c(1,2), 3)]
-        for(strn in strands){
+        strands <- strands[ifelse(strand_sep, c(1, 2), 3)]
+        for (strn in strands) {
             chosen_idx <- clusts[[lo]]
             bedFilename <- switch(strn,
-                                  "+" = bedfname_p,
-                                  "-" = bedfname_m,
-                                  "na" = bedfname)
+                "+" = bedfname_p,
+                "-" = bedfname_m,
+                "na" = bedfname
+            )
             ##
-            if(strn != "na" && strand_sep){
+            if (strn != "na" && strand_sep) {
                 chosen_idx <- .get_strand_specific_indices(
                     df = info_df,
                     seq_ids_in_cl = clusts[[lo]],
-                    strand_val = strn)
+                    strand_val = strn
+                )
             }
             strand_str <- ""
-            if(strand_sep) strand_str <- paste0("(", strn, "strand)")
+            if (strand_sep) strand_str <- paste0("(", strn, "strand)")
             ## TEST: no records in a cluster, or on one or both strand
-            if(length(chosen_idx) < 1){
-                cli::cli_alert_warning(paste("Cluster ", lo, strand_str,
-                                             ": No records"))
-                if(include_in_report) .write_empty_string()
-            }else{
-                limit_df <- info_df[chosen_idx,]
+            if (length(chosen_idx) < 1) {
+                cli::cli_alert_warning(paste(
+                    "Cluster ", lo, strand_str,
+                    ": No records"
+                ))
+                if (include_in_report) .write_empty_string()
+            } else {
+                limit_df <- info_df[chosen_idx, ]
                 strand_track_str <- ""
-                if(strn != "na"){
+                if (strn != "na") {
                     strand_track_str <- ifelse(strn == "+", "_plus_strand",
-                                               "_negative_strand")
+                        "_negative_strand"
+                    )
                 }
                 track.name <- paste0(track.name_prefix, lo, strand_track_str)
                 .write_as_track_bed(limit_df, chosen_idx,
-                                    track_name = track.name,
-                                    bedFilename = bedFilename)
-                if(include_in_report){
-                    .create_dload_text(embedFile = TRUE,
-                       use_path = bedFilename,
-                       use_text = paste("Download coordinates for cluster",
-                                        lo, strand_str, " as browser track"),
-                       include_in_report = include_in_report)
+                    track_name = track.name,
+                    bedFilename = bedFilename
+                )
+                if (include_in_report) {
+                    .create_dload_text(
+                        embedFile = TRUE,
+                        use_path = bedFilename,
+                        use_text = paste(
+                            "Download coordinates for cluster",
+                            lo, strand_str, " as browser track"
+                        ),
+                        include_in_report = include_in_report
+                    )
                 }
                 ##
             }
@@ -137,15 +155,19 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
     }
     ## This facility to have all files zipped together for download makes sense
     ## , atleast for now, when it is to be included in the report
-    if(one_zip_all && include_in_report){
-        cat(paste0("### All cluster track files (one zipped folder of",
-                   "all BED files)\n\n"))
-        .create_dload_text(embedFile = FALSE, use_path = bedFilesPath,
-                           use_text = "Download all track files (zip)",
-                           include_in_report = include_in_report)
+    if (one_zip_all && include_in_report) {
+        cat(paste0(
+            "### All cluster track files (one zipped folder of",
+            "all BED files)\n\n"
+        ))
+        .create_dload_text(
+            embedFile = FALSE, use_path = bedFilesPath,
+            use_text = "Download all track files (zip)",
+            include_in_report = include_in_report
+        )
     }
 } ## function Ends
-##==============================================================================
+## =============================================================================
 
 
 # @title
@@ -155,60 +177,70 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
 #
 #
 .create_dload_text <- function(embedFile = TRUE, use_path = NULL,
-                               use_text = NULL, include_in_report = TRUE){
-    if(include_in_report){
+                                use_text = NULL, include_in_report = TRUE) {
+    if (include_in_report) {
         dload_this <- xfun::embed_dir(use_path,
-                            text = paste("Download all track files (zip)"))
+            text = paste("Download all track files (zip)")
+        )
 
-        cat(paste0("\n<", dload_this$name,
-                   " href=\"", dload_this$attribs$href,
-                   "\" download=\"", dload_this$attribs$download,
-                   "\">", dload_this$children[[1]][1],
-                   "</a>\n"))
+        cat(paste0(
+            "\n<", dload_this$name,
+            " href=\"", dload_this$attribs$href,
+            "\" download=\"", dload_this$attribs$download,
+            "\">", dload_this$children[[1]][1],
+            "</a>\n"
+        ))
     }
 }
-##==============================================================================
+## =============================================================================
 
 .write_as_track_bed <- function(given_df, seq_ids, track_name, bedFilename,
-                                write_tc_bound = TRUE){
+                                write_tc_bound = TRUE) {
     ##
     old_colnames <- colnames(given_df)
-    if(write_tc_bound){
+    if (write_tc_bound) {
         df_gr <- GenomicRanges::makeGRangesFromDataFrame(given_df,
-                                                     keep.extra.columns = TRUE,
-                                                     seqnames.field = "chr")
+            keep.extra.columns = TRUE,
+            seqnames.field = "chr"
+        )
         ## Because lower and upper boundaries of the quantiles can be anything
         ## as chosen by the user, we should match and find out what columns
         ## are these
         colIdx <- grep("q_", names(S4Vectors::mcols(df_gr)))
         ##
         new_gr <- GenomicRanges::narrow(df_gr,
-                                start = as.integer(mcols(df_gr)[, colIdx[1]]),
-                                end = as.integer(mcols(df_gr)[, colIdx[2]])
+            start = as.integer(mcols(df_gr)[, colIdx[1]]),
+            end = as.integer(mcols(df_gr)[, colIdx[2]])
         )
         ## Check, they should be identical. If not, something is wrong!
         stopifnot(identical(df_gr$IQW, GenomicRanges::width(new_gr)))
         given_df <- as.data.frame(new_gr)
         ## make sure the first colnames is chr and not seqnames
-        if(!identical(colnames(given_df), old_colnames)){
+        if (!identical(colnames(given_df), old_colnames)) {
             colnames(given_df) <- c("chr", old_colnames[-1])
         }
     }
 
     track.description <- track_name
-    write(paste('track name="', track_name,'" description="',
-            track.description,'" visibility="pack"', ' itemRgb="On"', sep = ''),
-          file = bedFilename, append = FALSE)
+    write(paste('track name="', track_name, '" description="',
+        track.description, '" visibility="pack"', ' itemRgb="On"',
+        sep = ""
+    ),
+    file = bedFilename, append = FALSE
+    )
     use_score <- ifelse("phast" %in% colnames(given_df),
-                        given_df$phast, given_df$domTPM)
+        given_df$phast, given_df$domTPM
+    )
     utils::write.table(data.frame(given_df$chr,
-                              formatC(given_df$start, format = 'f', digits = 0),
-                              formatC(given_df$end, format = 'f', digits = 0),
-                              seq_ids,
-                              score = use_score,
-                              given_df$strand),
+        formatC(given_df$start, format = "f", digits = 0),
+        formatC(given_df$end, format = "f", digits = 0),
+        seq_ids,
+        score = use_score,
+        given_df$strand
+    ),
     file = bedFilename,
     append = TRUE, col.names = FALSE, row.names = FALSE,
-    quote = FALSE, sep = '\t')
+    quote = FALSE, sep = "\t"
+    )
 }
 ## =============================================================================

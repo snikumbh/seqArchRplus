@@ -18,21 +18,25 @@
 #' @export
 #'
 per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
-                                    colrs = "Paired"){
+                                    colrs = "Paired") {
     cli::cli_h1(paste0("All clusters' strand distributions"))
     cli::cli_h2(paste0("Sample: ", sname))
     ##
     result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
 
 
-    fname <- file.path(result_dir_path,
-                       paste0("Per_cluster_strand_distributions.pdf"))
+    fname <- file.path(
+        result_dir_path,
+        paste0("Per_cluster_strand_distributions.pdf")
+    )
 
     chr_set <- unique(info_df$chr)
     nChr <- length(chr_set)
-    empty_df <- data.frame("Chromosomes" = rep(chr_set, each=2),
-                           "Strand" = rep(c("-", "+"), times = nChr),
-                           "Frequency" = rep(0, times = nChr))
+    empty_df <- data.frame(
+        "Chromosomes" = rep(chr_set, each = 2),
+        "Strand" = rep(c("-", "+"), times = nChr),
+        "Frequency" = rep(0, times = nChr)
+    )
     ## Using 'times' instead of 'each' for Strand column and
     ## 'each' instead of 'times in Chromosomes column
     ## in empty_df makes
@@ -44,9 +48,11 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
     # ##
     chrStr <- paste0(empty_df$Chromosomes, empty_df$Strand)
 
-    plot_list <- lapply(seq_along(clusts), function(x){
-        df_strand <- data.frame("chr" = info_df$chr[ clusts[[x]] ],
-                                "strand" = info_df$strand[ clusts[[x]] ] )
+    plot_list <- lapply(seq_along(clusts), function(x) {
+        df_strand <- data.frame(
+            "chr" = info_df$chr[clusts[[x]]],
+            "strand" = info_df$strand[clusts[[x]]]
+        )
         df_strand_tab <- table(df_strand)
         df_strand_df <- data.frame(df_strand_tab)
         RchrStr <- paste0(df_strand_df$chr, df_strand_df$strand)
@@ -54,7 +60,7 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
         filled_df <- empty_df
 
         filled_df$chrStr <- chrStr
-        fill_idx <- unlist(lapply(RchrStr, function(a){
+        fill_idx <- unlist(lapply(RchrStr, function(a) {
             which(filled_df$chrStr == a)
         }))
 
@@ -62,22 +68,30 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
 
         ## Barplots
         pl <- ggplot(filled_df) +
-            ggplot2::geom_col(aes(x=Chromosomes, y = Frequency, fill = Strand),
-                              position = ggplot2::position_dodge(width = 0.5)) +
-            scale_fill_manual(values=colrs) +
+            ggplot2::geom_col(aes(
+                x = Chromosomes, y = Frequency,
+                fill = Strand
+            ),
+            position = ggplot2::position_dodge(width = 0.5)
+            ) +
+            scale_fill_manual(values = colrs) +
             xlab("") +
-            ggtitle(label = .get_strand_plot_title(this_id = x,
-                                                   nclust = length(clusts),
-                                                   tot_n = length(clusts[[x]]),
-                                                   strand_val = NULL)) +
+            ggtitle(label = .get_strand_plot_title(
+                this_id = x,
+                nclust = length(clusts),
+                tot_n = length(clusts[[x]]),
+                strand_val = NULL
+            )) +
             theme_classic() +
-            theme(legend.text = element_text(size = 12, face = "plain",
-                                             color = "black"),
-                  legend.position = "right",
-                  panel.grid.major.y = element_line()
+            theme(
+                legend.text = element_text(
+                    size = 12, face = "plain",
+                    color = "black"
+                ),
+                legend.position = "right",
+                panel.grid.major.y = element_line()
             )
         return(pl)
-
     })
     grDevices::pdf(file = fname, width = 20, height = 2, onefile = TRUE)
     lapply(plot_list, print)

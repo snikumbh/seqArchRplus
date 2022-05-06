@@ -100,22 +100,22 @@
 #'
 #'
 generate_all_plots <- function(sname, bed_info_fname, seqArchR_clusts,
-                               raw_seqs,
-                               cager_obj,
-                               tc_gr = NULL,
-                               order_by_iqw = TRUE,
-                               use_median_iqw = TRUE,
-                               iqw = TRUE, tpm = TRUE, cons = FALSE,
-                               pos_lab = NULL,
-                               txdb_obj = NULL,
-                               org_name,
-                               qLow = 0.1, qUp = 0.9,
-                               tss_region = c(-500, 100),
-                               raw_seqs_mh = NULL,
-                               motifs = c("WW", "SS", "TATAA", "CG"),
-                               motif_heatmaps_flanks = c(50, 100, 200),
-                               dir_path,
-                               txt_size = 25){
+                                raw_seqs,
+                                cager_obj,
+                                tc_gr = NULL,
+                                order_by_iqw = TRUE,
+                                use_median_iqw = TRUE,
+                                iqw = TRUE, tpm = TRUE, cons = FALSE,
+                                pos_lab = NULL,
+                                txdb_obj = NULL,
+                                org_name,
+                                qLow = 0.1, qUp = 0.9,
+                                tss_region = c(-500, 100),
+                                raw_seqs_mh = NULL,
+                                motifs = c("WW", "SS", "TATAA", "CG"),
+                                motif_heatmaps_flanks = c(50, 100, 200),
+                                dir_path,
+                                txt_size = 25) {
     iqw_tpm_pl <-
         annotations_oneplot_pl <-
         annotations_list_pl <-
@@ -124,52 +124,64 @@ generate_all_plots <- function(sname, bed_info_fname, seqArchR_clusts,
         stranded_seqlogos_pl <-
         per_cl_strand_pl <- NULL
     ##
-    if(is.null(tc_gr)){
+    if (is.null(tc_gr)) {
         tc_gr <- CAGEr::tagClustersGR(cager_obj, sample = sname)
     }
     ##
-    if(is.null(raw_seqs_mh))
+    if (is.null(raw_seqs_mh)) {
         raw_seqs_mh <- raw_seqs
+    }
     ##
-    info_df <- utils::read.delim(file = bed_info_fname,
-                                 sep = "\t", header = TRUE,
-                                 col.names = c("chr", "start", "end", "width",
-                                               "strand", "score", "nr_ctss",
-                                               "dominant_ctss", "domTPM",
-                                               paste0("q_", c(qLow, qUp)),
-                                               # "q_0.1", "q_0.9",
-                                               "IQW", "tpm"))
+    info_df <- utils::read.delim(
+        file = bed_info_fname,
+        sep = "\t", header = TRUE,
+        col.names = c(
+            "chr", "start", "end", "width",
+            "strand", "score", "nr_ctss",
+            "dominant_ctss", "domTPM",
+            paste0("q_", c(qLow, qUp)),
+            # "q_0.1", "q_0.9",
+            "IQW", "tpm"
+        )
+    )
     ##
     seqArchR_clusts_ord <- seqArchR_clusts
-    if(order_by_iqw){
+    if (order_by_iqw) {
         ## get clusters ordered by median IQW values
         seqArchR_clusts_ord <- order_clusters_iqw(
             sname = sname, clusts = seqArchR_clusts,
-            info_df = info_df, order_by_median = TRUE)
+            info_df = info_df, order_by_median = TRUE
+        )
     }
     ##
     use_clusts <- seqArchR_clusts_ord
     ##
-    seqs_acgt_image(sname = sname,
-                    seqs = raw_seqs,
-                    seqs_ord = unlist(use_clusts),
-                    pos_lab = pos_lab, dir_path = dir_path)
+    seqs_acgt_image(
+        sname = sname,
+        seqs = raw_seqs,
+        seqs_ord = unlist(use_clusts),
+        pos_lab = pos_lab, dir_path = dir_path
+    )
     ##
-    write_seqArchR_cluster_track_bed(sname = sname,
-                                     clusts = use_clusts,
-                                     info_df = info_df,
-                                     one_zip_all = TRUE,
-                                     org_name = org_name,
-                                     dir_path = dir_path,
-                                     include_in_report = FALSE,
-                                     strand_sep = FALSE)
+    write_seqArchR_cluster_track_bed(
+        sname = sname,
+        clusts = use_clusts,
+        info_df = info_df,
+        one_zip_all = TRUE,
+        org_name = org_name,
+        dir_path = dir_path,
+        include_in_report = FALSE,
+        strand_sep = FALSE
+    )
     ##
-    iqw_tpm_pl <- iqw_tpm_plots(sname = sname,
-                                dir_path = dir_path,
-                                info_df = info_df,
-                                iqw = iqw, tpm = tpm, cons = cons,
-                                clusts = use_clusts,
-                                txt_size = txt_size)
+    iqw_tpm_pl <- iqw_tpm_plots(
+        sname = sname,
+        dir_path = dir_path,
+        info_df = info_df,
+        iqw = iqw, tpm = tpm, cons = cons,
+        clusts = use_clusts,
+        txt_size = txt_size
+    )
 
     annotations_oneplot_pl <- per_cluster_annotations(
         sname = sname,
@@ -180,7 +192,8 @@ generate_all_plots <- function(sname, bed_info_fname, seqArchR_clusts,
         txdb_obj = txdb_obj,
         tss_region = tss_region,
         orgdb_obj = NULL, dir_path = dir_path,
-        one_plot = TRUE, txt_size = txt_size)
+        one_plot = TRUE, txt_size = txt_size
+    )
 
     annotations_list_pl <-
         per_cluster_annotations(
@@ -193,58 +206,70 @@ generate_all_plots <- function(sname, bed_info_fname, seqArchR_clusts,
             tss_region = tss_region,
             orgdb_obj = NULL, dir_path = dir_path,
             one_plot = FALSE,
-            txt_size = 12)
+            txt_size = 12
+        )
 
     seqlogos_oneplot_pl <-
-        per_cluster_seqlogos(sname = sname,
-                             seqs = raw_seqs,
-                             clusts = use_clusts,
-                             pos_lab = pos_lab, bits_yax = "max",
-                             strand_sep = FALSE, one_plot = TRUE,
-                             dir_path = dir_path,
-                             txt_size = txt_size)
+        per_cluster_seqlogos(
+            sname = sname,
+            seqs = raw_seqs,
+            clusts = use_clusts,
+            pos_lab = pos_lab, bits_yax = "max",
+            strand_sep = FALSE, one_plot = TRUE,
+            dir_path = dir_path,
+            txt_size = txt_size
+        )
     ## for combining later
     seqlogos_list_pl <-
-        per_cluster_seqlogos(sname = sname,
-                             seqs = raw_seqs,
-                             clusts = use_clusts,
-                             pos_lab = pos_lab, bits_yax = "max",
-                             strand_sep = FALSE, one_plot = FALSE,
-                             dir_path = dir_path,
-                             txt_size = 12)
+        per_cluster_seqlogos(
+            sname = sname,
+            seqs = raw_seqs,
+            clusts = use_clusts,
+            pos_lab = pos_lab, bits_yax = "max",
+            strand_sep = FALSE, one_plot = FALSE,
+            dir_path = dir_path,
+            txt_size = 12
+        )
 
     stranded_seqlogos_pl <-
-        per_cluster_seqlogos(sname = sname,
-                             seqs = raw_seqs,
-                             clusts = use_clusts,
-                             pos_lab = pos_lab,
-                             bits_yax = "max",
-                             info_df = info_df,
-                             strand_sep = TRUE, one_plot = FALSE,
-                             dir_path = dir_path,
-                             txt_size = 12)
+        per_cluster_seqlogos(
+            sname = sname,
+            seqs = raw_seqs,
+            clusts = use_clusts,
+            pos_lab = pos_lab,
+            bits_yax = "max",
+            info_df = info_df,
+            strand_sep = TRUE, one_plot = FALSE,
+            dir_path = dir_path,
+            txt_size = 12
+        )
 
-    plot_motif_heatmaps(sname = sname, seqs = raw_seqs_mh,
-                        flanks = motif_heatmaps_flanks,
-                        clusts = use_clusts,
-                        motifs =  motifs,
-                        dir_path = dir_path,
-                        fheight = 800, fwidth = 1600)
-
-    pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")
-    per_cl_strand_pl <- per_cluster_strand_dist(sname = sname,
-                                                clusts = use_clusts,
-                                                info_df = info_df,
-                                                dir_path = dir_path,
-                                                colrs = pair_colrs[4:5])
-
-    return(list(iqw_tpm_pl,
-                annotations_oneplot_pl,
-                annotations_list_pl,
-                seqlogos_oneplot_pl,
-                seqlogos_list_pl,
-                stranded_seqlogos_pl,
-                per_cl_strand_pl)
+    plot_motif_heatmaps(
+        sname = sname, seqs = raw_seqs_mh,
+        flanks = motif_heatmaps_flanks,
+        clusts = use_clusts,
+        motifs = motifs,
+        dir_path = dir_path,
+        fheight = 800, fwidth = 1600
     )
 
+    pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")
+    per_cl_strand_pl <- per_cluster_strand_dist(
+        sname = sname,
+        clusts = use_clusts,
+        info_df = info_df,
+        dir_path = dir_path,
+        colrs = pair_colrs[4:5]
+    )
+
+    return(list(
+        iqw_tpm_pl,
+        annotations_oneplot_pl,
+        annotations_list_pl,
+        seqlogos_oneplot_pl,
+        seqlogos_list_pl,
+        stranded_seqlogos_pl,
+        per_cl_strand_pl
+    ))
 }
+## =============================================================================
