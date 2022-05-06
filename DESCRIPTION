@@ -1,72 +1,69 @@
 Type: Package
 Package: seqArchRplus
-Title: Downstream analyses of promoter sequence architectures and HTML report 
-    generation
+Title: Downstream analyses of promoter sequence architectures and HTML
+    report generation
 Version: 0.99.0.2
 Authors@R: 
-    person("Sarvesh", "Nikumbh", 
-    email = "sarvesh.nikumbh@gmail.com", 
-    role = c("aut", "cre", "cph"), 
+    person("Sarvesh", "Nikumbh", , "sarvesh.nikumbh@gmail.com", 
+    role = c("aut", "cre", "cph"),
     comment = c(ORCID = "0000-0003-3163-4447"))
-Description: seqArchRplus enables downstream analyses of promoter sequences 
-    architectures/clusters identified by seqArchR. Included features are:
-    ordering clusters by their shape (interquantile widths); plot panels showing
-    per cluster shape, TPM and conservation score distributions, sequence 
-    logos, and peak annotations; per cluster chromosome and strand 
-    distributions, motif occurrence heatmaps; writing cluster BED track files 
-    and more. seqArchRplus can also generate HTML reports for easy viewing and 
-    comparison of promoter architectures between samples/stages.
+Description: seqArchRplus enables downstream analyses of promoter
+    sequences architectures/clusters identified by seqArchR. With additional 
+    available information such as the TPM values and interquantile widths 
+    (IQWs) of the CAGE tag clusters, seqArchRplus can order the sequence 
+    clusters from seqArchR by their shape (IQWs), and write the cluster 
+    information as browser/IGV track files. Provided visualizations are of two 
+    kind: per sample/stage and per cluster visualizations. Those of the
+    first kind include: plot panels for each sample showing per cluster shape, 
+    TPM and conservation score distributions, sequence logos, and peak 
+    annotations. The second include per cluster chromosome and strand 
+    distributions, motif occurrence heatmaps and GO term enrichments. 
+    Additionally, seqArchRplus can also generate HTML reports for easy viewing 
+    and comparison of promoter architectures between samples/stages.
 License: GPL-3 | file LICENSE
 URL: https://snikumbh.github.io/seqArchRplus/,
     https://github.com/snikumbh/seqArchRplus
 BugReports: https://github.com/snikumbh/seqArchRplus/issues
 Depends:
-    R (>= 4.1.0), seqArchR
+    R (>= 4.1.0),
+    seqArchR
 Imports:
-    stats,
-    utils,
-    ChIPseeker,
+    BiocParallel,
     Biostrings,
     BSgenome,
-    IRanges,
-    GenomicRanges,
-    S4Vectors,
-    GenomeInfoDb,
-    forcats, 
-    cowplot,
+    ChIPseeker,
     cli,
-    RColorBrewer,
-    heatmaps, 
-    scales,
+    cowplot,
     factoextra,
-    grDevices,
+    forcats,
+    GenomeInfoDb,
+    GenomicRanges,
     ggplot2 (>= 3.1.1),
-    BiocParallel
+    grDevices,
+    heatmaps,
+    IRanges,
+    RColorBrewer,
+    S4Vectors,
+    scales,
+    stats,
+    utils
 Suggests:
-    CAGEr (>= 2.0.2),
-    svglite,
-    slickR,
-    pdftools,
-    xfun,
     BiocStyle,
-    knitr (>= 1.22),
-    rmarkdown (>= 1.12),
-    testthat (>= 3.0.2),
+    CAGEr (>= 2.0.2),
     covr,
-    vdiffr (>= 0.3.0)
+    knitr (>= 1.22),
+    pdftools,
+    rmarkdown (>= 1.12),
+    slickR,
+    svglite,
+    testthat (>= 3.0.2),
+    vdiffr (>= 0.3.0),
+    xfun
 VignetteBuilder: 
     knitr
-biocViews: 
-    MotifDiscovery, 
-    GeneRegulation, 
-    MathematicalBiology, 
-    SystemsBiology,
-    Transcriptomics,
-    Genetics,
-    Clustering,
-    DimensionReduction,
-    FeatureExtraction,
-    DNASeq
+biocViews: MotifDiscovery, GeneRegulation, MathematicalBiology,
+    SystemsBiology, Transcriptomics, Genetics, Clustering,
+    DimensionReduction, FeatureExtraction, DNASeq
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.1.2
