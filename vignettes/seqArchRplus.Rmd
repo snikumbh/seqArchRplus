@@ -173,7 +173,7 @@ Similarly, any other such curations can be added.
 Specify all such curations together in one go like this: 
 `need_change <- list(c(39), c(24, 27), c(17))` and 
 `change_to <- list(36, 21, 0)` -- sequence cluster 39 is moved to the cluster 
-containing sequence cluster 36, 24and 27 are moved to that of 21 and 17 to a 
+containing sequence cluster 36, 24 and 27 are moved to that of 21 and 17 to a 
 totally new cluster of itself.
 
 ```{r curation-example, echo=TRUE, eval=FALSE}
@@ -243,7 +243,7 @@ seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(
 One can use all the individual functions from seqArchRplus to generate all 
 the plots.
 
-```{r call-individual-functions, eval=FALSE}
+```{r call-individual-functions, eval=FALSE, attr.source='.numberLines'}
 
 
 
@@ -428,6 +428,19 @@ for (sn in merged_sample_names) {
     )
 }
 ```
+
+### Some additional notes
+
+You may notice that the functions used in the above code block for generating 
+individual plots take as input a cluster list. 
+Here, we used the clusters upon first ordering them by their shape/IQWs (see 
+how we define `use_clusts <- seqArchR_clusts_ord[[sn]]`, and then pass 
+`use_clusts` to all functions.
+Depending upon the use case, one may use arbitrarily ordered (any other order) 
+clusters here. 
+One can use these to look at their annotations, and if some clusters happen to 
+to occur predominantly in 5' UTR or 3' UTR or exons or introns etc., such 
+clusters can be sequestered from further downstream analyses.
 
 
 

@@ -184,14 +184,15 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix) {
                 cager_obj = cager_obj, sname = sname,
                 qLow = qLow, qUp = qUp
             )
+            seqlevels(tc_gr) <- GenomeInfoDb::seqlevels(
+                CAGEr::CTSStagCountSE(cager_obj)
+            )
+            seqinfo(tc_gr) <- GenomeInfoDb::seqinfo(
+                CAGEr::CTSStagCountSE(cager_obj)
+            )
         }
     }
-    seqlevels(tc_gr) <- GenomeInfoDb::seqlevels(
-        CAGEr::CTSStagCountSE(cager_obj)
-    )
-    seqinfo(tc_gr) <- GenomeInfoDb::seqinfo(
-        CAGEr::CTSStagCountSE(cager_obj)
-    )
+
     tc_gr
 }
 ## =============================================================================
