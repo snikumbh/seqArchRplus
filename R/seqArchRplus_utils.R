@@ -165,7 +165,7 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix) {
 ## =============================================================================
 
 
-.handle_tc_cager <- function(tc_gr, cager_obj = NULL, sname,
+.handle_tc_cager <- function(tc_gr = NULL, cager_obj = NULL, sname,
                                 qLow = 0.1, qUp = 0.9) {
     if (is.null(tc_gr)) {
         if (is.null(cager_obj)) {
