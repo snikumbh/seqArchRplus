@@ -6,7 +6,7 @@
 #' @param clusts List of sequence ids in each cluster.
 #' @param tc_gr Tag clusters as \code{\link[GenomicRanges]{GRanges}}. If
 #' `cager_obj` is not provided (is NULL), this argument is required.
-#' It will be ignored only if cager_obj is provided.
+#' It will be ignored only if cager_obj is provided. Default is NULL
 #' @param cager_obj A CAGEexp object obtained from the CAGEr package, if and
 #' when CAGEr was used to process the raw CAGE data
 #' @param qLow,qUp The interquantile boundaries to be considered for obtaining
@@ -20,7 +20,7 @@
 #' @param dir_path Specify the /path/to/directory to store results
 #' @param txt_size Adjust text size for the plots
 #' @param use_suffix,use_prefix Character. Specify any suffix and/or prefix
-#' you wish to add to the filename
+#' you wish to add to the cluster labels
 #' @param n_cores Numeric. If you wish to parallelize annotation of peaks,
 #' specify the number of cores. Default is 1 (serial)
 #'
@@ -36,7 +36,7 @@
 #' @importFrom BiocParallel bplapply MulticoreParam SerialParam SnowParam
 #' multicoreWorkers ipclock ipcunlock ipcremove
 #'
-per_cluster_annotations <- function(sname, clusts, tc_gr,
+per_cluster_annotations <- function(sname, clusts, tc_gr = NULL,
                                     cager_obj = NULL,
                                     qLow = 0.1,
                                     qUp = 0.9,
@@ -48,54 +48,56 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
                                     txt_size = 12,
                                     use_suffix = NULL, use_prefix = "C",
                                     n_cores = 1) {
+    message("SAMARTH--------")
     cli::cli_h1(paste0("All clusters' genomic annotations"))
     cli::cli_h2(paste0("Sample: ", sname))
+    ## Check all needed arguments supplied
+    tc_gr <- .handle_tc_cager(tc_gr, cager_obj, sname, qLow, qUp)
+    stopifnot(!is.null(tc_gr))
+    ## clusts should be a list
+    if(!is.list(clusts)) clusts <- list(clusts)
+    ## as many records in tc_gr as number of sequence IDs in clusts
+    if(length(tc_gr) != sum(lengths(clusts))){
+        stop("Nb. of records in `tc_gr` should match the nb. of sequence IDs
+            in `clusts`")
+    }
     ##
     parallelize <- FALSE
     if (n_cores > 1) parallelize <- TRUE
-    bpparam <- .handle_multicore(crs = n_cores, parallelize = parallelize)
+    if(parallelize)
+        bpparam <- .handle_multicore(crs = n_cores, parallelize = parallelize)
     ##
     result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
     fname <- file.path(result_dir_path, paste0("Clusterwise_annotations.pdf"))
     ##
-    # clust_labs <- unlist(lapply(seq_along(clusts),
-    #                       function(x){
-    #                           paste0(x, "_(n=", length(clusts[[x]]), ")")
-    #                       }))
     clust_labels <- make_cluster_labels(clust = clusts, use_prefix, use_suffix)
-    tc_gr <- .handle_tc_cager(tc_gr, cager_obj, sname, qLow, qUp)
-    # if(is.null(tc_gr)){
-    #     if(is.null(cager_obj)){
-    #         stop("`tc_gr` is NULL, did you forgot to supply the `cager_obj`?",
-    #              "Please also specify `qLow` and `qUp` with the `cager_obj`")
-    #     }else{
-    #         if(!requireNamespace("CAGEr", quietly = TRUE)){
-    #             stop("Please install R package 'CAGEr' to automatically ",
-    #                  "extract CAGE tag clusters.")
-    #         }
-    #         any_null <- any(unlist(lapply(list(qLow, qUp), is.null)))
-    #         if(any_null) stop("Please specify both `qLow` and `qUp`.")
-    #         message("Using qLow = ", qLow, " and qUp = ", qUp)
-    #         tc_gr <- CAGEr::tagClustersGR(cager_obj, sample = sname,
-    #                                       returnInterquantileWidth = TRUE,
-    #                                       qLow = qLow, qUp = qUp)
-    #     }
-    # }
-    stopifnot(!is.null(tc_gr))
 
+
+    ## Using BiocParallel
     ## Based on: https://support.bioconductor.org/p/110570/
-    id <- BiocParallel::ipcid()
-    clustwise_anno <- BiocParallel::bplapply(clusts, function(x, id) {
-        BiocParallel::ipclock(id)
+    # id <- BiocParallel::ipcid()
+    # clustwise_anno <- BiocParallel::bplapply(clusts, function(x, id) {
+    #     BiocParallel::ipclock(id)
+    #     foo_anno <- ChIPseeker::annotatePeak(tc_gr[x, ],
+    #         tssRegion = tss_region,
+    #         TxDb = txdb_obj,
+    #         annoDb = orgdb_obj
+    #     )
+    #     BiocParallel::ipcunlock(id)
+    #     foo_anno
+    # }, id, BPPARAM = bpparam)
+    # BiocParallel::ipcremove(id)
+
+    ## Without BiocParallel
+    clustwise_anno <- lapply(clusts, function(x) {
         foo_anno <- ChIPseeker::annotatePeak(tc_gr[x, ],
             tssRegion = tss_region,
             TxDb = txdb_obj,
             annoDb = orgdb_obj
         )
-        BiocParallel::ipcunlock(id)
         foo_anno
-    }, id, BPPARAM = bpparam)
-    BiocParallel::ipcremove(id)
+    })
+
     names(clustwise_anno) <- seq(1, length(clusts))
 
     colrs <- RColorBrewer::brewer.pal(n = 9, name = "Paired")
@@ -107,7 +109,7 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
 
     ## without dplyr?
     df_list <- lapply(clustwise_anno, function(x) x@annoStat)
-    # print(df_list)
+
     sam <- do.call("rbind", df_list)
     per_df_nrows <- unlist(lapply(df_list, nrow))
     ## Add a column clust that we need downstream
@@ -157,7 +159,21 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
         sam_split <- split(sam, f = factor(sam$clust,
             levels = seq_along(clusts)
         ))
-        annobar_list <- BiocParallel::bplapply(sam_split, function(anno_df) {
+
+        ## Using BiocParallel
+        # annobar_list <- BiocParallel::bplapply(sam_split, function(anno_df) {
+        #     ##
+        #     anno_df$Feature <- factor(anno_df$Feature,
+        #         levels = levels(sam$Feature)
+        #     )
+        #     anno_pl <- .get_prop_anno_listplot(anno_df,
+        #         txt_size = txt_size,
+        #         colrs = colrs
+        #     )
+        # }, BPPARAM = bpparam)
+
+        ## Without BiocParallel
+        annobar_list <- lapply(sam_split, function(anno_df) {
             ##
             anno_df$Feature <- factor(anno_df$Feature,
                 levels = levels(sam$Feature)
@@ -166,7 +182,8 @@ per_cluster_annotations <- function(sname, clusts, tc_gr,
                 txt_size = txt_size,
                 colrs = colrs
             )
-        }, BPPARAM = bpparam)
+        })
+
         return(annobar_list)
     }
 }

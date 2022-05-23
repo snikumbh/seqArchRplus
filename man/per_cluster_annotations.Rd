@@ -7,7 +7,7 @@
 per_cluster_annotations(
   sname,
   clusts,
-  tc_gr,
+  tc_gr = NULL,
   cager_obj = NULL,
   qLow = 0.1,
   qUp = 0.9,
@@ -29,7 +29,7 @@ per_cluster_annotations(
 
 \item{tc_gr}{Tag clusters as \code{\link[GenomicRanges]{GRanges}}. If
 `cager_obj` is not provided (is NULL), this argument is required.
-It will be ignored only if cager_obj is provided.}
+It will be ignored only if cager_obj is provided. Default is NULL}
 
 \item{cager_obj}{A CAGEexp object obtained from the CAGEr package, if and
 when CAGEr was used to process the raw CAGE data}
@@ -52,7 +52,7 @@ single plot}
 \item{txt_size}{Adjust text size for the plots}
 
 \item{use_suffix, use_prefix}{Character. Specify any suffix and/or prefix
-you wish to add to the filename}
+you wish to add to the cluster labels}
 
 \item{n_cores}{Numeric. If you wish to parallelize annotation of peaks,
 specify the number of cores. Default is 1 (serial)}
