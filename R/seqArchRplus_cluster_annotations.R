@@ -3,9 +3,9 @@
 #' @title per_cluster_annotations
 #'
 #' @param sname Sample name
-#' @param clusts List of sequence ids in each cluster.
+#' @param clusts List of sequence IDs in each cluster.
 #' @param tc_gr Tag clusters as \code{\link[GenomicRanges]{GRanges}}. If
-#' `cager_obj` is not provided (is NULL), this argument is required.
+#' `cager_obj` is not provided (i.e., it is NULL), this argument is required.
 #' It will be ignored only if cager_obj is provided. Default is NULL
 #' @param cager_obj A CAGEexp object obtained from the CAGEr package, if and
 #' when CAGEr was used to process the raw CAGE data
@@ -25,6 +25,15 @@
 #' specify the number of cores. Default is 1 (serial)
 #'
 #' @export
+#'
+#' @details
+#' When annotations for only selected promoter clusters are required, alter
+#' the `clusts` argument to specify only those selected clusters. Because
+#' the `clusts` list holds the IDs of sequences belonging to each cluster, the
+#' corresponding records are selected from the `tc_gr` GRanges object. This
+#' approach requires that sequence IDs in `clusts` match the records in `tc_gr`.
+#' In other words, if sequence IDs in `clusts` range from 1 to 500, there
+#' should be 500 records in `tc_gr`. Also, see examples.
 #'
 #' @return
 #' When `one_plot = TRUE`, a single plot where annotation barplots for each
@@ -282,4 +291,67 @@ per_cluster_annotations <- function(sname, clusts, tc_gr = NULL,
     names(use_colors) <- anno_terms_ord
     use_colors
 }
+## =============================================================================
+
+# get_go_term_freq_plot <- function(peakAnno, choose_idx, plot_title_text,
+#     palname = "Set1", font.size = 10){
+#     ##
+#     anno_terms_ord <- .get_fixed_anno_ord()
+#     use_colors <- .get_named_colors(anno_terms_ord, palname)
+#     # use_colors <- get_ncolors(n=length(anno_terms_ord), palname=palname)
+#     # if(palname=="Set1") use_colors <- use_colors[c(2:length(use_colors),1)]
+#     # names(use_colors) <- anno_terms_ord
+#     ##
+#     anno_terms1 <- as.data.frame(peakAnno)[choose_idx,]$annotation
+#     anno_terms_splits <- strsplit(anno_terms1, " ")
+#     anno_terms <- unlist(lapply(anno_terms_splits, function(x){
+#         if(is.na(x[1])){ "NA";
+#         }else if(grepl("Intron", x[1]) || grepl("Exon", x[1])
+#             || grepl("Promoter", x[1])){
+#             x[1]
+#         }else{ paste(x[1], x[2]) }
+#     }))
+#     ##
+#     wordFreqTable <- table(anno_terms)
+#     ##
+#     wordFreqDF <- data.frame(word = rownames(wordFreqTable),
+#         freq = as.vector(wordFreqTable))
+#     ## convert to tibble using tidyr::pivot_longer
+#     wordFreqTib <- tidyr::pivot_longer(wordFreqDF, cols = c("word"),
+#         values_to = "Annotation")
+#     print(wordFreqTib$Annotation)
+#     ## ggplot2 frequency barplot
+#     # breaks <- sort(c(pretty(range(wordFreqDF$freq)), max(wordFreqDF$freq)))
+#     # max_idx <- which(breaks == max(wordFreqDF$freq))
+#     # colvec <- rep("black", length(breaks))
+#     # colvec[max_idx] <- "red"
+#     p2 <- ggplot(wordFreqTib, aes(y = freq, x = name))+
+#         ggplot2::theme_bw() +
+#         ggplot2::geom_col(aes(fill = Annotation), width=0.98) +
+#         ggplot2::scale_fill_manual(values=use_colors) +
+#         # ggplot2::scale_y_continuous(breaks = breaks,
+#         #                    minor_breaks = breaks,
+#         #                    labels = breaks) + #,
+#         #labels = scales::percent) +
+#         ggplot2::theme(#axis.title = element_text(size = 14),
+#             #axis.text = element_text(size = 12),
+#             axis.title = element_text(size=font.size),
+#             axis.text = element_text(size=font.size),
+#             axis.text.y = element_text(hjust = 1.0),
+#             axis.text.x = element_blank(),
+#             axis.title.x = element_blank(),
+#             axis.ticks.x = element_blank(),
+#             panel.grid = element_blank(),
+#             legend.text = element_text(size=14),
+#             legend.title = element_text(size=14),
+#             legend.position = "top",
+#             legend.direction = "vertical") +
+#         ggplot2::labs(y = "Count") +
+#         # ggplot2::geom_hline(yintercept = wordFreqDF[which.max(wordFreqDF[,"freq"]),"freq"],
+#         #            color = "red", linetype = "dashed") +
+#         # ggplot2::guides(fill = FALSE) +
+#         NULL
+#
+#     p2
+# }
 ## =============================================================================
