@@ -4,9 +4,9 @@
 #'
 #' @param sname Sample name
 #' @param clusts List of sequence IDs in each cluster.
-#' @param tc_gr Tag clusters as \code{\link[GenomicRanges]{GRanges}}. If
-#' `cager_obj` is not provided (i.e., it is NULL), this argument is required.
-#' It will be ignored only if cager_obj is provided. Default is NULL
+#' @param tc_gr Tag clusters as \code{\link[GenomicRanges]{GRanges}} or a
+#' bedfile. If `cager_obj` is not provided (i.e., it is NULL), this argument
+#' is required.It will be ignored only if cager_obj is provided. Default is NULL
 #' @param cager_obj A CAGEexp object obtained from the CAGEr package, if and
 #' when CAGEr was used to process the raw CAGE data
 #' @param qLow,qUp The interquantile boundaries to be considered for obtaining
@@ -27,13 +27,12 @@
 #' @export
 #'
 #' @details
-#' When annotations for only selected promoter clusters are required, alter
+#' When annotations for only selected clusters are required, alter
 #' the `clusts` argument to specify only those selected clusters. Because
 #' the `clusts` list holds the IDs of sequences belonging to each cluster, the
 #' corresponding records are selected from the `tc_gr` GRanges object. This
-#' approach requires that sequence IDs in `clusts` match the records in `tc_gr`.
-#' In other words, if sequence IDs in `clusts` range from 1 to 500, there
-#' should be 500 records in `tc_gr`. Also, see examples.
+#' approach requires that sequence IDs in `clusts` are directly associated with
+#' the ranges in `tc_gr`. Also, see examples.
 #'
 #' @return
 #' When `one_plot = TRUE`, a single plot where annotation barplots for each
@@ -57,19 +56,22 @@ per_cluster_annotations <- function(sname, clusts, tc_gr = NULL,
                                     txt_size = 12,
                                     use_suffix = NULL, use_prefix = "C",
                                     n_cores = 1) {
-    message("SAMARTH--------")
+
     cli::cli_h1(paste0("All clusters' genomic annotations"))
     cli::cli_h2(paste0("Sample: ", sname))
     ## Check all needed arguments supplied
+    ## Prepare tc_gr
     tc_gr <- .handle_tc_cager(tc_gr, cager_obj, sname, qLow, qUp)
     stopifnot(!is.null(tc_gr))
     ## clusts should be a list
     if(!is.list(clusts)) clusts <- list(clusts)
+
+    ##
     ## as many records in tc_gr as number of sequence IDs in clusts
-    if(length(tc_gr) != sum(lengths(clusts))){
-        stop("Nb. of records in `tc_gr` should match the nb. of sequence IDs
-            in `clusts`")
-    }
+    # if(length(tc_gr) != sum(lengths(clusts))){
+    #     stop("Nb. of records in `tc_gr` should match the nb. of sequence IDs
+    #         in `clusts`")
+    # }
     ##
     parallelize <- FALSE
     if (n_cores > 1) parallelize <- TRUE

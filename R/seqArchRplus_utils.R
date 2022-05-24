@@ -165,6 +165,9 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix) {
 ## =============================================================================
 
 
+## Handles preparing a tagcluster GRanges object from either a CAGEexp object
+## if that is provided.
+## Also, it can be prepared using a BED file provided.
 .handle_tc_cager <- function(tc_gr = NULL, cager_obj = NULL, sname,
                                 qLow = 0.1, qUp = 0.9) {
     if (is.null(tc_gr)) {
@@ -192,10 +195,23 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix) {
             )
         }
     }
-
+    if(.check_bedfile(tc_gr)){
+        message("SAMARTH")
+        df <- read.delim(tc_gr, header = TRUE, sep="\t")
+        tc_gr <- GenomicRanges::makeGRangesFromDataFrame(df,
+            keep.extra.columns = TRUE)
+    }
     tc_gr
 }
 ## =============================================================================
+
+.check_bedfile <- function(bedfname){
+    ## Just check if bedfname is valid and exists
+    if(file.exists(bedfname))
+        return(TRUE)
+    return(FALSE)
+}
+
 
 .get_cage_tc_cager <- function(cager_obj, sname, qLow, qUp) {
     any_null <- any(unlist(lapply(list(qLow, qUp), is.null)))

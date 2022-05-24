@@ -27,9 +27,9 @@ per_cluster_annotations(
 
 \item{clusts}{List of sequence IDs in each cluster.}
 
-\item{tc_gr}{Tag clusters as \code{\link[GenomicRanges]{GRanges}}. If
-`cager_obj` is not provided (i.e., it is NULL), this argument is required.
-It will be ignored only if cager_obj is provided. Default is NULL}
+\item{tc_gr}{Tag clusters as \code{\link[GenomicRanges]{GRanges}} or a
+bedfile. If `cager_obj` is not provided (i.e., it is NULL), this argument
+is required.It will be ignored only if cager_obj is provided. Default is NULL}
 
 \item{cager_obj}{A CAGEexp object obtained from the CAGEr package, if and
 when CAGEr was used to process the raw CAGE data}
@@ -67,11 +67,10 @@ the clusters in `clusts`).
 per_cluster_annotations
 }
 \details{
-When annotations for only selected promoter clusters are required, alter
+When annotations for only selected clusters are required, alter
 the `clusts` argument to specify only those selected clusters. Because
 the `clusts` list holds the IDs of sequences belonging to each cluster, the
 corresponding records are selected from the `tc_gr` GRanges object. This
-approach requires that sequence IDs in `clusts` match the records in `tc_gr`.
-In other words, if sequence IDs in `clusts` range from 1 to 500, there
-should be 500 records in `tc_gr`. Also, see examples.
+approach requires that sequence IDs in `clusts` are directly associated with
+the ranges in `tc_gr`. Also, see examples.
 }

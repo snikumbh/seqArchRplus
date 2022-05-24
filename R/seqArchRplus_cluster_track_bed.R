@@ -19,6 +19,13 @@
 #' @param info_df The data.frame holding information to be written to the BED
 #' file
 #'
+#' @param use_q_bound Logical. Write the lower and upper quantiles as tag
+#' cluster boundaries. Default is TRUE
+#'
+#' @param use_as_names Specify the column name from info_df which you would like
+#' to use as names for display with the track. By default, `use_names` is NULL,
+#' and the sequence/tag cluster IDs are used as names.
+#'
 #' @param one_zip_all Logical. Specify TRUE when the facility to download BED
 #' files for all clusters with one click is desired, otherwise FALSE. This is
 #' relevant only when include_in_report is TRUE
@@ -39,10 +46,29 @@
 #' @param strand_sep Logical. Specify TRUE if records for each strand are to
 #' be written in separate BED files.
 #'
-#' @details Note: For providing downloadable links in the HTML report, the
+#' @details
+#'
+#' Note on links in HTML:
+#' For providing downloadable links in the HTML report, the
 #' complete BED files are encoded into base64 strings and embedded with the
 #' HTML report itself. This considerably increases the size of the HTML file,
 #' and can slow down loading of the HTML file in your browser.
+#'
+#' Note on BED files:
+#' The output BED files have selected columns provided in the `info_df`.
+#' These are "chr", "start", "end", "name", "score", "strand", "dominant_ctss".
+#' By default, the sequence/tag cluster IDs are used as names.
+#' If `use_as_names` is specified, information from that column in the
+#' `info_df` is used as "name".
+#' If conservation score (e.g., PhastCons) is available, it is used as the
+#' score, otherwise the TPM value of the dominant CTSS is used.
+#' The final two columns, are the 'thickStart' and 'thickEnd' values
+#' corresponding to the BED format. The 'thickEnd' column is the dominant_ctss
+#' position.
+#' Importantly, the lower and upper quantile boundaries are used as the start
+#' and end coordinates of the cluster when `use_q_bound` is set to TRUE
+#' (the default).
+#'
 #'
 #' @return
 #' When `include_in_report = FALSE`, the cluster information is written to disk
@@ -55,6 +81,8 @@
 #' @export
 #'
 write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
+                                                use_q_bound = TRUE,
+                                                use_as_names = NULL,
                                                 one_zip_all = TRUE,
                                                 org_name = NULL,
                                                 dir_path = NULL,
@@ -71,7 +99,7 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
     }
 
     ##
-    cli::cli_alert_info("Preparing cluster-wise BED for ", sname)
+    cli::cli_alert_info(paste0("Preparing cluster-wise BED for ", sname))
     result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
     bedFilesPath <- file.path(result_dir_path, "Cluster_BED_tracks")
     stopifnot(.check_and_create_dir(bedFilesPath))
@@ -89,6 +117,10 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
             sname, "]\n\n"
         ))
     }
+
+    if(use_q_bound)
+        cli::cli_alert_info(paste0("Using quantiles as tag ",
+            "cluster boundaries"))
 
     for (lo in seq_along(clusts)) {
         fname_prefix <- paste0(org_name, "_TC_sample_", sname, "_cluster")
@@ -134,10 +166,28 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
                     )
                 }
                 track.name <- paste0(track.name_prefix, lo, strand_track_str)
-                .write_as_track_bed(limit_df, chosen_idx,
+
+
+                if(is.null(use_as_names)){
+                    set_names <- chosen_idx
+                }else{
+                    ## make sure column exists
+                    if(use_as_names %in% colnames(limit_df)){
+                        set_names <- as.vector(limit_df[, use_as_names])
+                    }else{
+                        stop("Specified column name in `use_names` does not ",
+                            "exist in `info_df`")
+                    }
+                }
+
+
+                .write_as_track_bed(given_df = limit_df,
+                    use_names = set_names,
                     track_name = track.name,
-                    bedFilename = bedFilename
+                    bedFilename = bedFilename,
+                    use_q_bound = use_q_bound
                 )
+
                 if (include_in_report) {
                     .create_dload_text(
                         embedFile = TRUE,
@@ -194,36 +244,46 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
 }
 ## =============================================================================
 
-.write_as_track_bed <- function(given_df, seq_ids, track_name, bedFilename,
-                                write_tc_bound = TRUE) {
+.write_as_track_bed <- function(given_df, use_names, track_name, bedFilename,
+                                use_q_bound = TRUE) {
+    ##
+    ## given_df should have separate start and end columns
     ##
     old_colnames <- colnames(given_df)
-    if (write_tc_bound) {
+
+    if (use_q_bound) {
+
         df_gr <- GenomicRanges::makeGRangesFromDataFrame(given_df,
-            keep.extra.columns = TRUE,
-            seqnames.field = "chr"
+            keep.extra.columns = TRUE
         )
         ## Because lower and upper boundaries of the quantiles can be anything
         ## as chosen by the user, we should match and find out what columns
         ## are these
         colIdx <- grep("q_", names(S4Vectors::mcols(df_gr)))
-        ##
-        new_gr <- GenomicRanges::narrow(df_gr,
-            start = as.integer(mcols(df_gr)[, colIdx[1]]),
-            end = as.integer(mcols(df_gr)[, colIdx[2]])
-        )
-        ## Check, they should be identical. If not, something is wrong!
-        stopifnot(identical(df_gr$IQW, GenomicRanges::width(new_gr)))
-        given_df <- as.data.frame(new_gr)
-        ## make sure the first colnames is chr and not seqnames
-        if (!identical(colnames(given_df), old_colnames)) {
-            colnames(given_df) <- c("chr", old_colnames[-1])
+        ## If use_q_bound is TRUE, colIdx should not be empty
+        if(length(colIdx) == 0){
+            warning("`use_q_bound` is set to TRUE, but no columns with quantile
+            information found")
+        }else{
+            ## We assume that the qLow appears first and then qUp
+            new_gr <- GenomicRanges::narrow(df_gr,
+                start = as.integer(mcols(df_gr)[, colIdx[1]]),
+                end = as.integer(mcols(df_gr)[, colIdx[2]])
+            )
+            ## Check, they should be identical. If not, something is wrong!
+            stopifnot(identical(df_gr$IQW, GenomicRanges::width(new_gr)))
+            given_df <- as.data.frame(new_gr)
+            ## make sure the first colnames is chr and not seqnames
+            if (!identical(colnames(given_df), old_colnames)) {
+                colnames(given_df) <- c("chr", old_colnames[-1])
+            }
         }
     }
 
     track.description <- track_name
     write(paste('track name="', track_name, '" description="',
         track.description, '" visibility="pack"', ' itemRgb="On"',
+        ' colorByStrand="255,0,0 0,0,255"',
         sep = ""
     ),
     file = bedFilename, append = FALSE
@@ -231,12 +291,16 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
     use_score <- ifelse("phast" %in% colnames(given_df),
         given_df$phast, given_df$domTPM
     )
+
+
     utils::write.table(data.frame(given_df$chr,
-        formatC(given_df$start, format = "f", digits = 0),
+        formatC(given_df$start-1, format = "f", digits = 0),
         formatC(given_df$end, format = "f", digits = 0),
-        seq_ids,
-        score = use_score,
-        given_df$strand
+        use_names, ## Name column
+        score = use_score, ## Score column
+        given_df$strand, ## Strand column
+        given_df$dominant_ctss-1, ## thickStart
+        given_df$dominant_ctss ## thickEnd
     ),
     file = bedFilename,
     append = TRUE, col.names = FALSE, row.names = FALSE,

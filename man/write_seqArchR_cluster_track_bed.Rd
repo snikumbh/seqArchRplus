@@ -9,6 +9,8 @@ write_seqArchR_cluster_track_bed(
   sname,
   clusts = NULL,
   info_df,
+  use_q_bound = TRUE,
+  use_as_names = NULL,
   one_zip_all = TRUE,
   org_name = NULL,
   dir_path = NULL,
@@ -23,6 +25,13 @@ write_seqArchR_cluster_track_bed(
 
 \item{info_df}{The data.frame holding information to be written to the BED
 file}
+
+\item{use_q_bound}{Logical. Write the lower and upper quantiles as tag
+cluster boundaries. Default is TRUE}
+
+\item{use_as_names}{Specify the column name from info_df which you would like
+to use as names for display with the track. By default, `use_names` is NULL,
+and the sequence/tag cluster IDs are used as names.}
 
 \item{one_zip_all}{Logical. Specify TRUE when the facility to download BED
 files for all clusters with one click is desired, otherwise FALSE. This is
@@ -57,8 +66,24 @@ Writes the seqArchR clusters are BED tracks for viewing in IGV
 or any genome browser
 }
 \details{
-Note: For providing downloadable links in the HTML report, the
+Note on links in HTML:
+For providing downloadable links in the HTML report, the
 complete BED files are encoded into base64 strings and embedded with the
 HTML report itself. This considerably increases the size of the HTML file,
 and can slow down loading of the HTML file in your browser.
+
+Note on BED files:
+The output BED files have selected columns provided in the `info_df`.
+These are "chr", "start", "end", "name", "score", "strand", "dominant_ctss".
+By default, the sequence/tag cluster IDs are used as names.
+If `use_as_names` is specified, information from that column in the
+`info_df` is used as "name".
+If conservation score (e.g., PhastCons) is available, it is used as the
+score, otherwise the TPM value of the dominant CTSS is used.
+The final two columns, are the 'thickStart' and 'thickEnd' values
+corresponding to the BED format. The 'thickEnd' column is the dominant_ctss
+position.
+Importantly, the lower and upper quantile boundaries are used as the start
+and end coordinates of the cluster when `use_q_bound` is set to TRUE
+(the default).
 }
