@@ -63,9 +63,10 @@
 #' @importFrom IRanges IRanges
 #' @importFrom GenomeInfoDb seqlevels seqlevels<- seqinfo seqinfo<-
 #' @importFrom S4Vectors mcols
+#' @importFrom utils read.delim
 #'
 #' @export
-## Writes TCs as BED files via Granges and also as fasta files with a fixed
+## Writes TCs as BED files via GRanges and also as FASTA files with a fixed
 ## flank size of +/- 500 bp (or provided flank size)
 ##
 ##
