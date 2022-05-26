@@ -26,3 +26,26 @@ The list of clusters ordered by their mean/median interquantile widths
 \description{
 Order clusters by median or mean interquantile widths
 }
+\examples{
+
+bed_fname <- system.file("extdata", "info_df_small.bed.gz",
+         package = "seqArchRplus", mustWork = TRUE)
+
+info_df <- read.delim(file = bed_fname,
+         sep = "\t", header = TRUE,
+         col.names = c("chr", "start", "end", "width",
+                 "dominant_ctss", "domTPM",
+                 "strand",	"score", "nr_ctss",
+                 "q_0.1", "q_0.9", "IQW", "tpm"))
+
+use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+         package = "seqArchRplus", mustWork = TRUE))
+
+
+ordered_clusts <- seqArchRplus::order_clusters_iqw(
+                                 sname = "sample1",
+                                 clusts = use_clusts,
+                                 info_df = info_df,
+                                 order_by_median = TRUE)
+
+}

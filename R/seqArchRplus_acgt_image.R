@@ -14,6 +14,25 @@
 #' @return Nothing. PNG images are written to disk using the provided filename.
 #' @export
 #'
+#' @examples
+#'
+#' library(Biostrings)
+#' raw_seqs <- Biostrings::readDNAStringSet(
+#'                           filepath = system.file("extdata",
+#'                             "promoters_small.fa.gz",
+#'                             package = "seqArchRplus",
+#'                             mustWork = TRUE)
+#'                         )
+#'
+#' use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+#'          package = "seqArchRplus", mustWork = TRUE))
+#'
+#' seqs_acgt_image(sname = "sample1",
+#'                 seqs = raw_seqs,
+#'                 seqs_ord = unlist(use_clusts),
+#'                 pos_lab = -45:45,
+#'                 dir_path = tempdir())
+#'
 #'
 seqs_acgt_image <- function(sname, seqs, seqs_ord, pos_lab, xt_freq = 5,
                             yt_freq = 500, f_height = 1200,

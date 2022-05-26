@@ -2,11 +2,14 @@
 
 #' @title per_cluster_annotations
 #'
-#' @param sname Sample name
-#' @param clusts List of sequence IDs in each cluster.
+#' @param sname Sample name. Default is NULL. This is a required argument
+#' if the CAGEexp object is provided. See `cager_obj` argument
+#' @param clusts List of sequence IDs in each cluster. This can be NULL only
+#' when a BED file is passed to the argument `tc_gr`
 #' @param tc_gr Tag clusters as \code{\link[GenomicRanges]{GRanges}} or a
-#' bedfile. If `cager_obj` is not provided (i.e., it is NULL), this argument
-#' is required.It will be ignored only if cager_obj is provided. Default is NULL
+#' BED file (specify filename with path). If `cager_obj` is not provided (i.e.,
+#'  it is NULL), this argument is required. It will be ignored only if
+#'  `cager_obj` is provided. Default is NULL
 #' @param cager_obj A CAGEexp object obtained from the CAGEr package, if and
 #' when CAGEr was used to process the raw CAGE data
 #' @param qLow,qUp The interquantile boundaries to be considered for obtaining
@@ -44,7 +47,72 @@
 #' @importFrom BiocParallel bplapply MulticoreParam SerialParam SnowParam
 #' multicoreWorkers ipclock ipcunlock ipcremove
 #'
-per_cluster_annotations <- function(sname, clusts, tc_gr = NULL,
+#' @examples
+#'
+#' ## Need the TxDb object to run these examples
+#' if(require("TxDb.Hvulgare2.MorexV3.gene")){
+#'
+#' library(GenomicRanges)
+#' library(TxDb.Hvulgare2.MorexV3.gene)
+#'
+#' bed_fname <- system.file("extdata", "info_df_small.bed.gz",
+#'          package = "seqArchRplus", mustWork = TRUE)
+#'
+#' info_df <- read.delim(file = bed_fname,
+#'          sep = "\t", header = TRUE,
+#'          col.names = c("chr", "start", "end", "width",
+#'                  "dominant_ctss", "domTPM",
+#'                  "strand",	"score", "nr_ctss",
+#'                  "q_0.1", "q_0.9", "IQW", "tpm"))
+#'
+#' tc_gr_from_df <- GenomicRanges::makeGRangesFromDataFrame(info_df,
+#'                                                   keep.extra.columns = TRUE)
+#'
+#' use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+#'          package = "seqArchRplus", mustWork = TRUE))
+#'
+#' tdir <- tempdir()
+#'
+#' # Get annotations for all clusters in use_clusts
+#' annotations_pl <- per_cluster_annotations(sname = "sample1",
+#'                                 clusts = use_clusts,
+#'                                 tc_gr = tc_gr_from_df,
+#'                                 txdb_obj = TxDb.Hvulgare2.MorexV3.gene,
+#'                                 one_plot = FALSE,
+#'                                 dir_path = tdir,
+#'                                 tss_region = c(-500,100))
+#'
+#' # Get annotations for selected clusters in use_clusts
+#' # -- First two clusters
+#' selected_clusts <- lapply(seq(2), function(x) use_clusts[[x]])
+#' # OR
+#' # -- Mixed set of clusters, say 1 and 3 out of total 3
+#' selected_clusts <- lapply(c(1,3), function(x) use_clusts[[x]])
+#' #
+#' annotations_pl <- per_cluster_annotations(sname = "sample1",
+#'                                 clusts = selected_clusters,
+#'                                 tc_gr = tc_gr_from_df,
+#'                                 txdb_obj = TxDb.Hvulgare2.MorexV3.gene,
+#'                                 one_plot = FALSE,
+#'                                 dir_path = tdir,
+#'                                 tss_region = c(-500,100))
+#'
+#' # Alternatively, you can also directly specify a BED file to the `tc_gr`
+#' # argument. This is useful when one may not have access to the CAGEexp
+#' # object, but only clusters' information is available in a BED file.
+#' #
+#' annotations_pl <- per_cluster_annotations(sname = "sample1",
+#'                                 clusts = NULL,
+#'                                 tc_gr = bed_fname,
+#'                                 txdb_obj = TxDb.Hvulgare2.MorexV3.gene,
+#'                                 one_plot = FALSE,
+#'                                 dir_path = tdir,
+#'                                 tss_region = c(-500,100))
+#' }
+#'
+#'
+per_cluster_annotations <- function(sname = NULL, clusts = NULL,
+                                    tc_gr = NULL,
                                     cager_obj = NULL,
                                     qLow = 0.1,
                                     qUp = 0.9,
@@ -60,12 +128,19 @@ per_cluster_annotations <- function(sname, clusts, tc_gr = NULL,
     cli::cli_h1(paste0("All clusters' genomic annotations"))
     cli::cli_h2(paste0("Sample: ", sname))
     ## Check all needed arguments supplied
+
+
     ## Prepare tc_gr
-    tc_gr <- .handle_tc_cager(tc_gr, cager_obj, sname, qLow, qUp)
-    stopifnot(!is.null(tc_gr))
+    tc_gr2 <- .handle_tc_cager(tc_gr, cager_obj, sname, qLow, qUp)
+    stopifnot(!is.null(tc_gr2))
+    ## If tc_gr was prepared from a BED file, populate the clusts arg
+    if(.check_bedfile(tc_gr)){
+        clusts <- seq(length(tc_gr))
+    }
     ## clusts should be a list
     if(!is.list(clusts)) clusts <- list(clusts)
-
+    ##
+    tc_gr <- tc_gr2
     ##
     ## as many records in tc_gr as number of sequence IDs in clusts
     # if(length(tc_gr) != sum(lengths(clusts))){
@@ -349,7 +424,8 @@ per_cluster_annotations <- function(sname, clusts, tc_gr = NULL,
 #             legend.position = "top",
 #             legend.direction = "vertical") +
 #         ggplot2::labs(y = "Count") +
-#         # ggplot2::geom_hline(yintercept = wordFreqDF[which.max(wordFreqDF[,"freq"]),"freq"],
+#         # ggplot2::geom_hline(yintercept =
+              # wordFreqDF[which.max(wordFreqDF[,"freq"]),"freq"],
 #         #            color = "red", linetype = "dashed") +
 #         # ggplot2::guides(fill = FALSE) +
 #         NULL

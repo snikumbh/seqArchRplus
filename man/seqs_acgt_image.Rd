@@ -39,3 +39,24 @@ Nothing. PNG images are written to disk using the provided filename.
 \description{
 Visualize all sequences as an image
 }
+\examples{
+
+library(Biostrings)
+raw_seqs <- Biostrings::readDNAStringSet(
+                          filepath = system.file("extdata",
+                            "promoters_small.fa.gz",
+                            package = "seqArchRplus",
+                            mustWork = TRUE)
+                        )
+
+use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+         package = "seqArchRplus", mustWork = TRUE))
+
+seqs_acgt_image(sname = "sample1",
+                seqs = raw_seqs,
+                seqs_ord = unlist(use_clusts),
+                pos_lab = -45:45,
+                dir_path = tempdir())
+
+
+}

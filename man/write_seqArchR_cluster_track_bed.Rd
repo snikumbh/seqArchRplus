@@ -87,3 +87,52 @@ Importantly, the lower and upper quantile boundaries are used as the start
 and end coordinates of the cluster when `use_q_bound` is set to TRUE
 (the default).
 }
+\examples{
+
+info_df <- read.delim(file = system.file("extdata", "info_df_small.bed.gz",
+         package = "seqArchRplus", mustWork = TRUE),
+         sep = "\t", header = TRUE,
+           col.names = c("chr", "start", "end", "width",
+                 "dominant_ctss", "domTPM",
+                 "strand",	"score", "nr_ctss",
+                  "q_0.1", "q_0.9", "IQW", "tpm"))
+
+use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+         package = "seqArchRplus", mustWork = TRUE))
+
+
+# Write seqArchR clusters of promoters/CAGE tag clusters as BED track files
+# All possible variations are enlisted here
+
+# Using quantiles information as the tag cluster boundaries
+# via arg `use_q_bound = TRUE` and using custom names for each.
+# Create a new/custom column, and specify the new column name for argument
+# `use_as_names`. Notice that any custom names can be obtained by this
+# approach.
+
+info_df$use_names <- paste(rownames(info_df), info_df$score, sep = "_")
+
+write_seqArchR_cluster_track_bed(sname = "sample1",
+                                 clusts = use_clusts,
+                                 info_df = info_df,
+                                 use_q_bound = FALSE,
+                                 use_as_names = "use_names",
+                                 dir_path = tempdir()
+                                 )
+
+# Generating textual output that can be included in HTML reports.
+# This requires package xfun.
+\dontrun{
+write_seqArchR_cluster_track_bed(sname = "sample1",
+                                 clusts = use_clusts,
+                                 info_df = info_df,
+                                 use_q_bound = FALSE,
+                                 use_as_names = "use_names",
+                                 dir_path = tempdir(),
+                                 include_in_report = TRUE
+                                 )
+}
+
+
+
+}

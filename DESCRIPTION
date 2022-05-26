@@ -26,8 +26,11 @@ URL: https://snikumbh.github.io/seqArchRplus/,
 BugReports: https://github.com/snikumbh/seqArchRplus/issues
 Depends:
     R (>= 4.1.0),
+    GenomicRanges,
+    IRanges,
+    S4Vectors,
     seqArchR
-Imports:
+Imports: 
     BiocParallel,
     Biostrings,
     BSgenome,
@@ -37,13 +40,10 @@ Imports:
     factoextra,
     forcats,
     GenomeInfoDb,
-    GenomicRanges,
     ggplot2 (>= 3.1.1),
     grDevices,
     heatmaps,
-    IRanges,
     RColorBrewer,
-    S4Vectors,
     scales,
     stats,
     utils
@@ -61,9 +61,7 @@ Suggests:
     xfun
 VignetteBuilder: 
     knitr
-biocViews: MotifDiscovery, GeneRegulation, MathematicalBiology,
-    SystemsBiology, Transcriptomics, Genetics, Clustering,
-    DimensionReduction, FeatureExtraction, DNASeq
+biocViews: Annotation, Visualization, ReportWriting, GO
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.1.2

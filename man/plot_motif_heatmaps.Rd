@@ -50,3 +50,24 @@ Nothing. PNG images are written to disk using the provided filenames.
 \description{
 Plot heatmaps of motifs occuring in seqArchR clusters
 }
+\examples{
+
+library(Biostrings)
+raw_seqs <- Biostrings::readDNAStringSet(
+                          filepath = system.file("extdata",
+                            "promoters_small_200.fa.gz",
+                            package = "seqArchRplus",
+                            mustWork = TRUE)
+                        )
+
+use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+         package = "seqArchRplus", mustWork = TRUE))
+
+plot_motif_heatmaps(sname = "sample1", seqs = raw_seqs,
+                    flanks = c(50, 100, 200),
+                    clusts = use_clusts,
+                    motifs = c("WW", "SS", "TATAA", "CG", "Y"),
+                    dir_path = tempdir(),
+                    fheight = 800, fwidth = 1600)
+
+}

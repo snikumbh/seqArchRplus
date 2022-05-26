@@ -27,3 +27,28 @@ chromosomes and strands. Plots are also written to disk.
 Visualize as barplots how promoters in each cluster are distributed
 on different chromosomes and strands
 }
+\examples{
+
+library(RColorBrewer)
+bed_fname <- system.file("extdata", "info_df_small.bed.gz",
+         package = "seqArchRplus", mustWork = TRUE)
+
+info_df <- read.delim(file = bed_fname,
+         sep = "\t", header = TRUE,
+         col.names = c("chr", "start", "end", "width",
+                 "dominant_ctss", "domTPM",
+                 "strand",	"score", "nr_ctss",
+                 "q_0.1", "q_0.9", "IQW", "tpm"))
+
+use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+         package = "seqArchRplus", mustWork = TRUE))
+
+pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")
+per_cl_strand_pl <- per_cluster_strand_dist(sname = "sample1",
+                                             clusts = use_clusts,
+                                             info_df = info_df,
+                                             dir_path = tempdir(),
+                                             colrs = pair_colrs)
+
+
+}

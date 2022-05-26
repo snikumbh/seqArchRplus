@@ -2,7 +2,8 @@
 % Please edit documentation in R/seqArchRplus_handle_cage_tc.R
 \name{handle_tc_from_cage}
 \alias{handle_tc_from_cage}
-\title{Handle writing of tag clusters to disk as BED files.}
+\title{Handle writing of tag clusters (TCs) from CAGE experiment to disk as
+  BED files.}
 \usage{
 handle_tc_from_cage(
   sname,
@@ -26,8 +27,8 @@ handle_tc_from_cage(
 \item{tc_gr}{Tag clusters as \code{\link[GenomicRanges]{GRanges}}. If
 `cager_obj` is not provided (is NULL), this argument is required. Also note
 that the columns should match the columns (with mcols) as returned by
-\code{\link[CAGEr]{tagClusters}}.
-If `tc_gr` is provided, `cager_obj` is ignored}
+\code{\link[CAGEr]{tagClusters}}. If `tc_gr` is provided, `cager_obj` is
+ignored}
 
 \item{cager_obj}{A CAGEexp object obtained from the CAGEr package, if and
 when CAGEr was used to process the raw CAGE data}
@@ -51,30 +52,53 @@ used in the filename. This can be the organism name etc. Specify without
 any separator. By default, an underscore is used as a separator in the
 filename.}
 
-\item{write_to_disk}{Logical. Specify TRUE to write files to disk.
-More specifically, BED files are written to disk only when this is set to
-TRUE. For promoter sequences, FASTA files are written to disk if this arg is
-set to TRUE, otherwise not. and a DNAStringSet object is returned if
-`ret_seqs` is set to TRUE.}
+\item{write_to_disk}{Logical. Specify TRUE to write files to disk. More
+specifically, BED files are written to disk only when this is set to TRUE.
+For promoter sequences, FASTA files are written to disk if this arg is set
+to TRUE, otherwise not. and a DNAStringSet object is returned if `ret_seqs`
+is set to TRUE.}
 
 \item{ret_seqs}{Logical. Specify TRUE if promoter sequences are to be
 returned as a DNAStringSet object.}
 }
 \value{
-If `ret_seqs` is TRUE, a DNAStringSet object is returned.
-Depending on `write_to_disk`, files are written to disk at the specified
-location.
+If `ret_seqs` is TRUE, a DNAStringSet object is returned. Depending
+  on `write_to_disk`, files are written to disk at the specified location.
 
 If `ret_seq = TRUE`, the promoter sequences are returned as a
 \code{\link[Biostrings]{DNAStringSet}} object.
 }
 \description{
-Handle writing of tag clusters to disk as BED files. It can also
-return corresponding promoter sequences as a DNAStringSet object or write
-them to disk as FASTA files.
+Handle writing of tag clusters obtained from a CAGE experiment
+  to disk as BED files. It can also return corresponding promoter sequences
+  as a DNAStringSet object or write them to disk as FASTA files.
+
+  For information on tag clusters obtained by clustering of CAGE-derived TSS,
+  we refer the reader to the CAGEr vignette, Section 3.7
+  \url{https://www.bioconductor.org/packages/release/bioc/vignettes/CAGEr/inst/doc/CAGEexp.html#ctss-clustering}
 }
 \details{
-You can use the fname_prefix and fname_suffix arguments to specify strings
-to be used as prefix and suffix for the files. For example, the organism
-name can be used as a prefix for the filename. Similarly, for suffix.
+You can use the fname_prefix and fname_suffix arguments to specify
+strings to be used as prefix and suffix for the files. For example, the
+organism name can be used as a prefix for the filename. Similarly, for
+suffix.
+}
+\examples{
+
+if(require("BSgenome.Hvulgare2.NCBI.MorexV3")){
+
+  seqs <- seqArchRplus::handle_tc_from_cage(sname = sn,
+                                 cager_obj = ce,
+                                 fl_size_up = 500,
+                                 fl_size_down = 500,
+                                 dir_path = NULL,
+                                 fname_prefix = "pre",
+                                 fname_suffix = "suff",
+                                 write_to_disk = FALSE,
+                                 bsgenome = BSgenome.Hvulgare2.NCBI.MorexV3,
+                                 ret_seqs = TRUE)
+
+}
+
+
 }

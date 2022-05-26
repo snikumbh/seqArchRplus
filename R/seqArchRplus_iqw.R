@@ -54,6 +54,32 @@
 #'
 #' @export
 #'
+#' @examples
+#'
+#' bed_fname <- system.file("extdata", "info_df_small.bed.gz",
+#'          package = "seqArchRplus", mustWork = TRUE)
+#'
+#' info_df <- read.delim(file = bed_fname,
+#'          sep = "\t", header = TRUE,
+#'          col.names = c("chr", "start", "end", "width",
+#'                  "dominant_ctss", "domTPM",
+#'                  "strand",	"score", "nr_ctss",
+#'                  "q_0.1", "q_0.9", "IQW", "tpm"))
+#'
+#' use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+#'          package = "seqArchRplus", mustWork = TRUE))
+#'
+#'
+#' iqw_tpm_pl <- iqw_tpm_plots(sname = "sample1",
+#'                             dir_path = tempdir(),
+#'                             info_df = info_df,
+#'                             iqw = TRUE,
+#'                             tpm = TRUE,
+#'                             cons = FALSE,
+#'                             clusts = use_clusts,
+#'                             txt_size = 14)
+#'
+#'
 iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
                             tpm = TRUE, cons = TRUE, txt_size = 12,
                             use_suffix = NULL, use_prefix = "C",
@@ -274,6 +300,28 @@ iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
 #' @importFrom stats median
 #'
 #' @export
+#'
+#' @examples
+#'
+#' bed_fname <- system.file("extdata", "info_df_small.bed.gz",
+#'          package = "seqArchRplus", mustWork = TRUE)
+#'
+#' info_df <- read.delim(file = bed_fname,
+#'          sep = "\t", header = TRUE,
+#'          col.names = c("chr", "start", "end", "width",
+#'                  "dominant_ctss", "domTPM",
+#'                  "strand",	"score", "nr_ctss",
+#'                  "q_0.1", "q_0.9", "IQW", "tpm"))
+#'
+#' use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+#'          package = "seqArchRplus", mustWork = TRUE))
+#'
+#'
+#' ordered_clusts <- seqArchRplus::order_clusters_iqw(
+#'                                  sname = "sample1",
+#'                                  clusts = use_clusts,
+#'                                  info_df = info_df,
+#'                                  order_by_median = TRUE)
 #'
 order_clusters_iqw <- function(sname, clusts, info_df,
                                 order_by_median = TRUE) {
