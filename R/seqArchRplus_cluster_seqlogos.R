@@ -45,12 +45,12 @@
 #' library(Biostrings)
 #' raw_seqs <- Biostrings::readDNAStringSet(
 #'                           filepath = system.file("extdata",
-#'                             "promoters_small.fa.gz",
+#'                             "example_promoters45.fa.gz",
 #'                             package = "seqArchRplus",
 #'                             mustWork = TRUE)
 #'                         )
 #'
-#' use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+#' use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
 #'          package = "seqArchRplus", mustWork = TRUE))
 #'
 #' seqlogo_pl <- per_cluster_seqlogos(sname = "sample1",
@@ -64,7 +64,7 @@
 #'                                    txt_size = 14)
 #'
 per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
-                                    pos_lab = -45:45, bits_yax = "max",
+                                    pos_lab = NULL, bits_yax = "max",
                                     strand_sep = FALSE, one_plot = TRUE,
                                     info_df = NULL, txt_size = 12,
                                     save_png = FALSE, dir_path) {
