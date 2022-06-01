@@ -19,12 +19,12 @@
 #' library(Biostrings)
 #' raw_seqs <- Biostrings::readDNAStringSet(
 #'                           filepath = system.file("extdata",
-#'                             "promoters_small.fa.gz",
+#'                             "example_promoters45.fa.gz",
 #'                             package = "seqArchRplus",
 #'                             mustWork = TRUE)
 #'                         )
 #'
-#' use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+#' use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
 #'          package = "seqArchRplus", mustWork = TRUE))
 #'
 #' seqs_acgt_image(sname = "sample1",
