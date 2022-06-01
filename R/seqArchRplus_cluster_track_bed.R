@@ -82,15 +82,13 @@
 #'
 #' @examples
 #'
-#' info_df <- read.delim(file = system.file("extdata", "info_df_small.bed.gz",
-#'          package = "seqArchRplus", mustWork = TRUE),
-#'          sep = "\t", header = TRUE,
-#'            col.names = c("chr", "start", "end", "width",
-#'                  "dominant_ctss", "domTPM",
-#'                  "strand",	"score", "nr_ctss",
-#'                   "q_0.1", "q_0.9", "IQW", "tpm"))
+#' bed_fname <- system.file("extdata", "example_info_df.bed.gz",
+#'          package = "seqArchRplus", mustWork = TRUE)
 #'
-#' use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+#' info_df <- read.delim(file = bed_fname,
+#'          sep = "\t", header = TRUE)
+#'
+#' use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
 #'          package = "seqArchRplus", mustWork = TRUE))
 #'
 #'
@@ -103,7 +101,7 @@
 #' # `use_as_names`. Notice that any custom names can be obtained by this
 #' # approach.
 #'
-#' info_df$use_names <- paste(rownames(info_df), info_df$score, sep = "_")
+#' info_df$use_names <- paste(rownames(info_df), info_df$domTPM, sep = "_")
 #'
 #' write_seqArchR_cluster_track_bed(sname = "sample1",
 #'                                  clusts = use_clusts,
@@ -136,6 +134,8 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
                                                 dir_path = NULL,
                                                 include_in_report = FALSE,
                                                 strand_sep = FALSE) {
+    cli::cli_h1(paste0("Writing cluster track BED files"))
+    cli::cli_h2(paste0("Sample: ", sname))
     if (include_in_report) {
         if (!requireNamespace("xfun", quietly = TRUE)) {
             stop(
@@ -307,24 +307,34 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
         ## Because lower and upper boundaries of the quantiles can be anything
         ## as chosen by the user, we should match and find out what columns
         ## are these
-        colIdx <- grep("q_", names(S4Vectors::mcols(df_gr)))
+        # colIdx <- grep("q_", names(S4Vectors::mcols(df_gr)))
+        colIdx <- grep("q_", colnames(given_df))
         ## If use_q_bound is TRUE, colIdx should not be empty
         if(length(colIdx) == 0){
             warning("`use_q_bound` is set to TRUE, but no columns with quantile
             information found")
         }else{
             ## We assume that the qLow appears first and then qUp
+
+            ## This narrowing can fail when IQWs are larger than the range
+            ## widths
             new_gr <- GenomicRanges::narrow(df_gr,
-                start = as.integer(mcols(df_gr)[, colIdx[1]]),
-                end = as.integer(mcols(df_gr)[, colIdx[2]])
-            )
+                # start = as.integer( GenomicRanges::mcols(df_gr)[, colIdx[1]] ),
+                # end = as.integer( GenomicRanges::mcols(df_gr)[, colIdx[2]] )
+                start = as.vector(given_df[, colIdx[1]]),
+                end = as.vector(given_df[, colIdx[2]])
+                )
+
             ## Check, they should be identical. If not, something is wrong!
-            stopifnot(identical(df_gr$IQW, GenomicRanges::width(new_gr)))
+            # stopifnot(identical(df_gr$IQW, GenomicRanges::width(new_gr)))
+            stopifnot(identical(given_df$IQW, GenomicRanges::width(new_gr)))
             given_df <- as.data.frame(new_gr)
+
             ## make sure the first colnames is chr and not seqnames
             if (!identical(colnames(given_df), old_colnames)) {
                 colnames(given_df) <- c("chr", old_colnames[-1])
             }
+
         }
     }
 
@@ -342,8 +352,8 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
 
 
     utils::write.table(data.frame(given_df$chr,
-        formatC(given_df$start-1, format = "f", digits = 0),
-        formatC(given_df$end, format = "f", digits = 0),
+        formatC(as.integer(given_df$start-1), format = "f", digits = 0),
+        formatC(as.integer(given_df$end), format = "f", digits = 0),
         use_names, ## Name column
         score = use_score, ## Score column
         given_df$strand, ## Strand column

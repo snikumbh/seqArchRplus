@@ -50,37 +50,37 @@
 #' @examples
 #'
 #' ## Need the TxDb object to run these examples
-#' if(require("TxDb.Hvulgare2.MorexV3.gene")){
+#' if(require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")){
 #'
 #' library(GenomicRanges)
-#' library(TxDb.Hvulgare2.MorexV3.gene)
+#' library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
+#' library(ChIPseeker)
 #'
-#' bed_fname <- system.file("extdata", "info_df_small.bed.gz",
+#' bed_fname <- system.file("extdata", "example_info_df.bed.gz",
 #'          package = "seqArchRplus", mustWork = TRUE)
 #'
 #' info_df <- read.delim(file = bed_fname,
-#'          sep = "\t", header = TRUE,
-#'          col.names = c("chr", "start", "end", "width",
-#'                  "dominant_ctss", "domTPM",
-#'                  "strand",	"score", "nr_ctss",
-#'                  "q_0.1", "q_0.9", "IQW", "tpm"))
+#'          sep = "\t", header = TRUE)
 #'
 #' tc_gr_from_df <- GenomicRanges::makeGRangesFromDataFrame(info_df,
 #'                                                   keep.extra.columns = TRUE)
 #'
-#' use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+#' tc_gr <- readRDS(system.file("extdata", "example_tc_gr.rds",
+#'          package = "seqArchRplus", mustWork = TRUE))
+#'
+#' use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
 #'          package = "seqArchRplus", mustWork = TRUE))
 #'
 #' tdir <- tempdir()
 #'
 #' # Get annotations for all clusters in use_clusts
 #' annotations_pl <- per_cluster_annotations(sname = "sample1",
-#'                                 clusts = use_clusts,
-#'                                 tc_gr = tc_gr_from_df,
-#'                                 txdb_obj = TxDb.Hvulgare2.MorexV3.gene,
-#'                                 one_plot = FALSE,
-#'                                 dir_path = tdir,
-#'                                 tss_region = c(-500,100))
+#'                          clusts = use_clusts,
+#'                          tc_gr = tc_gr_from_df,
+#'                          txdb_obj = TxDb.Dmelanogaster.UCSC.dm6.ensGene,
+#'                          one_plot = FALSE,
+#'                          dir_path = tdir,
+#'                          tss_region = c(-500,100))
 #'
 #' # Get annotations for selected clusters in use_clusts
 #' # -- First two clusters
@@ -90,24 +90,24 @@
 #' selected_clusts <- lapply(c(1,3), function(x) use_clusts[[x]])
 #' #
 #' annotations_pl <- per_cluster_annotations(sname = "sample1",
-#'                                 clusts = selected_clusters,
-#'                                 tc_gr = tc_gr_from_df,
-#'                                 txdb_obj = TxDb.Hvulgare2.MorexV3.gene,
-#'                                 one_plot = FALSE,
-#'                                 dir_path = tdir,
-#'                                 tss_region = c(-500,100))
+#'                          clusts = selected_clusts,
+#'                          tc_gr = tc_gr,
+#'                          txdb_obj = TxDb.Dmelanogaster.UCSC.dm6.ensGene,
+#'                          one_plot = FALSE,
+#'                          dir_path = tdir,
+#'                          tss_region = c(-500,100))
 #'
 #' # Alternatively, you can also directly specify a BED file to the `tc_gr`
 #' # argument. This is useful when one may not have access to the CAGEexp
 #' # object, but only clusters' information is available in a BED file.
 #' #
 #' annotations_pl <- per_cluster_annotations(sname = "sample1",
-#'                                 clusts = NULL,
-#'                                 tc_gr = bed_fname,
-#'                                 txdb_obj = TxDb.Hvulgare2.MorexV3.gene,
-#'                                 one_plot = FALSE,
-#'                                 dir_path = tdir,
-#'                                 tss_region = c(-500,100))
+#'                          clusts = NULL,
+#'                          tc_gr = bed_fname,
+#'                          txdb_obj = TxDb.Dmelanogaster.UCSC.dm6.ensGene,
+#'                          one_plot = FALSE,
+#'                          dir_path = tdir,
+#'                          tss_region = c(-500,100))
 #' }
 #'
 #'
@@ -134,13 +134,16 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
     tc_gr2 <- .handle_tc_cager(tc_gr, cager_obj, sname, qLow, qUp)
     stopifnot(!is.null(tc_gr2))
     ## If tc_gr was prepared from a BED file, populate the clusts arg
-    if(.check_bedfile(tc_gr)){
-        clusts <- seq(length(tc_gr))
+
+    if(!is.null(tc_gr2[[2]]) && tc_gr2[[2]] == "bed"){
+        clusts <- seq(length(tc_gr2[[1]]))
     }
+
     ## clusts should be a list
     if(!is.list(clusts)) clusts <- list(clusts)
     ##
-    tc_gr <- tc_gr2
+    tc_gr <- tc_gr2[[1]]
+
     ##
     ## as many records in tc_gr as number of sequence IDs in clusts
     # if(length(tc_gr) != sum(lengths(clusts))){

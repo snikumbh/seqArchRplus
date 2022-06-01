@@ -195,13 +195,20 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix) {
             )
         }
     }
-    if(.check_bedfile(tc_gr)){
-        message("SAMARTH")
-        df <- read.delim(tc_gr, header = TRUE, sep="\t")
-        tc_gr <- GenomicRanges::makeGRangesFromDataFrame(df,
-            keep.extra.columns = TRUE)
+
+    if(!(is(tc_gr, "GRanges") || is(tc_gr, "TagClusters"))){
+        if(.check_bedfile(tc_gr)){
+            cli::cli_alert_info("Reading from Bed file")
+            df <- read.delim(tc_gr, header = TRUE, sep="\t")
+            tc_gr <- GenomicRanges::makeGRangesFromDataFrame(df,
+                keep.extra.columns = TRUE)
+        }
+        return(list(tc_gr, "bed"))
+    }else{
+        return(list(tc_gr, NULL))
     }
-    tc_gr
+    stop("Expecting `tc_gr` to be a GRanges object or a bedfile")
+
 }
 ## =============================================================================
 
