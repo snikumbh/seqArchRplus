@@ -1,3 +1,8 @@
+# seqArchRplus 0.99.0.6
+
+## New
+* (User-facing) Examples added majority of functions using example/dummy data
+
 # seqArchRplus 0.99.0.5
 
 ## Bug-fixes

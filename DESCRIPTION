@@ -2,7 +2,7 @@ Type: Package
 Package: seqArchRplus
 Title: Downstream analyses of promoter sequence architectures and HTML
     report generation
-Version: 0.99.0.5
+Version: 0.99.0.6
 Authors@R: 
     person("Sarvesh", "Nikumbh", , "sarvesh.nikumbh@gmail.com", 
     role = c("aut", "cre", "cph"),
@@ -28,8 +28,7 @@ Depends:
     R (>= 4.1.0),
     GenomicRanges,
     IRanges,
-    S4Vectors,
-    seqArchR
+    S4Vectors
 Imports: 
     BiocParallel,
     Biostrings,
@@ -43,11 +42,14 @@ Imports:
     ggplot2 (>= 3.1.1),
     grDevices,
     heatmaps,
+    methods,
     RColorBrewer,
     scales,
+    seqArchR,
     stats,
     utils
 Suggests:
+    BSgenome.Dmelanogaster.UCSC.dm6,
     BiocStyle,
     CAGEr (>= 2.0.2),
     covr,
@@ -57,6 +59,7 @@ Suggests:
     slickR,
     svglite,
     testthat (>= 3.0.2),
+    TxDb.Dmelanogaster.UCSC.dm6.ensGene,
     vdiffr (>= 0.3.0),
     xfun
 VignetteBuilder: 
