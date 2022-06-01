@@ -69,22 +69,26 @@
 #' @importFrom GenomeInfoDb seqlevels seqlevels<- seqinfo seqinfo<-
 #' @importFrom S4Vectors mcols
 #' @importFrom utils read.delim
+#' @importFrom methods is
 #'
 #' @export
 #'
 #' @examples
 #'
-#' if(require("BSgenome.Hvulgare2.NCBI.MorexV3")){
+#' if(require("BSgenome.Dmelanogaster.UCSC.dm6")){
 #'
-#'   seqs <- seqArchRplus::handle_tc_from_cage(sname = sn,
-#'                                  cager_obj = ce,
+#'   tc_gr <- readRDS(system.file("extdata", "example_tc_gr.rds",
+#'          package = "seqArchRplus", mustWork = TRUE))
+#'
+#'   seqs <- seqArchRplus::handle_tc_from_cage(sname = "sample1",
+#'                                  tc_gr = tc_gr,
 #'                                  fl_size_up = 500,
 #'                                  fl_size_down = 500,
 #'                                  dir_path = NULL,
 #'                                  fname_prefix = "pre",
 #'                                  fname_suffix = "suff",
 #'                                  write_to_disk = FALSE,
-#'                                  bsgenome = BSgenome.Hvulgare2.NCBI.MorexV3,
+#'                                  bsgenome = BSgenome.Dmelanogaster.UCSC.dm6,
 #'                                  ret_seqs = TRUE)
 #'
 #' }
@@ -120,6 +124,9 @@ handle_tc_from_cage <- function(sname, tc_gr, cager_obj, qLow = 0.1, qUp = 0.9,
     )
     ##
     this_gr <- .handle_tc_cager(tc_gr, cager_obj, sname, qLow, qUp)
+    ## We do not accept a BED file for tc_gr here. But the .handle_tc_cager
+    ## function, returns the gr as a first element of list
+    this_gr <- this_gr[[1]]
     ##
     # this_gr <- CAGEr::tagClustersGR(cager_obj, sample = sname,
     #                                 returnInterquantileWidth = TRUE,
