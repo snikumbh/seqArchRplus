@@ -85,17 +85,20 @@ suffix.
 }
 \examples{
 
-if(require("BSgenome.Hvulgare2.NCBI.MorexV3")){
+if(require("BSgenome.Dmelanogaster.UCSC.dm6")){
 
-  seqs <- seqArchRplus::handle_tc_from_cage(sname = sn,
-                                 cager_obj = ce,
+  tc_gr <- readRDS(system.file("extdata", "example_tc_gr.rds",
+         package = "seqArchRplus", mustWork = TRUE))
+
+  seqs <- seqArchRplus::handle_tc_from_cage(sname = "sample1",
+                                 tc_gr = tc_gr,
                                  fl_size_up = 500,
                                  fl_size_down = 500,
                                  dir_path = NULL,
                                  fname_prefix = "pre",
                                  fname_suffix = "suff",
                                  write_to_disk = FALSE,
-                                 bsgenome = BSgenome.Hvulgare2.NCBI.MorexV3,
+                                 bsgenome = BSgenome.Dmelanogaster.UCSC.dm6,
                                  ret_seqs = TRUE)
 
 }

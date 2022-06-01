@@ -89,15 +89,13 @@ and end coordinates of the cluster when `use_q_bound` is set to TRUE
 }
 \examples{
 
-info_df <- read.delim(file = system.file("extdata", "info_df_small.bed.gz",
-         package = "seqArchRplus", mustWork = TRUE),
-         sep = "\t", header = TRUE,
-           col.names = c("chr", "start", "end", "width",
-                 "dominant_ctss", "domTPM",
-                 "strand",	"score", "nr_ctss",
-                  "q_0.1", "q_0.9", "IQW", "tpm"))
+bed_fname <- system.file("extdata", "example_info_df.bed.gz",
+         package = "seqArchRplus", mustWork = TRUE)
 
-use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+info_df <- read.delim(file = bed_fname,
+         sep = "\t", header = TRUE)
+
+use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
          package = "seqArchRplus", mustWork = TRUE))
 
 
@@ -110,7 +108,7 @@ use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
 # `use_as_names`. Notice that any custom names can be obtained by this
 # approach.
 
-info_df$use_names <- paste(rownames(info_df), info_df$score, sep = "_")
+info_df$use_names <- paste(rownames(info_df), info_df$domTPM, sep = "_")
 
 write_seqArchR_cluster_track_bed(sname = "sample1",
                                  clusts = use_clusts,

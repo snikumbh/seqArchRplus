@@ -67,7 +67,7 @@ even iff `iqw` is set to FALSE.
 }
 \examples{
 
-bed_fname <- system.file("extdata", "info_df_small.bed.gz",
+bed_fname <- system.file("extdata", "example_info_df.bed.gz",
          package = "seqArchRplus", mustWork = TRUE)
 
 info_df <- read.delim(file = bed_fname,
@@ -77,7 +77,7 @@ info_df <- read.delim(file = bed_fname,
                  "strand",	"score", "nr_ctss",
                  "q_0.1", "q_0.9", "IQW", "tpm"))
 
-use_clusts <- readRDS(system.file("extdata", "clust_info.rds",
+use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
          package = "seqArchRplus", mustWork = TRUE))
 
 

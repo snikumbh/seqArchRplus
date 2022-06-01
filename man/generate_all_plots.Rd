@@ -7,10 +7,12 @@
 generate_all_plots(
   sname,
   bed_info_fname,
+  custom_colnames = NULL,
   seqArchR_clusts,
   raw_seqs,
-  cager_obj,
+  cager_obj = NULL,
   tc_gr = NULL,
+  use_q_bound = FALSE,
   order_by_iqw = TRUE,
   use_median_iqw = TRUE,
   iqw = TRUE,
@@ -18,7 +20,7 @@ generate_all_plots(
   cons = FALSE,
   pos_lab = NULL,
   txdb_obj = NULL,
-  org_name,
+  org_name = NULL,
   qLow = 0.1,
   qUp = 0.9,
   tss_region = c(-500, 100),
@@ -35,15 +37,22 @@ generate_all_plots(
 \item{bed_info_fname}{The BED filename with information on tag clusters. See
 details for expected columns (column names)/information}
 
+\item{custom_colnames}{Specify custom column/header names to be used
+with the BED file information}
+
 \item{seqArchR_clusts}{The seqArchR clusters' list}
 
 \item{raw_seqs}{The sequences corresponding to the cluster elements (also
 available from the seqArchR result object)}
 
 \item{cager_obj}{The CAGEr object. This expects that
-\code{\link[CAGEr]{clusterCTSS}} has been run beforehand}
+\code{\link[CAGEr]{clusterCTSS}} has been run beforehand. Default is NULL}
 
-\item{tc_gr}{The tag clusters as a \code{\link[GenomicRanges]{GRanges}}}
+\item{tc_gr}{The tag clusters as a \code{\link[GenomicRanges]{GRanges}}.
+Default is NULL}
+
+\item{use_q_bound}{Logical. Write the lower and upper quantiles as tag
+cluster boundaries in BED track files with tag clusters. Default is TRUE}
 
 \item{order_by_iqw}{Logical. Set TRUE to order clusters by the IQW median
 or mean. Set argument `use_median_iqw`.to TRUE to use the median, else will
@@ -127,4 +136,63 @@ CAGEr tag clusters.
 
 The supplied clusters are ordered by their mean/median interquantile widths
 before proceeding to generate the visualizations.
+}
+\examples{
+
+library(GenomicRanges)
+library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
+library(ChIPseeker)
+library(Biostrings)
+
+bed_fname <- system.file("extdata", "example_info_df.bed.gz",
+         package = "seqArchRplus", mustWork = TRUE)
+
+## info_df <- read.delim(file = bed_fname,
+##         sep = "\t", header = TRUE)
+
+
+tc_gr <- readRDS(system.file("extdata", "example_tc_gr.rds",
+         package = "seqArchRplus", mustWork = TRUE))
+
+use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
+         package = "seqArchRplus", mustWork = TRUE))
+
+
+
+raw_seqs <- Biostrings::readDNAStringSet(
+                          filepath = system.file("extdata",
+                            "example_promoters45.fa.gz",
+                            package = "seqArchRplus",
+                            mustWork = TRUE)
+                        )
+
+raw_seqs_mh <- Biostrings::readDNAStringSet(
+                          filepath = system.file("extdata",
+                            "example_promoters200.fa.gz",
+                            package = "seqArchRplus",
+                            mustWork = TRUE)
+                        )
+
+
+generate_all_plots(sname = "sample1",
+                   bed_info_fname = bed_fname,
+                   seqArchR_clusts = use_clusts,
+                   raw_seqs = raw_seqs,
+                   tc_gr = tc_gr,
+                   use_q_bound = FALSE,
+                   order_by_iqw = TRUE,
+                   use_median_iqw = TRUE,
+                   iqw = TRUE, tpm = TRUE, cons = FALSE,
+                   pos_lab = -45:45,
+                   txdb_obj = TxDb.Dmelanogaster.UCSC.dm6.ensGene,
+                   org_name = "Dmelanogaster22",
+                   qLow = 0.1, qUp = 0.9,
+                   tss_region = c(-500, 100),
+                   raw_seqs_mh = raw_seqs_mh,
+                   motifs = c("WW", "SS", "TATAA", "CG"),
+                   motif_heatmaps_flanks = c(50, 100, 200),
+                   dir_path = tempdir(),
+                   txt_size = 25)
+
+
 }
