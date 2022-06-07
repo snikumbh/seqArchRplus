@@ -20,6 +20,7 @@ generate_all_plots(
   cons = FALSE,
   pos_lab = NULL,
   txdb_obj = NULL,
+  orgdb_obj = NULL,
   org_name = NULL,
   qLow = 0.1,
   qUp = 0.9,
@@ -67,7 +68,9 @@ should be included}
 
 \item{pos_lab}{The position labels}
 
-\item{txdb_obj}{The TranscriptsDB object}
+\item{txdb_obj}{The TranscriptsDB object for the organism}
+
+\item{orgdb_obj}{The OrgDb object for the organism}
 
 \item{org_name}{The organism name. This is used in the tracknames for tracks
 writte nas BED files}
@@ -180,7 +183,7 @@ generate_all_plots(sname = "sample1",
                    raw_seqs = raw_seqs,
                    tc_gr = tc_gr,
                    use_q_bound = FALSE,
-                   order_by_iqw = TRUE,
+                   order_by_iqw = FALSE,
                    use_median_iqw = TRUE,
                    iqw = TRUE, tpm = TRUE, cons = FALSE,
                    pos_lab = -45:45,
@@ -194,5 +197,7 @@ generate_all_plots(sname = "sample1",
                    dir_path = tempdir(),
                    txt_size = 25)
 
-
+}
+\author{
+Sarvesh Nikumbh
 }

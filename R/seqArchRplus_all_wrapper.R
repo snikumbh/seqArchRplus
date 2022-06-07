@@ -37,7 +37,9 @@
 #'
 #' @param pos_lab The position labels
 #'
-#' @param txdb_obj The TranscriptsDB object
+#' @param txdb_obj The TranscriptsDB object for the organism
+#'
+#' @param orgdb_obj The OrgDb object for the organism
 #'
 #' @param org_name The organism name. This is used in the tracknames for tracks
 #' writte nas BED files
@@ -148,7 +150,7 @@
 #'                    raw_seqs = raw_seqs,
 #'                    tc_gr = tc_gr,
 #'                    use_q_bound = FALSE,
-#'                    order_by_iqw = TRUE,
+#'                    order_by_iqw = FALSE,
 #'                    use_median_iqw = TRUE,
 #'                    iqw = TRUE, tpm = TRUE, cons = FALSE,
 #'                    pos_lab = -45:45,
@@ -162,7 +164,7 @@
 #'                    dir_path = tempdir(),
 #'                    txt_size = 25)
 #'
-#'
+#' @author Sarvesh Nikumbh
 generate_all_plots <- function(sname, bed_info_fname,
                                 custom_colnames = NULL,
                                 seqArchR_clusts,
@@ -175,6 +177,7 @@ generate_all_plots <- function(sname, bed_info_fname,
                                 iqw = TRUE, tpm = TRUE, cons = FALSE,
                                 pos_lab = NULL,
                                 txdb_obj = NULL,
+                                orgdb_obj = NULL,
                                 org_name = NULL,
                                 qLow = 0.1, qUp = 0.9,
                                 tss_region = c(-500, 100),
@@ -210,7 +213,6 @@ generate_all_plots <- function(sname, bed_info_fname,
     }
     ##
     if(is.null(custom_colnames)){
-        message("NO custom colnames")
         info_df <- utils::read.delim(file = bed_info_fname,
                                         sep = "\t", header = TRUE)
     }else{
@@ -296,6 +298,15 @@ generate_all_plots <- function(sname, bed_info_fname,
             one_plot = FALSE,
             txt_size = 12
         )
+
+    go_list_pl <- per_cluster_go_term_enrichments(sname = "sample1",
+                            clusts = use_clusts,
+                            tc_gr = tc_gr,
+                            txdb_obj = txdb_obj,
+                            dir_path = dir_path,
+                            one_file = TRUE,
+                            tss_region = tss_region,
+                            orgdb_obj = orgdb_obj)
 
     seqlogos_oneplot_pl <-
         per_cluster_seqlogos(

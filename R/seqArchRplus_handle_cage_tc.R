@@ -93,7 +93,7 @@
 #'
 #' }
 #'
-#'
+#' @author Sarvesh Nikumbh
 ## Writes TCs as BED files via GRanges and also as FASTA files with a fixed
 ## flank size of +/- 500 bp (or provided flank size)
 ##

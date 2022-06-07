@@ -103,5 +103,7 @@ if(require("BSgenome.Dmelanogaster.UCSC.dm6")){
 
 }
 
-
+}
+\author{
+Sarvesh Nikumbh
 }

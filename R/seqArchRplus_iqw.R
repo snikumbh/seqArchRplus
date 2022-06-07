@@ -80,6 +80,7 @@
 #'                             txt_size = 14)
 #'
 #'
+#' @author Sarvesh Nikumbh
 iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
                             tpm = TRUE, cons = TRUE, txt_size = 12,
                             use_suffix = NULL, use_prefix = "C",

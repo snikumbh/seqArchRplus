@@ -142,6 +142,8 @@
 #'     final = TRUE, dir_path = use_dir)
 #' }
 #'
+#'
+#' @author Sarvesh Nikumbh
 curate_clusters <- function(sname, use_aggl = "ward.D", use_dist = "euclid",
                             seqArchR_result, iter, pos_lab = NULL,
                             regularize = TRUE, topn = 50, use_cutk = 2,

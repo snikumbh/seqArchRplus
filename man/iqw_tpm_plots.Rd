@@ -92,3 +92,6 @@ iqw_tpm_pl <- iqw_tpm_plots(sname = "sample1",
 
 
 }
+\author{
+Sarvesh Nikumbh
+}

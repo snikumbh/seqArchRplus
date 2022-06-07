@@ -64,10 +64,13 @@ use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
          package = "seqArchRplus", mustWork = TRUE))
 
 plot_motif_heatmaps(sname = "sample1", seqs = raw_seqs,
-                    flanks = c(50, 100, 200),
+                    flanks = c(10, 20, 50),
                     clusts = use_clusts,
                     motifs = c("WW", "SS", "TATAA", "CG", "Y"),
                     dir_path = tempdir(),
                     fheight = 800, fwidth = 1600)
 
+}
+\author{
+Sarvesh Nikumbh
 }

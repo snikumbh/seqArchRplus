@@ -1,3 +1,11 @@
+# seqArchRplus 0.99.0.7
+
+## New
+* (User-facing) Now possible to perform per cluster GO term enrichment analysis 
+  via `per_cluster_go_term_enrichments()` when a orgDb package is available for
+  the organism
+
+
 # seqArchRplus 0.99.0.6
 
 ## New

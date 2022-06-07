@@ -2,6 +2,18 @@
 
 #' @title per_cluster_annotations
 #'
+#' @description This function helps annotate the genomic regions specified in
+#' `tc_gr` with features, namely, promoter-TSS (transcription start site),
+#' exons, 5'UTR, 3'UTR, introns and (distal) intergenic regions. This requires
+#' that the annotations are available as a TxDb object. The selected genomic
+#' regions can be specified as a single GenomicRanges object. These regions
+#' can be specified directly as a BED file (when available) or select specific
+#' regions from a larger set of regions based on some clustering.
+#'
+#' When working with CAGE data, if the CAGEr package was used and the
+#' corresponding CAGEexp object is available, it can also be used -- see
+#' `cager_obj` argument.
+#'
 #' @param sname Sample name. Default is NULL. This is a required argument
 #' if the CAGEexp object is provided. See `cager_obj` argument
 #' @param clusts List of sequence IDs in each cluster. This can be NULL only

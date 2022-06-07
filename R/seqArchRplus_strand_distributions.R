@@ -41,6 +41,8 @@
 #'                                              colrs = pair_colrs)
 #'
 #'
+#'
+#' @author Sarvesh Nikumbh
 per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
                                     colrs = "Paired") {
     cli::cli_h1(paste0("All clusters' strand distributions"))

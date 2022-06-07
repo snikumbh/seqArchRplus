@@ -33,7 +33,7 @@
 #'                 pos_lab = -45:45,
 #'                 dir_path = tempdir())
 #'
-#'
+#' @author Sarvesh Nikumbh
 seqs_acgt_image <- function(sname, seqs, seqs_ord, pos_lab, xt_freq = 5,
                             yt_freq = 500, f_height = 1200,
                             f_width = 600, dir_path) {

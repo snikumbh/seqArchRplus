@@ -63,6 +63,7 @@
 #'                                    dir_path = tempdir(),
 #'                                    txt_size = 14)
 #'
+#' @author Sarvesh Nikumbh
 per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
                                     pos_lab = NULL, bits_yax = "max",
                                     strand_sep = FALSE, one_plot = TRUE,

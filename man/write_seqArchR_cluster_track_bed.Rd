@@ -132,5 +132,7 @@ write_seqArchR_cluster_track_bed(sname = "sample1",
 }
 
 
-
+}
+\author{
+Sarvesh Nikumbh
 }

@@ -166,4 +166,8 @@ seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(sname = sn,
     final = TRUE, dir_path = use_dir)
 }
 
+
+}
+\author{
+Sarvesh Nikumbh
 }

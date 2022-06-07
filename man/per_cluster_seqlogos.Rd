@@ -84,3 +84,6 @@ seqlogo_pl <- per_cluster_seqlogos(sname = "sample1",
                                    txt_size = 14)
 
 }
+\author{
+Sarvesh Nikumbh
+}

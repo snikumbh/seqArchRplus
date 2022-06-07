@@ -51,4 +51,8 @@ per_cl_strand_pl <- per_cluster_strand_dist(sname = "sample1",
                                              colrs = pair_colrs)
 
 
+
+}
+\author{
+Sarvesh Nikumbh
 }

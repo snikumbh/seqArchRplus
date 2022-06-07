@@ -58,5 +58,7 @@ seqs_acgt_image(sname = "sample1",
                 pos_lab = -45:45,
                 dir_path = tempdir())
 
-
+}
+\author{
+Sarvesh Nikumbh
 }

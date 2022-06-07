@@ -125,7 +125,7 @@
 #' }
 #'
 #'
-#'
+#' @author Sarvesh Nikumbh
 write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
                                                 use_q_bound = TRUE,
                                                 use_as_names = NULL,
