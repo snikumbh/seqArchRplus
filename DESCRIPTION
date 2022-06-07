@@ -2,7 +2,7 @@ Type: Package
 Package: seqArchRplus
 Title: Downstream analyses of promoter sequence architectures and HTML
     report generation
-Version: 0.99.0.6
+Version: 0.99.0.7
 Authors@R: 
     person("Sarvesh", "Nikumbh", , "sarvesh.nikumbh@gmail.com", 
     role = c("aut", "cre", "cph"),
@@ -67,7 +67,8 @@ Suggests:
     xfun
 VignetteBuilder: 
     knitr
-biocViews: Annotation, Visualization, ReportWriting, GO
+biocViews: Annotation, Visualization, ReportWriting, GO, MotifAnnotation, 
+    Clustering
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.1.2
