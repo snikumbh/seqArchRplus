@@ -17,7 +17,11 @@
 #' @param clusts List of sequence ids in each cluster.
 #'
 #' @param info_df The data.frame holding information to be written to the BED
-#' file
+#' file. Expected columns are "chr", "start", "end", "names", "strand",
+#' "domTPM", and "dominant_ctss". Out of these, only "dominant_ctss" column is
+#' optional; when present this is visualised as thickStart and thickEnd.
+#' The "domTPM" column is treated as scores for visualizing by default. One
+#' can also visualize PhastCons score
 #'
 #' @param use_q_bound Logical. Write the lower and upper quantiles as tag
 #' cluster boundaries. Default is TRUE
@@ -56,15 +60,18 @@
 #'
 #' Note on BED files:
 #' The output BED files have selected columns provided in the `info_df`.
-#' These are "chr", "start", "end", "name", "score", "strand", "dominant_ctss".
+#' These are "chr", "start", "end", "name", "score" (see more info below),
+#'  "strand", "dominant_ctss".
 #' By default, the sequence/tag cluster IDs are used as names.
 #' If `use_as_names` is specified, information from that column in the
 #' `info_df` is used as "name".
+#'
 #' If conservation score (e.g., PhastCons) is available, it is used as the
-#' score, otherwise the TPM value of the dominant CTSS is used.
-#' The final two columns, are the 'thickStart' and 'thickEnd' values
-#' corresponding to the BED format. The 'thickEnd' column is the dominant_ctss
-#' position.
+#' score, otherwise the TPM value of the dominant CTSS (domTPM) is used.
+#' The final two columns (when dominantCTSS column is present), are the
+#'  'thickStart' and 'thickEnd' values corresponding to the BED format.
+#'  The 'thickEnd' column is the dominant_ctss position.
+#'
 #' Importantly, the lower and upper quantile boundaries are used as the start
 #' and end coordinates of the cluster when `use_q_bound` is set to TRUE
 #' (the default).
@@ -350,19 +357,37 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
         given_df$phast, given_df$domTPM
     )
 
+    use_domctss <- ifelse("dominant_ctss" %in% colnames(given_df), TRUE, FALSE)
+    ## We do not assume any dominant_ctss positions.
+    ## The input DF can be appropriately modified before calling:
+    ## add a new column by manuipulating the start and end coordinates
 
-    utils::write.table(data.frame(given_df$chr,
-        formatC(as.integer(given_df$start-1), format = "f", digits = 0),
-        formatC(as.integer(given_df$end), format = "f", digits = 0),
-        use_names, ## Name column
-        score = use_score, ## Score column
-        given_df$strand, ## Strand column
-        as.integer(given_df$dominant_ctss)-1, ## thickStart
-        as.integer(given_df$dominant_ctss) ## thickEnd
-    ),
-    file = bedFilename,
-    append = TRUE, col.names = FALSE, row.names = FALSE,
-    quote = FALSE, sep = "\t"
-    )
+    if(use_domctss){
+        utils::write.table(data.frame(given_df$chr,
+            formatC(as.integer(given_df$start-1), format = "f", digits = 0),
+            formatC(as.integer(given_df$end), format = "f", digits = 0),
+            use_names, ## Name column
+            score = use_score, ## Score column
+            given_df$strand, ## Strand column
+            as.integer(given_df$dominant_ctss)-1, ## thickStart
+            as.integer(given_df$dominant_ctss) ## thickEnd
+        ),
+        file = bedFilename,
+        append = TRUE, col.names = FALSE, row.names = FALSE,
+        quote = FALSE, sep = "\t"
+        )
+    }else{
+        utils::write.table(data.frame(given_df$chr,
+            formatC(as.integer(given_df$start-1), format = "f", digits = 0),
+            formatC(as.integer(given_df$end), format = "f", digits = 0),
+            use_names, ## Name column
+            score = use_score, ## Score column
+            given_df$strand ## Strand column
+        ),
+            file = bedFilename,
+            append = TRUE, col.names = FALSE, row.names = FALSE,
+            quote = FALSE, sep = "\t"
+        )
+    }
 }
 ## =============================================================================

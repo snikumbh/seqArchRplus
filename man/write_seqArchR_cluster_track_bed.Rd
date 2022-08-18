@@ -24,7 +24,11 @@ write_seqArchR_cluster_track_bed(
 \item{clusts}{List of sequence ids in each cluster.}
 
 \item{info_df}{The data.frame holding information to be written to the BED
-file}
+file. Expected columns are "chr", "start", "end", "names", "strand",
+"domTPM", and "dominant_ctss". Out of these, only "dominant_ctss" column is
+optional; when present this is visualised as thickStart and thickEnd.
+The "domTPM" column is treated as scores for visualizing by default. One
+can also visualize PhastCons score}
 
 \item{use_q_bound}{Logical. Write the lower and upper quantiles as tag
 cluster boundaries. Default is TRUE}
@@ -74,15 +78,18 @@ and can slow down loading of the HTML file in your browser.
 
 Note on BED files:
 The output BED files have selected columns provided in the `info_df`.
-These are "chr", "start", "end", "name", "score", "strand", "dominant_ctss".
+These are "chr", "start", "end", "name", "score" (see more info below),
+ "strand", "dominant_ctss".
 By default, the sequence/tag cluster IDs are used as names.
 If `use_as_names` is specified, information from that column in the
 `info_df` is used as "name".
+
 If conservation score (e.g., PhastCons) is available, it is used as the
-score, otherwise the TPM value of the dominant CTSS is used.
-The final two columns, are the 'thickStart' and 'thickEnd' values
-corresponding to the BED format. The 'thickEnd' column is the dominant_ctss
-position.
+score, otherwise the TPM value of the dominant CTSS (domTPM) is used.
+The final two columns (when dominantCTSS column is present), are the
+ 'thickStart' and 'thickEnd' values corresponding to the BED format.
+ The 'thickEnd' column is the dominant_ctss position.
+
 Importantly, the lower and upper quantile boundaries are used as the start
 and end coordinates of the cluster when `use_q_bound` is set to TRUE
 (the default).
