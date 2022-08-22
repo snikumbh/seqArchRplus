@@ -88,6 +88,8 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
             start = midP - fl_up,
             end = midP + fl_down
         )
+        message("local")
+        print(head(seqs))
         ##
         seq_order <- unlist(clusts)
         #### Using heatmaps pkg
@@ -113,10 +115,12 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
         ), ".png")
         fname <- file.path(result_dir_path, fname_suffix)
 
-        clust_lens <- unlist(lapply(clusts, length))
+        clust_lens <- lengths(clusts)
+        print(clust_lens)
         ##
         grDevices::png(fname, height = fheight, width = fwidth, units = funits)
-        pl_hms <- heatmaps::plotHeatmapList(patt_hm_list500,
+        pl_hms <- heatmaps::plotHeatmapList(
+            patt_hm_list500,
             box.width = 1.3,
             cex.label = 1.1,
             cex.axis = 0.7, scale.lwd = 0.5,
@@ -126,7 +130,8 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
             partition.lines = TRUE,
             partition.col = nClust_colors,
             legend = TRUE,
-            legend.width = 0.3, cex.legend = 0.8,
+            legend.width = 0.3,
+            cex.legend = 0.8,
             legend.pos = "r"
         )
         grDevices::dev.off()
@@ -135,3 +140,210 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
     ##
 }
 ## =============================================================================
+
+
+.get_cluster_legend_plot <- function(clusts, use_colors){
+    # Cluster partitions
+    nClust <- length(clusts)
+    clust_lens <- lengths(clusts)
+
+    if (is.null(use_colors)) {
+        message("Using default colors")
+        nClust_colors <- .get_ncolors(n = nClust, palname = "Set1")
+    }
+    ##
+
+    clust_pl_formula <- function() {
+        opts <- heatmaps::heatmapOptions()
+        opts$partition <- clust_lens
+        opts$colors <- nClust_colors
+        #png(filename = "./dummy.png", width = 200, height = 800)
+        heatmaps::plot_clusters(opts)
+        #dev.off()
+    }
+
+    clust_pl <- cowplot::ggdraw()
+
+    message("clust_pl saved")
+    # clust_pl
+}
+
+
+#' @title Plot heatmaps of motifs occurring in seqArchR clusters
+#'
+#' @description This function uses the seqPattern package. It is
+#'  recommended to use this function rather than `plot_motif_heatmaps`
+#'
+#' @param sname The sample name
+#'
+#' @param seqs The sequences as a DNAStringSet object
+#'
+#' @param flanks Flank size. The same flank is used upstream and downstream.
+#' A vector of values is also accepted when more than oone flanks should be
+#' visualized.
+#'
+#' @param clusts List of sequence Ids in each cluster.
+#'
+#' @param use_colors Specify colors to use
+#'
+#' @param motifs A vector of motifs to be visualized in the sequence. This can
+#' be any words formed by the
+#' \href{https://www.bioinformatics.org/sms2/iupac.html}{IUPAC code}.
+#' For example, TATAA, CG, WW, SS etc.
+#'
+#' @param dir_path The path to the directory
+#'
+#' @param fheight,fwidth Height and width of the individual heatmap
+#' plots in pixels. Default values are 500 and 300
+#'
+#' @param n_cores Numeric. If you wish to parallelize annotation of peaks,
+#' specify the number of cores. Default is 1 (serial)
+#'
+#' @param ... Additional arguments passed to seqPattern::plotPatternDensityMap
+#'
+#' @return Nothing. PNG images are written to disk using the provided filenames.
+#'
+#' @importFrom Biostrings width
+#'
+#' @export
+#'
+#' @examples
+#'
+#' library(Biostrings)
+#' raw_seqs <- Biostrings::readDNAStringSet(
+#'                           filepath = system.file("extdata",
+#'                             "example_promoters200.fa.gz",
+#'                             package = "seqArchRplus",
+#'                             mustWork = TRUE)
+#'                         )
+#'
+#' use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
+#'          package = "seqArchRplus", mustWork = TRUE))
+#'
+#' plot_motif_heatmaps2(sname = "sample1", seqs = raw_seqs,
+#'                     flanks = c(10, 20, 50),
+#'                     clusts = use_clusts,
+#'                     motifs = c("WW", "SS", "TATAA", "CG", "Y"),
+#'                     dir_path = tempdir(),
+#'                     fheight = 800, fwidth = 1600)
+#'
+#' @author Sarvesh Nikumbh
+
+## Using seqPattern and cowplot
+## TODO: different flanks
+plot_motif_heatmaps2 <- function(sname,
+                            seqs, flanks = c(50), clusts,
+                            use_colors = NULL, motifs, dir_path,
+                            fheight = 1.5*fwidth, fwidth = 2000,
+                            n_cores = 1, ...){
+    cli::cli_h1(paste0("Motif heatmaps"))
+    cli::cli_h2(paste0("Sample: ", sname))
+    ##
+    parallelize <- FALSE
+    if (n_cores > 1) parallelize <- TRUE
+    # bpparam <- .handle_multicore(crs = n_cores, parallelize = parallelize)
+    ##
+    result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
+    ##
+    all_motifs_str <- paste0(motifs, collapse = "_")
+
+    ######
+    ## Iterate over different flanks
+    sam <- lapply(flanks, function(x) {
+        cli::cli_h3(paste0("Using flank: ", x))
+        fl_up <- fl_down <- x
+
+        maxL <- Biostrings::width(seqs[1])
+        midP <- base::ceiling(maxL / 2)
+        seqs <- Biostrings::subseq(seqs,
+            start = midP - fl_up,
+            end = midP + fl_down
+        )
+        message("local")
+        print(head(seqs))
+        ##
+        seq_order <- unlist(clusts)
+        #### Using seqPattern pkg
+        fname_suffix <- paste(fl_up, "up", fl_down, "down",
+            "motifHeatmaps", all_motifs_str,
+            sep = "_"
+        )
+        use_ext <- ".png"
+        fname <- file.path(result_dir_path, fname_suffix)
+        fname_w_ext <- file.path(result_dir_path, paste0(fname_suffix, use_ext))
+
+        clust_lens <- lengths(clusts)
+
+        use_ticks <- cumsum(clust_lens)
+
+        ##
+        use_tempdir <- tempdir()
+        use_outFile <- file.path(
+            use_tempdir,
+            paste0("TStamp_",
+                format(Sys.time(), "%Y-%m-%d_%H_%M_%S"),
+                "_PatternDensityMap"))
+
+        use_xticksAt <- c(1, Biostrings::width(seqs[1])/2,
+            Biostrings::width(seqs[1])-1)
+        use_yticksAt <- rev(cumsum(clust_lens))
+
+        ##
+        seqPattern::plotPatternDensityMap(
+            regionsSeq = seqs,
+            seqOrder = seq_order,
+            flankUp = fl_up,
+            flankDown = fl_down,
+            patterns = motifs,
+            addReferenceLine = TRUE,
+            xTicksAt = use_xticksAt,
+            xTicks = c(-x, 0, x),
+            yTicksAt = use_yticksAt,
+            yTicks = rep("", length(use_yticksAt)),
+            useMulticore = parallelize,
+            nrCores = n_cores,
+            outFile = use_outFile,
+            plotWidth = fwidth,
+            plotHeight = fheight,
+            ...)
+        ##
+
+        # clust_pl <- .get_cluster_legend_plot(clusts, use_colors)
+
+        ##
+        fname_patt <- basename(use_outFile)
+        files <- list.files(use_tempdir, pattern = fname_patt,
+            full.names = TRUE)
+        ##
+        legend_file <- grep("ColorLegend", files)
+        file.copy(from = files[legend_file],
+            to = paste0(fname, ".ColorLegend.png"))
+        ## order the files by the sequence in motifs TODO
+        # files <- c(files[-legend_file], files[legend_file])
+        files <- files[-legend_file]
+        ## For the moment, keep legend file separate
+        stopifnot(length(files) > 0)
+
+        files <- rev(files)
+        pick_pls <- lapply(files, function(f){
+                        pl <- cowplot::ggdraw() +
+                            cowplot::draw_image(f)
+                        pl
+                    })
+        ##
+        grid_pl <- cowplot::plot_grid(plotlist = pick_pls, nrow = 1,
+            align = c("h")
+        )
+        ##
+        cowplot::save_plot(filename = fname_w_ext, plot = grid_pl, nrow = 1)
+
+        ##
+        cli::cli_alert_success(paste0("Written to: ", fname_w_ext))
+        grid_pl
+    })
+    sam
+
+}
+
+
+
