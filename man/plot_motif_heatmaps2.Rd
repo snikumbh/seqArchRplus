@@ -70,8 +70,7 @@ plot_motif_heatmaps2(sname = "sample1", seqs = raw_seqs,
                     flanks = c(10, 20, 50),
                     clusts = use_clusts,
                     motifs = c("WW", "SS", "TATAA", "CG", "Y"),
-                    dir_path = tempdir(),
-                    fheight = 800, fwidth = 1600)
+                    dir_path = tempdir())
 
 }
 \author{

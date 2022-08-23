@@ -2,7 +2,7 @@ Type: Package
 Package: seqArchRplus
 Title: Downstream analyses of promoter sequence architectures and HTML
     report generation
-Version: 0.99.0.8
+Version: 0.99.0.9
 Authors@R: 
     person("Sarvesh", "Nikumbh", , "sarvesh.nikumbh@gmail.com", 
     role = c("aut", "cre", "cph"),
@@ -48,6 +48,7 @@ Imports:
     RColorBrewer,
     scales,
     seqArchR,
+    seqPattern,
     stats,
     utils
 Suggests:

@@ -88,8 +88,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
             start = midP - fl_up,
             end = midP + fl_down
         )
-        message("local")
-        print(head(seqs))
+
         ##
         seq_order <- unlist(clusts)
         #### Using heatmaps pkg
@@ -116,7 +115,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
         fname <- file.path(result_dir_path, fname_suffix)
 
         clust_lens <- lengths(clusts)
-        print(clust_lens)
+
         ##
         grDevices::png(fname, height = fheight, width = fwidth, units = funits)
         pl_hms <- heatmaps::plotHeatmapList(
@@ -142,32 +141,36 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 ## =============================================================================
 
 
-.get_cluster_legend_plot <- function(clusts, use_colors){
-    # Cluster partitions
-    nClust <- length(clusts)
-    clust_lens <- lengths(clusts)
+# .get_cluster_legend_plot <- function(clusts, use_colors){
+#     # Cluster partitions
+#     nClust <- length(clusts)
+#     clust_lens <- lengths(clusts)
+#
+#     if (is.null(use_colors)) {
+#         message("Using default colors")
+#         nClust_colors <- .get_ncolors(n = nClust, palname = "Set1")
+#     }
+#     ##
+#
+#     clust_pl_formula <- function() {
+#         opts <- heatmaps::heatmapOptions()
+#         opts$partition <- clust_lens
+#         opts$colors <- nClust_colors
+#         #png(filename = "./dummy.png", width = 200, height = 800)
+#         heatmaps::plot_clusters(opts)
+#         #dev.off()
+#     }
+#
+#     clust_pl <- cowplot::ggdraw()
+#
+#     message("clust_pl saved")
+#
+# }
 
-    if (is.null(use_colors)) {
-        message("Using default colors")
-        nClust_colors <- .get_ncolors(n = nClust, palname = "Set1")
-    }
-    ##
 
-    clust_pl_formula <- function() {
-        opts <- heatmaps::heatmapOptions()
-        opts$partition <- clust_lens
-        opts$colors <- nClust_colors
-        #png(filename = "./dummy.png", width = 200, height = 800)
-        heatmaps::plot_clusters(opts)
-        #dev.off()
-    }
 
-    clust_pl <- cowplot::ggdraw()
-
-    message("clust_pl saved")
-    # clust_pl
-}
-
+## Using seqPattern and cowplot
+## TODO: different flanks
 
 #' @title Plot heatmaps of motifs occurring in seqArchR clusters
 #'
@@ -199,11 +202,13 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 #' @param n_cores Numeric. If you wish to parallelize annotation of peaks,
 #' specify the number of cores. Default is 1 (serial)
 #'
-#' @param ... Additional arguments passed to seqPattern::plotPatternDensityMap
+#' @param ... Additional arguments passed to
+#' \code{\link{seqPattern::plotPatternDensityMap}}
 #'
 #' @return Nothing. PNG images are written to disk using the provided filenames.
 #'
 #' @importFrom Biostrings width
+#' @importFrom seqPattern plotPatternDensityMap
 #'
 #' @export
 #'
@@ -223,14 +228,11 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 #' plot_motif_heatmaps2(sname = "sample1", seqs = raw_seqs,
 #'                     flanks = c(10, 20, 50),
 #'                     clusts = use_clusts,
-#'                     motifs = c("WW", "SS", "TATAA", "CG", "Y"),
-#'                     dir_path = tempdir(),
-#'                     fheight = 800, fwidth = 1600)
+#'                     motifs = c("WW", "SS"),
+#'                     dir_path = tempdir())
 #'
 #' @author Sarvesh Nikumbh
 
-## Using seqPattern and cowplot
-## TODO: different flanks
 plot_motif_heatmaps2 <- function(sname,
                             seqs, flanks = c(50), clusts,
                             use_colors = NULL, motifs, dir_path,
@@ -259,8 +261,7 @@ plot_motif_heatmaps2 <- function(sname,
             start = midP - fl_up,
             end = midP + fl_down
         )
-        message("local")
-        print(head(seqs))
+
         ##
         seq_order <- unlist(clusts)
         #### Using seqPattern pkg
@@ -339,9 +340,7 @@ plot_motif_heatmaps2 <- function(sname,
 
         ##
         cli::cli_alert_success(paste0("Written to: ", fname_w_ext))
-        grid_pl
     })
-    sam
 
 }
 
