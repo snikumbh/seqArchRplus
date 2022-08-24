@@ -9,9 +9,14 @@
 #' @param dir_path Specify the path to the directory on disk where plots
 #' will be saved
 #' @param colrs Specify colors used for two strands
+#' @param txt_size Size of the text in the plots (includes plot title,
+#' y-axis title, axis texts, legend title and text)
+#' @param fwidth Width of the individual plots in file
+#' @param fheight Height of the plots in file
 #'
 #' @return A list of plots showing the per cluster division of promoters on
-#' chromosomes and strands. Plots are also written to disk.
+#' chromosomes and strands. These plots are also written to disk in file named
+#' "Per_cluster_strand_distributions.pdf"
 #'
 #' @importFrom ggplot2 theme_classic scale_fill_manual element_line
 #'
@@ -26,25 +31,24 @@
 #' info_df <- read.delim(file = bed_fname,
 #'          sep = "\t", header = TRUE,
 #'          col.names = c("chr", "start", "end", "width",
+#'                  "strand", "score", "nr_ctss",
 #'                  "dominant_ctss", "domTPM",
-#'                  "strand",	"score", "nr_ctss",
 #'                  "q_0.1", "q_0.9", "IQW", "tpm"))
 #'
 #' use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
 #'          package = "seqArchRplus", mustWork = TRUE))
 #'
-#' pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")
+#' pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")[4:5]
 #' per_cl_strand_pl <- per_cluster_strand_dist(sname = "sample1",
 #'                                              clusts = use_clusts,
 #'                                              info_df = info_df,
 #'                                              dir_path = tempdir(),
 #'                                              colrs = pair_colrs)
 #'
-#'
-#'
 #' @author Sarvesh Nikumbh
 per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
-                                    colrs = "Paired") {
+                                    colrs = "Paired", txt_size = 14,
+                                    fwidth = 20, fheight = 3) {
     cli::cli_h1(paste0("All clusters' strand distributions"))
     cli::cli_h2(paste0("Sample: ", sname))
     ##
@@ -55,6 +59,7 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
         result_dir_path,
         paste0("Per_cluster_strand_distributions.pdf")
     )
+
 
     chr_set <- unique(info_df$chr)
     nChr <- length(chr_set)
@@ -110,8 +115,13 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
             )) +
             theme_classic() +
             theme(
+                plot.title = element_text(size = txt_size),
+                axis.text = element_text(size = txt_size),
+                axis.title.y = element_text(size = txt_size),
+                legend.title = element_text(size = txt_size),
                 legend.text = element_text(
-                    size = 12, face = "plain",
+                    size = txt_size,
+                    face = "plain",
                     color = "black"
                 ),
                 legend.position = "right",
@@ -119,9 +129,17 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
             )
         return(pl)
     })
-    grDevices::pdf(file = fname, width = 20, height = 2, onefile = TRUE)
-    lapply(plot_list, print)
+    grDevices::pdf(file = fname, width = fwidth, height = fheight,
+        onefile = TRUE)
+    lapply(plot_list, gridExtra::grid.arrange)
     grDevices::dev.off()
+
+    ## This approach produces pages with text stating "page x of X" at the top.
+    ## We do not want this. And, I don't know of a way to disable it.
+    # ml <- gridExtra::marrangeGrob(plot_list,
+    #     nrow = 1,
+    #     ncol = 1)
+    # ggplot2::ggsave(fname2, ml, width = 20, height = 2)
     plot_list
 }
 ## =============================================================================

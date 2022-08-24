@@ -44,10 +44,13 @@ plots in pixels. Default values are 500 and 300}
 \item{n_cores}{Numeric. If you wish to parallelize annotation of peaks,
 specify the number of cores. Default is 1 (serial)}
 
-\item{...}{Additional arguments passed to seqPattern::plotPatternDensityMap}
+\item{...}{Additional arguments passed to
+\code{\link[seqPattern]{plotPatternDensityMap}}}
 }
 \value{
 Nothing. PNG images are written to disk using the provided filenames.
+In addition, two legends are printed to separate files: the color legend
+and the clustering legend, which can be then combined with the heatmaps.
 }
 \description{
 This function uses the seqPattern package. It is
@@ -69,7 +72,7 @@ use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
 plot_motif_heatmaps2(sname = "sample1", seqs = raw_seqs,
                     flanks = c(10, 20, 50),
                     clusts = use_clusts,
-                    motifs = c("WW", "SS", "TATAA", "CG", "Y"),
+                    motifs = c("WW", "SS"),
                     dir_path = tempdir())
 
 }

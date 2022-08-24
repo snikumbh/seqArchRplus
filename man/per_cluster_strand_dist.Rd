@@ -5,7 +5,16 @@
 \title{Visualize as barplots how promoters in each cluster are distributed
 on different chromosomes and strands}
 \usage{
-per_cluster_strand_dist(sname, clusts, info_df, dir_path, colrs = "Paired")
+per_cluster_strand_dist(
+  sname,
+  clusts,
+  info_df,
+  dir_path,
+  colrs = "Paired",
+  txt_size = 14,
+  fwidth = 20,
+  fheight = 3
+)
 }
 \arguments{
 \item{sname}{The sample name}
@@ -18,10 +27,18 @@ per_cluster_strand_dist(sname, clusts, info_df, dir_path, colrs = "Paired")
 will be saved}
 
 \item{colrs}{Specify colors used for two strands}
+
+\item{txt_size}{Size of the text in the plots (includes plot title,
+y-axis title, axis texts, legend title and text)}
+
+\item{fwidth}{Width of the individual plots in file}
+
+\item{fheight}{Height of the plots in file}
 }
 \value{
 A list of plots showing the per cluster division of promoters on
-chromosomes and strands. Plots are also written to disk.
+chromosomes and strands. These plots are also written to disk in file named
+"Per_cluster_strand_distributions.pdf"
 }
 \description{
 Visualize as barplots how promoters in each cluster are distributed
@@ -36,21 +53,19 @@ bed_fname <- system.file("extdata", "example_info_df.bed.gz",
 info_df <- read.delim(file = bed_fname,
          sep = "\t", header = TRUE,
          col.names = c("chr", "start", "end", "width",
+                 "strand", "score", "nr_ctss",
                  "dominant_ctss", "domTPM",
-                 "strand",	"score", "nr_ctss",
                  "q_0.1", "q_0.9", "IQW", "tpm"))
 
 use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
          package = "seqArchRplus", mustWork = TRUE))
 
-pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")
+pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")[4:5]
 per_cl_strand_pl <- per_cluster_strand_dist(sname = "sample1",
                                              clusts = use_clusts,
                                              info_df = info_df,
                                              dir_path = tempdir(),
                                              colrs = pair_colrs)
-
-
 
 }
 \author{

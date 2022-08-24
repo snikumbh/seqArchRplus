@@ -141,31 +141,31 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 ## =============================================================================
 
 
-# .get_cluster_legend_plot <- function(clusts, use_colors){
-#     # Cluster partitions
-#     nClust <- length(clusts)
-#     clust_lens <- lengths(clusts)
-#
-#     if (is.null(use_colors)) {
-#         message("Using default colors")
-#         nClust_colors <- .get_ncolors(n = nClust, palname = "Set1")
-#     }
-#     ##
-#
-#     clust_pl_formula <- function() {
-#         opts <- heatmaps::heatmapOptions()
-#         opts$partition <- clust_lens
-#         opts$colors <- nClust_colors
-#         #png(filename = "./dummy.png", width = 200, height = 800)
-#         heatmaps::plot_clusters(opts)
-#         #dev.off()
-#     }
-#
-#     clust_pl <- cowplot::ggdraw()
-#
-#     message("clust_pl saved")
-#
-# }
+.get_cluster_legend_plot <- function(clusts, use_colors,
+                                        result_dir_path,
+                                        fwidth = 200, fheight = 800){
+    # Cluster partitions
+    nClust <- length(clusts)
+    clust_lens <- rev(lengths(clusts))
+
+    if (is.null(use_colors)) {
+        message("Using default colors")
+        nClust_colors <- .get_ncolors(n = nClust, palname = "Set1")
+    }
+    ##
+
+    opts <- heatmaps::heatmapOptions()
+    opts$partition <- clust_lens
+    opts$colors <- nClust_colors
+    clust_pl_fname <- file.path(result_dir_path,
+                                "motif_heatmaps_ClusteringLegend.png")
+    png(filename = clust_pl_fname, width = fwidth, height = fheight,
+        units = "px")
+    heatmaps::plot_clusters(opts)
+    dev.off()
+
+    clust_pl_fname
+}
 
 
 
@@ -203,12 +203,15 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 #' specify the number of cores. Default is 1 (serial)
 #'
 #' @param ... Additional arguments passed to
-#' \code{\link{seqPattern::plotPatternDensityMap}}
+#' \code{\link[seqPattern]{plotPatternDensityMap}}
 #'
 #' @return Nothing. PNG images are written to disk using the provided filenames.
+#' In addition, two legends are printed to separate files: the color legend
+#' and the clustering legend, which can be then combined with the heatmaps.
 #'
 #' @importFrom Biostrings width
 #' @importFrom seqPattern plotPatternDensityMap
+#' @importFrom grDevices png
 #'
 #' @export
 #'
@@ -249,6 +252,12 @@ plot_motif_heatmaps2 <- function(sname,
     ##
     all_motifs_str <- paste0(motifs, collapse = "_")
 
+    ##
+    clust_pl_fname <- .get_cluster_legend_plot(clusts, use_colors,
+                            result_dir_path,
+                            fwidth = 200, fheight = 0.75*fheight)
+
+
     ######
     ## Iterate over different flanks
     sam <- lapply(flanks, function(x) {
@@ -278,7 +287,7 @@ plot_motif_heatmaps2 <- function(sname,
         use_ticks <- cumsum(clust_lens)
 
         ##
-        use_tempdir <- tempdir()
+        use_tempdir <- "." #tempdir()
         use_outFile <- file.path(
             use_tempdir,
             paste0("TStamp_",
@@ -309,7 +318,6 @@ plot_motif_heatmaps2 <- function(sname,
             ...)
         ##
 
-        # clust_pl <- .get_cluster_legend_plot(clusts, use_colors)
 
         ##
         fname_patt <- basename(use_outFile)
@@ -317,8 +325,11 @@ plot_motif_heatmaps2 <- function(sname,
             full.names = TRUE)
         ##
         legend_file <- grep("ColorLegend", files)
+        final_legend_fname <- paste0(fname, ".ColorLegend.png")
         file.copy(from = files[legend_file],
-            to = paste0(fname, ".ColorLegend.png"))
+            to = final_legend_fname)
+
+        ##
         ## order the files by the sequence in motifs TODO
         # files <- c(files[-legend_file], files[legend_file])
         files <- files[-legend_file]
@@ -326,21 +337,40 @@ plot_motif_heatmaps2 <- function(sname,
         stopifnot(length(files) > 0)
 
         files <- rev(files)
+        #files <- c(files, clust_pl_fname)
         pick_pls <- lapply(files, function(f){
                         pl <- cowplot::ggdraw() +
                             cowplot::draw_image(f)
                         pl
                     })
         ##
-        grid_pl <- cowplot::plot_grid(plotlist = pick_pls, nrow = 1,
+        grid_pl <- cowplot::plot_grid(plotlist = pick_pls, nrow = 1, ncol = 2,
             align = c("h")
         )
+
+        # total_pl <- cowplot::ggdraw() +
+        #     cowplot::draw_plot(grid_pl) +
+        #     cowplot::draw_image(
+        #         clust_pl_fname, x = 0, y = 0,
+        #         hjust = 0,
+        #         vjust = 0,
+        #         halign = 0, valign = 0,
+        #         width = 0.15
+        #     )
+        # cowplot::save_plot(filename = "./dummy.png", plot = total_pl,
+        #     nrow = 1, ncol = 1)
         ##
         cowplot::save_plot(filename = fname_w_ext, plot = grid_pl, nrow = 1)
 
         ##
-        cli::cli_alert_success(paste0("Written to: ", fname_w_ext))
+        cli::cli_alert_success(paste0("Motif heatmaps written to: ",
+            fname_w_ext))
+        cli::cli_alert_success(paste0("Clustering legend in file:",
+            clust_pl_fname))
+        cli::cli_alert_success(paste0("Color legend in file:",
+            final_legend_fname))
     })
+
 
 }
 

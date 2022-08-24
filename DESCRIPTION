@@ -25,7 +25,7 @@ URL: https://snikumbh.github.io/seqArchRplus/,
     https://github.com/snikumbh/seqArchRplus
 BugReports: https://github.com/snikumbh/seqArchRplus/issues
 Depends:
-    R (>= 4.1.0),
+    R (>= 4.2.0),
     GenomicRanges,
     IRanges,
     S4Vectors
@@ -43,6 +43,7 @@ Imports:
     ggplot2 (>= 3.1.1),
     graphics,
     grDevices,
+    gridExtra,
     heatmaps,
     methods,
     RColorBrewer,
