@@ -129,9 +129,9 @@ per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
         return(comb_one_pl)
     } else {
         grDevices::pdf(file = fname, width = 20, height = 2, onefile = TRUE)
-        lapply(arch_list, print)
+        lapply(arch_list, gridExtra::grid.arrange)
         grDevices::dev.off()
-
+        cli::cli_alert_success(paste0("Written to file: ", fname))
         ## save PNGs
         if (save_png) {
             .save_PNGs(
@@ -221,7 +221,7 @@ strand_sep_seqlogos <- function(sname, seqs, clusts, info_df, pos_lab,
 
     plots_p_n <- lapply(seq_along(clusts), function(x) {
         if (length(per_cl_idx_by_strand[[x]]$`+`) < 1) {
-            print("plus is zero")
+            message("plus is zero")
             pl_p <- ggplot2::ggplot() +
                 ggplot2::theme_void()
         } else {
@@ -247,7 +247,7 @@ strand_sep_seqlogos <- function(sname, seqs, clusts, info_df, pos_lab,
                 )
         }
         if (length(per_cl_idx_by_strand[[x]]$`-`) < 1) {
-            print("negative is zero")
+            message("negative is zero")
             pl_n <- ggplot() +
                 theme_void()
         } else {
@@ -282,7 +282,7 @@ strand_sep_seqlogos <- function(sname, seqs, clusts, info_df, pos_lab,
     ## by trial and error to a very large value. Instead, we decide to plot this
     ## a pair on one page
     grDevices::pdf(file = fname, width = 20, height = 4.5, onefile = TRUE)
-    lapply(plots_p_n, print)
+    lapply(plots_p_n, gridExtra::grid.arrange)
     grDevices::dev.off()
 
     ## save PNGs

@@ -173,7 +173,7 @@ per_cluster_go_term_enrichments <- function(sname = NULL, clusts = NULL,
         error = function(e) e)
 
     if(is(foo_go, 'simpleError')){
-        print("ontology ALL errored, hence using BP")
+        message("ontology ALL errored, hence using BP")
         foo_go <- tryCatch(clusterProfiler::enrichGO(gene =
                 as.data.frame(peakAnno)[choose_idx, useKeyType],
             keyType = useKeyType,
@@ -183,7 +183,7 @@ per_cluster_go_term_enrichments <- function(sname = NULL, clusts = NULL,
 
     use_label <- "N/A"
     if(is(foo_go, 'simpleError')){
-        print("ontology ALL and BP both errored, hence N/A")
+        message("ontology ALL and BP both errored, hence N/A")
         foo_go <- NULL
         use_label <- "All and BP errored, hence N/A"
     }
@@ -209,7 +209,7 @@ per_cluster_go_term_enrichments <- function(sname = NULL, clusts = NULL,
                 legend.title = element_text(size=14))
         return(p1)
     }else{
-        print("Null/Zero rows")
+        message("Null/Zero rows")
         p1 <- ggplot() +
             ggplot2::geom_blank() + theme_bw() +
             theme(panel.grid = element_blank(),
