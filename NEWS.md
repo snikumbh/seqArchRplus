@@ -1,3 +1,8 @@
+# seqArchRplus 0.99.0
+
+## New
+* Package ready for Bioconductor submission
+
 # seqArchRplus 0.99.0.10
 
 ## New
