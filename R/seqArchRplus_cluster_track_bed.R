@@ -80,8 +80,8 @@
 #' @return
 #' When `include_in_report = FALSE`, the cluster information is written to disk
 #' as BED track files that can be viewed in the genome browser or IGV.
-#' Otherwise, HTML text is returned that can be included in the report as
-#' downloadable links for each cluster BED file.
+#' Otherwise, a str object holding HTML text is returned that can be included
+#' in the report as downloadable links for each cluster BED file (use `cat`).
 #' When `one_zip_all = TRUE`, a link to download all files zipped into one is
 #' also provided to enable convenience.
 #'
@@ -121,7 +121,7 @@
 #' # Generating textual output that can be included in HTML reports.
 #' # This requires package xfun.
 #' \donttest{
-#' write_seqArchR_cluster_track_bed(sname = "sample1",
+#' cat_str <- write_seqArchR_cluster_track_bed(sname = "sample1",
 #'                                  clusts = use_clusts,
 #'                                  info_df = info_df,
 #'                                  use_q_bound = FALSE,
@@ -144,6 +144,8 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
                                                 strand_sep = FALSE) {
     cli::cli_h1(paste0("Writing cluster track BED files"))
     cli::cli_h2(paste0("Sample: ", sname))
+
+    cat_str <- ""
     if (include_in_report) {
         if (!requireNamespace("xfun", quietly = TRUE)) {
             stop(
@@ -168,7 +170,7 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
     if (include_in_report) {
         prefix_str <- "Individual"
         if (strand_sep) prefix_str <- "Strand-separated individual"
-        cat(paste0(
+        cat_str <- paste0(cat_str, paste0(
             "\n\n### ", prefix_str, " cluster track BED files [",
             sname, "]\n\n"
         ))
@@ -212,7 +214,9 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
                     "Cluster ", lo, strand_str,
                     ": No records"
                 ))
-                if (include_in_report) .write_empty_string()
+                if (include_in_report) {
+                    cat_str <- paste0(cat_str, .write_empty_string())
+                }
             } else {
                 limit_df <- info_df[chosen_idx, ]
                 strand_track_str <- ""
@@ -261,14 +265,15 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
     ## This facility to have all files zipped together for download makes sense
     ## , atleast for now, when it is to be included in the report
     if (one_zip_all && include_in_report) {
-        cat(paste0(
+        cat_str < paste0(cat_str, paste0(
             "### All cluster track files (one zipped folder of",
             "all BED files)\n\n"
         ))
-        .create_dload_text(
+        cat_str <- paste0(cat_str, .create_dload_text(
             embedFile = FALSE, use_path = bedFilesPath,
             use_text = "Download all track files (zip)"
-        )
+        ))
+        return(cat_str)
     }
 } ## function Ends
 ## =============================================================================
@@ -288,14 +293,14 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
         dload_this <- xfun::embed_file(path = use_path, text = use_text)
     }
 
-    cat(paste0(
+    cat_str <- paste0(
         "\n<", dload_this$name,
         " href=\"", dload_this$attribs$href,
         "\" download=\"", dload_this$attribs$download,
         "\">", dload_this$children[[1]][1],
         "</a>\n"
-    ))
-
+    )
+    return(cat_str)
 }
 ## =============================================================================
 

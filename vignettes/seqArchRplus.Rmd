@@ -31,7 +31,7 @@ sequence architectures. These are:
 - Curate the final set of clusters from seqArchR. 
 See the 
 [`seqArchR` vignette](http://bioconductor.org/packages/release/bioc/vignettes/seqArchR/inst/doc/seqArchR.html)
-, or the preprint to understand in detail why this is required 
+, or the preprint to understand in detail why this may be required 
 
 - Order the sequence architectures by the interquantile widths (IQWs) of the 
 tag clusters (_aka_ promoter shape).
@@ -39,8 +39,8 @@ See
 [`CAGEr` vignette](https://www.bioconductor.org/packages/release/bioc/vignettes/CAGEr/inst/doc/CAGEexp.html) 
 for more information on tag clusters
 
-- Visualize distributions of IQW, TPM and conservation scores (when available) 
-per cluster
+- Visualize distributions of IQW, TPM and conservation scores (or other when 
+ available) per cluster
 
 - Visualize the percentages of annotations for genome-wide CAGE-derived 
 transcription tag clusters for each architecture-based clusters
@@ -57,15 +57,15 @@ transcription tag clusters for each architecture-based clusters
 - Produce BED track files of seqArchR clusters for visualization in a genome
 browser or IGV
 
-- Generate HTML reports that help you navigate this wealth of information
-with ease, and enable insights and hypotheses generation 
-
 We hope that using seqArchRplus (together with seqArchR) will be useful in 
 swiftly, but comprehensively, analyzing promoters identified using CAGE for 
-any organism.
-We have tested seqArchR on promoters in drosophila (Schor et al. 2017 and 
-modENCODE), zebrafish (Nepal et al. 2013), mice (Fantom), humans (ENCODE) and 
-also in plants (barley so far).
+any organism, and enable insights and hypotheses generation with ease. 
+So far, we have tested seqArchR and seqArchRplus on promoters in drosophila 
+(Schor et al. 2017 and modENCODE), zebrafish (Nepal et al. 2013), mice (Fantom),
+humans (ENCODE), and also in plants (barley and maize).
+
+We already envisage a feature for future version: generate HTML reports that help you navigate this wealth of information with ease.
+
 
 
 # Installation
@@ -92,7 +92,7 @@ if (!requireNamespace("remotes", quietly = TRUE)) {
     install.packages("remotes")
 }
 
-remotes::install_github("snikumbh/seqArchRplus", build_vignettes = FALSE)
+remotes::install_github("snikumbh/seqArchRplus", build_vignettes = TRUE)
 ```
 
 
@@ -107,6 +107,7 @@ and file a [new issue](https://github.com/snikumbh/seqArchRplus/issues/new).
 ```{r setup-two, echo=TRUE}
 # Load seqArchRplus
 library(seqArchRplus)
+library(seqArchR)
 library(Biostrings)
 library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
 library(ChIPseeker)
@@ -181,38 +182,44 @@ Specify all such curations together in one go like this:
 containing sequence cluster 36, 24 and 27 are moved to that of 21, and 17 to a 
 totally new cluster of itself.
 
-```{r curation-example, echo=TRUE, eval=FALSE}
+```{r curation-example, echo=TRUE, eval=TRUE}
 
 ## Using dummy sample names. Please replace with your sample names here
-## Suppose `merged_sample_names` holds the sample names
+
 sample_names <- paste0("sample", 1:3)
 
 sn <- "sample1"
 use_aggl <- "complete"
 use_dist <- "euclid"
 
+use_dir <- tempdir()
+
+seqArchR_result <- readRDS(system.file("extdata", "seqArchR_result.rds",
+      package = "seqArchRplus", mustWork = TRUE))
 
 ## get seqArchR clusters custom curated
 seqArchR_clusts <- seqArchRplus::curate_clusters(
     sname = sn,
     use_aggl = use_aggl, use_dist = use_dist,
-    seqArchR_result = results[[sn]], iter = 5,
-    use_cutk = 2, final = FALSE, dir_path = tempdir()
+    seqArchR_result = seqArchR_result, iter = 5,
+    pos_lab = NULL, regularize = FALSE, topn = 50,
+    use_cutk = 2, final = FALSE, dir_path = use_dir
 )
 
-## Suppose we identify K = 18 upon visual inspection.
-set_cutk <- 18
+
+## Suppose we identify K = 5 upon visual inspection.
+set_cutk <- 5
 
 
 ## Form the lists need_change and change_to for re-assignments
-need_change <- list()
-change_to <- list()
+need_change <- list(c(2))
+change_to <- list(c(1))
 
 
 seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(
     sname = sn,
     use_aggl = use_aggl, use_dist = use_dist,
-    seqArchR_result = results[[sn]], iter = 5,
+    seqArchR_result = seqArchR_result, iter = 5,
     use_cutk = set_cutk, #***
 
     need_change = need_change,
@@ -226,18 +233,18 @@ seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(
 seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(
     sname = sn,
     use_aggl = use_aggl, use_dist = use_dist,
-    seqArchR_result = results[[sn]], iter = 5,
+    seqArchR_result = seqArchR_result, iter = 5,
+    pos_lab = NULL, regularize = FALSE, topn = 50,
     use_cutk = set_cutk, #***
-
     need_change = need_change,
     change_to = change_to,
     final = TRUE, #***
 
-    dir_path = use_dir
+    dir_path = tempdir()
 )
 ## This fetches us clusters with custom/curated collation in _arbitrary_ order.
-## See the next function call to order_clusters_iqw that orders these clusters
-## by their median/mean IQW
+## See below for the function call to `order_clusters_iqw` that orders these 
+## clusters by their median/mean interquantile width
 ```
 
 
@@ -272,24 +279,6 @@ use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
 ## for production quality
 use_txt_size <- 35
 
-# iqw_tpm_pl <-
-#     annotations_oneplot_pl <-
-#     annotations_list_pl <-
-#     seqlogos_oneplot_pl <-
-#     seqlogos_list_pl <-
-#     stranded_seqlogos_pl <-
-#     per_cl_strand_pl <-
-#     vector("list", length(sample_names))
-#
-# names(iqw_tpm_pl) <-
-#     names(annotations_oneplot_pl) <-
-#     names(annotations_list_pl) <-
-#     names(seqlogos_list_pl) <-
-#     names(seqlogos_oneplot_pl) <-
-#     names(stranded_seqlogos_pl) <-
-#     names(per_cl_strand_pl) <-
-#         sample_names
-
 bed_info_fname <- system.file("extdata", "example_info_df.bed.gz",
     package = "seqArchRplus", mustWork = TRUE
 )
@@ -303,7 +292,6 @@ tc_gr <- readRDS(system.file("extdata", "example_tc_gr.rds",
     package = "seqArchRplus", mustWork = TRUE
 ))
 
-use_dir <- tempdir()
 
 ## get clusters ordered by median IQW values
 seqArchR_clusts_ord <- seqArchRplus::order_clusters_iqw(
@@ -381,7 +369,7 @@ seqlogos_oneplot_pl <-
         txt_size = use_txt_size
     )
 
-## for combining later
+## Obtain the sequence logos as a list for combining later
 seqlogos_list_pl <-
     seqArchRplus::per_cluster_seqlogos(
         sname = "sample1",
@@ -454,7 +442,7 @@ clusters can be sequestered from further downstream analyses.
 
 You can let seqArchRplus generate all plots using default settings like so.
 
-```{r generate-all-plots, eval=TRUE}
+```{r generate-all-plots, eval=FALSE}
 
 seqArchRplus::generate_all_plots(
     sname = "sample1",
@@ -484,8 +472,8 @@ seqArchRplus::generate_all_plots(
 # Conclusion
 
 seqArchRplus enables many of the downstream analyses steps for studying the 
-de novo identified sequence clusters/architectures using seqArchR or any other 
-clustering technique.
+de novo identified sequence clusters/architectures using seqArchR or clusters 
+obtained by any other clustering technique.
 These promoter sequences can be identified using CAGE or variations of CAGE.
 
 

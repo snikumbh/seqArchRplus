@@ -26,7 +26,7 @@
 #' - Produce BED track files of seqArchR clusters for visulization in a genome
 #' browser or IGV
 #'
-#' - Generate HTML reports that help you navigate this wealth of information
+#' - (future) Generate HTML reports that help you navigate this wealth of information
 #' with ease, and enable insights and hypotheses generation
 #'
 #'
@@ -36,6 +36,3 @@
 #' @name seqArchRplus
 NULL
 
-
-## quiets concerns of R CMD check re: the .'s that appear in pipelines
-# if(getRversion() >= "2.15.1")  utils::globalVariables(c("seqArchRconfig"))

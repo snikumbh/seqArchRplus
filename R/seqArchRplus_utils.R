@@ -107,7 +107,8 @@
 
 
 .write_empty_string <- function() {
-    cat(paste0("<a href= >Empty", "</a>\n"))
+    cat_str <- paste0("<a href= >Empty", "</a>\n")
+    cat_str
 }
 ## =============================================================================
 
