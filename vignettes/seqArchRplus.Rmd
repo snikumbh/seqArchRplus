@@ -1,5 +1,5 @@
 ---
-title: "Downstream analysis of clusters of promoter sequence architectures with seqArchRplus"
+title: "Downstream analysis of clusters of promoter sequence architectures using seqArchRplus"
 author: "Sarvesh Nikumbh"
 date: "`r Sys.Date()`"
 package: seqArchRplus
@@ -7,7 +7,7 @@ output:
   BiocStyle::html_document:
       toc: true
 vignette: >
-  %\VignetteIndexEntry{Downstream analysis of clusters of promoter sequence architectures with seqArchRplus}
+  %\VignetteIndexEntry{Downstream analysis of clusters of promoter sequence architectures using seqArchRplus}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
