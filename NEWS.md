@@ -1,3 +1,10 @@
+# seqArchRplus 0.99.0.10
+
+## New
+* (User-facing) An alternative function to plot motif heatmaps using the R pkg 
+  seqPattern. Function name: `plot_motif_heatmaps2()`
+
+
 # seqArchRplus 0.99.0.7
 
 ## New
