@@ -287,11 +287,10 @@ plot_motif_heatmaps2 <- function(sname,
         use_ticks <- cumsum(clust_lens)
 
         ##
-        use_tempdir <- "." #tempdir()
+        use_tempdir <- dir_path #tempdir()
         use_outFile <- file.path(
             use_tempdir,
-            paste0("TStamp_",
-                format(Sys.time(), "%Y-%m-%d_%H_%M_%S"),
+            paste0("TStamp_", format(Sys.time(), "%Y-%m-%d_%H_%M_%S"),
                 "_PatternDensityMap"))
 
         use_xticksAt <- c(1, Biostrings::width(seqs[1])/2,
@@ -348,17 +347,6 @@ plot_motif_heatmaps2 <- function(sname,
             align = c("h")
         )
 
-        # total_pl <- cowplot::ggdraw() +
-        #     cowplot::draw_plot(grid_pl) +
-        #     cowplot::draw_image(
-        #         clust_pl_fname, x = 0, y = 0,
-        #         hjust = 0,
-        #         vjust = 0,
-        #         halign = 0, valign = 0,
-        #         width = 0.15
-        #     )
-        # cowplot::save_plot(filename = "./dummy.png", plot = total_pl,
-        #     nrow = 1, ncol = 1)
         ##
         cowplot::save_plot(filename = fname_w_ext, plot = grid_pl, nrow = 1)
 

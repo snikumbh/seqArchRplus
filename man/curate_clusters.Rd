@@ -28,7 +28,7 @@ clustering. This is passed on to `seqArchR::collate_seqArchR_result`.
 See argument `aggl_method` in \link[seqArchR]{collate_seqArchR_result}.}
 
 \item{use_dist}{The distance method to be used for hierarchical clustering.
-This is passed on to `seqArchR::collate_seqArchR_result`. See argument
+This is passed on to \link[seqArchR]{collate_seqArchR_result}. See argument
 `dist_method` in \link[seqArchR]{collate_seqArchR_result}.}
 
 \item{seqArchR_result}{The seqArchR result object.}
@@ -131,7 +131,7 @@ Also see examples below.
 }
 \examples{
 
-\dontrun{
+\donttest{
 library(Biostrings)
 raw_seqs <- Biostrings::readDNAStringSet(
                           filepath = system.file("extdata",
@@ -143,27 +143,33 @@ raw_seqs <- Biostrings::readDNAStringSet(
 use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
          package = "seqArchRplus", mustWork = TRUE))
 
+seqArchR_result <- readRDS(system.file("extdata", "seqArchR_result.rds",
+         package = "seqArchRplus", mustWork = TRUE))
+
+use_aggl <- "complete"
+use_dist <- "euclid"
+
 ## get seqArchR clusters custom curated
-seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(sname = sn,
+seqArchR_clusts <- seqArchRplus::curate_clusters(sname = "sample1",
     use_aggl = use_aggl, use_dist = use_dist,
-    seqArchR_result = results[[sn]], iter = 5,
+    seqArchR_result = seqArchR_result, iter = 5,
     pos_lab = NULL, regularize = FALSE, topn = 50,
-    use_cutk = 21, final = FALSE, dir_path = use_dir)
+    use_cutk = 5, final = FALSE, dir_path = tempdir())
 
 ## Form the lists need_change and change_to for re-assignments
-need_change <- list(c(57), c(22), c(58), c(30), c(27), c(54), c(6))
-change_to <- list(0, 0, 0, 0, 0, 40, 0)
+need_change <- list(c(2))
+change_to <- list(c(1))
 
 ## This fetches us clusters with custom/curated collation in _arbitrary_ order
 ## See the next function call to order_clusters_iqw that orders these clusters
 ## by their median/mean IQW
-seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(sname = sn,
+seqArchR_clusts <- seqArchRplus::curate_clusters(sname = "sample1",
     use_aggl = use_aggl, use_dist = use_dist,
-    seqArchR_result = results[[sn]], iter = 5,
+    seqArchR_result = seqArchR_result, iter = 5,
     pos_lab = NULL, regularize = FALSE, topn = 50,
-    use_cutk = 21,
+    use_cutk = 5,
     need_change = need_change, change_to = change_to,
-    final = TRUE, dir_path = use_dir)
+    final = TRUE, dir_path = tempdir())
 }
 
 

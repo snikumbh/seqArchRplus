@@ -13,6 +13,7 @@ generate_all_plots(
   cager_obj = NULL,
   tc_gr = NULL,
   use_q_bound = FALSE,
+  use_as_names = NULL,
   order_by_iqw = TRUE,
   use_median_iqw = TRUE,
   iqw = TRUE,
@@ -55,8 +56,12 @@ Default is NULL}
 \item{use_q_bound}{Logical. Write the lower and upper quantiles as tag
 cluster boundaries in BED track files with tag clusters. Default is TRUE}
 
+\item{use_as_names}{Specify the column name from info_df which you would like
+to use as names for display with the track. By default, `use_names` is NULL,
+and the sequence/tag cluster IDs are used as names}
+
 \item{order_by_iqw}{Logical. Set TRUE to order clusters by the IQW median
-or mean. Set argument `use_median_iqw`.to TRUE to use the median, else will
+or mean. Set argument `use_median_iqw` to TRUE to use the median, else will
 use mean if FALSE}
 
 \item{use_median_iqw}{Logical. Set TRUE if the median IQW for each cluster

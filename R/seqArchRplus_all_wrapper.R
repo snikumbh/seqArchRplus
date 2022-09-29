@@ -24,8 +24,12 @@
 #' @param use_q_bound Logical. Write the lower and upper quantiles as tag
 #' cluster boundaries in BED track files with tag clusters. Default is TRUE
 #'
+#' @param use_as_names Specify the column name from info_df which you would like
+#' to use as names for display with the track. By default, `use_names` is NULL,
+#' and the sequence/tag cluster IDs are used as names
+#'
 #' @param order_by_iqw Logical. Set TRUE to order clusters by the IQW median
-#' or mean. Set argument `use_median_iqw`.to TRUE to use the median, else will
+#' or mean. Set argument `use_median_iqw` to TRUE to use the median, else will
 #' use mean if FALSE
 #'
 #' @param use_median_iqw Logical. Set TRUE if the median IQW for each cluster
@@ -172,6 +176,7 @@ generate_all_plots <- function(sname, bed_info_fname,
                                 cager_obj = NULL,
                                 tc_gr = NULL,
                                 use_q_bound = FALSE,
+                                use_as_names = NULL,
                                 order_by_iqw = TRUE,
                                 use_median_iqw = TRUE,
                                 iqw = TRUE, tpm = TRUE, cons = FALSE,
@@ -194,19 +199,6 @@ generate_all_plots <- function(sname, bed_info_fname,
         stranded_seqlogos_pl <-
         per_cl_strand_pl <- NULL
     ##
-    # ## Prepare tc_gr
-    # tc_gr2 <- .handle_tc_cager(tc_gr, cager_obj, sname, qLow, qUp)
-    # stopifnot(!is.null(tc_gr2))
-    # ## If tc_gr was prepared from a BED file, populate the clusts arg
-    #
-    # if(!is.null(tc_gr2[[2]]) && tc_gr2[[2]] == "bed"){
-    #     clusts <- seq(length(tc_gr2[[1]]))
-    # }
-    #
-    # ## clusts should be a list
-    # if(!is.list(clusts)) clusts <- list(clusts)
-    # ##
-    # tc_gr <- tc_gr2[[1]]
     ##
     if (is.null(raw_seqs_mh)) {
         raw_seqs_mh <- raw_seqs
@@ -220,18 +212,6 @@ generate_all_plots <- function(sname, bed_info_fname,
             sep = "\t", header = TRUE, col.names = custom_colnames
                 )
     }
-    # info_df <- utils::read.delim(
-    #     file = bed_info_fname,
-    #     sep = "\t", header = TRUE,
-    #     col.names = c(
-    #         "chr", "start", "end", "width",
-    #         "strand", "score", "nr_ctss",
-    #         "dominant_ctss", "domTPM",
-    #         paste0("q_", c(qLow, qUp)),
-    #         # "q_0.1", "q_0.9",
-    #         "IQW", "tpm"
-    #     )
-    # )
 
     ##
     seqArchR_clusts_ord <- seqArchR_clusts
@@ -257,6 +237,7 @@ generate_all_plots <- function(sname, bed_info_fname,
         clusts = use_clusts,
         info_df = info_df,
         use_q_bound = use_q_bound,
+        use_as_names = use_as_names,
         one_zip_all = FALSE,
         org_name = org_name,
         dir_path = dir_path,

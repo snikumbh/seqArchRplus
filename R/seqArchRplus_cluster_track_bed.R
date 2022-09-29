@@ -32,7 +32,7 @@
 #'
 #' @param one_zip_all Logical. Specify TRUE when the facility to download BED
 #' files for all clusters with one click is desired, otherwise FALSE. This is
-#' relevant only when include_in_report is TRUE
+#' relevant only when include_in_report is TRUE. Default is FALSE
 #'
 #' @param org_name Organism name
 #'
@@ -120,14 +120,15 @@
 #'
 #' # Generating textual output that can be included in HTML reports.
 #' # This requires package xfun.
-#' \dontrun{
+#' \donttest{
 #' write_seqArchR_cluster_track_bed(sname = "sample1",
 #'                                  clusts = use_clusts,
 #'                                  info_df = info_df,
 #'                                  use_q_bound = FALSE,
 #'                                  use_as_names = "use_names",
 #'                                  dir_path = tempdir(),
-#'                                  include_in_report = TRUE
+#'                                  include_in_report = TRUE,
+#'                                  one_zip_all = TRUE
 #'                                  )
 #' }
 #'
@@ -136,7 +137,7 @@
 write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
                                                 use_q_bound = TRUE,
                                                 use_as_names = NULL,
-                                                one_zip_all = TRUE,
+                                                one_zip_all = FALSE,
                                                 org_name = NULL,
                                                 dir_path = NULL,
                                                 include_in_report = FALSE,
@@ -250,8 +251,7 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
                         use_text = paste(
                             "Download coordinates for cluster",
                             lo, strand_str, " as browser track"
-                        ),
-                        include_in_report = include_in_report
+                        )
                     )
                 }
                 ##
@@ -267,8 +267,7 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
         ))
         .create_dload_text(
             embedFile = FALSE, use_path = bedFilesPath,
-            use_text = "Download all track files (zip)",
-            include_in_report = include_in_report
+            use_text = "Download all track files (zip)"
         )
     }
 } ## function Ends
@@ -282,20 +281,21 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
 #
 #
 .create_dload_text <- function(embedFile = TRUE, use_path = NULL,
-                                use_text = NULL, include_in_report = TRUE) {
-    if (include_in_report) {
-        dload_this <- xfun::embed_dir(use_path,
-            text = paste("Download all track files (zip)")
-        )
-
-        cat(paste0(
-            "\n<", dload_this$name,
-            " href=\"", dload_this$attribs$href,
-            "\" download=\"", dload_this$attribs$download,
-            "\">", dload_this$children[[1]][1],
-            "</a>\n"
-        ))
+                                use_text = NULL) {
+    if (!embedFile) {
+        dload_this <- xfun::embed_dir(use_path, text = use_text)
+    }else{
+        dload_this <- xfun::embed_file(path = use_path, text = use_text)
     }
+
+    cat(paste0(
+        "\n<", dload_this$name,
+        " href=\"", dload_this$attribs$href,
+        "\" download=\"", dload_this$attribs$download,
+        "\">", dload_this$children[[1]][1],
+        "</a>\n"
+    ))
+
 }
 ## =============================================================================
 
@@ -318,8 +318,8 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
         colIdx <- grep("q_", colnames(given_df))
         ## If use_q_bound is TRUE, colIdx should not be empty
         if(length(colIdx) == 0){
-            warning("`use_q_bound` is set to TRUE, but no columns with quantile
-            information found")
+            cli::cli_alert_warning("`use_q_bound` is set to TRUE, but no
+                columns with quantile information found")
         }else{
             ## We assume that the qLow appears first and then qUp
 

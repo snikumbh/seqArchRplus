@@ -11,7 +11,7 @@ write_seqArchR_cluster_track_bed(
   info_df,
   use_q_bound = TRUE,
   use_as_names = NULL,
-  one_zip_all = TRUE,
+  one_zip_all = FALSE,
   org_name = NULL,
   dir_path = NULL,
   include_in_report = FALSE,
@@ -39,7 +39,7 @@ and the sequence/tag cluster IDs are used as names.}
 
 \item{one_zip_all}{Logical. Specify TRUE when the facility to download BED
 files for all clusters with one click is desired, otherwise FALSE. This is
-relevant only when include_in_report is TRUE}
+relevant only when include_in_report is TRUE. Default is FALSE}
 
 \item{org_name}{Organism name}
 
@@ -127,14 +127,15 @@ write_seqArchR_cluster_track_bed(sname = "sample1",
 
 # Generating textual output that can be included in HTML reports.
 # This requires package xfun.
-\dontrun{
+\donttest{
 write_seqArchR_cluster_track_bed(sname = "sample1",
                                  clusts = use_clusts,
                                  info_df = info_df,
                                  use_q_bound = FALSE,
                                  use_as_names = "use_names",
                                  dir_path = tempdir(),
-                                 include_in_report = TRUE
+                                 include_in_report = TRUE,
+                                 one_zip_all = TRUE
                                  )
 }
 
