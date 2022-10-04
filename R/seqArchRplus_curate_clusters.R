@@ -107,7 +107,7 @@
 #'
 #' @examples
 #'
-#' \donttest{
+#'
 #' library(Biostrings)
 #' raw_seqs <- Biostrings::readDNAStringSet(
 #'                           filepath = system.file("extdata",
@@ -147,7 +147,7 @@
 #'     use_cutk = 5,
 #'     need_change = need_change, change_to = change_to,
 #'     final = TRUE, dir_path = tempdir())
-#' }
+#'
 #'
 #'
 #' @author Sarvesh Nikumbh
@@ -163,7 +163,7 @@ curate_clusters <- function(sname, use_aggl = "ward.D", use_dist = "euclid",
     if (final) {
         if (is.null(need_change) || is.null(change_to)) {
             stop("Both `need_change` and `change_to` should be specified when ",
-                 "`final` is TRUE")
+                "`final` is TRUE")
         } else {
             fname_suffix <- "_final"
         }
