@@ -89,14 +89,13 @@ enriched for the given GO term vs. the total genes in the cluster.
 \examples{
 library(GenomicRanges)
 library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
-#library(ChIPseeker)
+library(ChIPseeker) ## important to load this package
 library(org.Dm.eg.db)
 
 bed_fname <- system.file("extdata", "example_info_df.bed.gz",
          package = "seqArchRplus", mustWork = TRUE)
 
-info_df <- read.delim(file = bed_fname,
-         sep = "\t", header = TRUE)
+info_df <- read.delim(file = bed_fname, sep = "\t", header = TRUE)
 
 tc_gr_from_df <- GenomicRanges::makeGRangesFromDataFrame(info_df,
                                                   keep.extra.columns = TRUE)
@@ -111,11 +110,11 @@ tdir <- tempdir()
 
 # Get GO term enrichments for all clusters in use_clusts
 go_pl <- per_cluster_go_term_enrichments(sname = "sample1",
-                         clusts = use_clusts,
+                         clusts = use_clusts[1:2],
                          tc_gr = tc_gr_from_df,
                          txdb_obj = TxDb.Dmelanogaster.UCSC.dm6.ensGene,
                          dir_path = tdir,
-                         one_file = TRUE,
+                         one_file = FALSE,
                          tss_region = c(-500,100),
                          orgdb_obj = "org.Dm.eg.db")
 

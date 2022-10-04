@@ -60,8 +60,8 @@ be written in separate BED files.}
 \value{
 When `include_in_report = FALSE`, the cluster information is written to disk
 as BED track files that can be viewed in the genome browser or IGV.
-Otherwise, HTML text is returned that can be included in the report as
-downloadable links for each cluster BED file.
+Otherwise, a str object holding HTML text is returned that can be included
+in the report as downloadable links for each cluster BED file (use `cat`).
 When `one_zip_all = TRUE`, a link to download all files zipped into one is
 also provided to enable convenience.
 }
@@ -128,7 +128,7 @@ write_seqArchR_cluster_track_bed(sname = "sample1",
 # Generating textual output that can be included in HTML reports.
 # This requires package xfun.
 \donttest{
-write_seqArchR_cluster_track_bed(sname = "sample1",
+cat_str <- write_seqArchR_cluster_track_bed(sname = "sample1",
                                  clusts = use_clusts,
                                  info_df = info_df,
                                  use_q_bound = FALSE,

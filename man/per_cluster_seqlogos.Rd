@@ -21,14 +21,16 @@ per_cluster_seqlogos(
 \arguments{
 \item{sname}{The sample name}
 
-\item{seqs}{The raw sequences as a DNAStringSet. These are also available
-as part of the seqArchR result object.}
+\item{seqs}{The raw sequences as a \code{\link[Biostrings]{DNAStringSet}}.
+These are also available as part of the seqArchR result object.}
 
 \item{clusts}{List of sequence ids in each cluster.}
 
 \item{pos_lab}{The position labels}
 
-\item{bits_yax}{The yaxis limits. See argument in seqArchR}
+\item{bits_yax}{The yaxis limits. Possible values are "full", and "auto".
+See argument in \code{\link[seqArchR]{plot_ggseqlogo_of_seqs}} for more
+details}
 
 \item{strand_sep}{Logical. Whether sequences are to be separated by strand.}
 
@@ -77,7 +79,7 @@ seqlogo_pl <- per_cluster_seqlogos(sname = "sample1",
                                    seqs = raw_seqs,
                                    clusts = use_clusts,
                                    pos_lab = -45:45,
-                                   bits_yax = "max",
+                                   bits_yax = "auto",
                                    strand_sep = FALSE,
                                    one_plot = TRUE,
                                    dir_path = tempdir(),

@@ -63,7 +63,7 @@
 #'          sep = "\t", header = TRUE,
 #'          col.names = c("chr", "start", "end", "width",
 #'                  "dominant_ctss", "domTPM",
-#'                  "strand",	"score", "nr_ctss",
+#'                  "strand", "score", "nr_ctss",
 #'                  "q_0.1", "q_0.9", "IQW", "tpm"))
 #'
 #' use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
@@ -311,7 +311,7 @@ iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
 #'          sep = "\t", header = TRUE,
 #'          col.names = c("chr", "start", "end", "width",
 #'                  "dominant_ctss", "domTPM",
-#'                  "strand",	"score", "nr_ctss",
+#'                  "strand", "score", "nr_ctss",
 #'                  "q_0.1", "q_0.9", "IQW", "tpm"))
 #'
 #' use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",

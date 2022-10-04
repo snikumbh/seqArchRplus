@@ -62,14 +62,13 @@
 #' @examples
 #' library(GenomicRanges)
 #' library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
-#' #library(ChIPseeker)
+#' library(ChIPseeker) ## important to load this package
 #' library(org.Dm.eg.db)
 #'
 #' bed_fname <- system.file("extdata", "example_info_df.bed.gz",
 #'          package = "seqArchRplus", mustWork = TRUE)
 #'
-#' info_df <- read.delim(file = bed_fname,
-#'          sep = "\t", header = TRUE)
+#' info_df <- read.delim(file = bed_fname, sep = "\t", header = TRUE)
 #'
 #' tc_gr_from_df <- GenomicRanges::makeGRangesFromDataFrame(info_df,
 #'                                                   keep.extra.columns = TRUE)
@@ -84,11 +83,11 @@
 #'
 #' # Get GO term enrichments for all clusters in use_clusts
 #' go_pl <- per_cluster_go_term_enrichments(sname = "sample1",
-#'                          clusts = use_clusts,
+#'                          clusts = use_clusts[1:2],
 #'                          tc_gr = tc_gr_from_df,
 #'                          txdb_obj = TxDb.Dmelanogaster.UCSC.dm6.ensGene,
 #'                          dir_path = tdir,
-#'                          one_file = TRUE,
+#'                          one_file = FALSE,
 #'                          tss_region = c(-500,100),
 #'                          orgdb_obj = "org.Dm.eg.db")
 #'
@@ -145,14 +144,15 @@ per_cluster_go_term_enrichments <- function(sname = NULL, clusts = NULL,
                         " (n = ", length(clusts[[x]]), ")")
         pl <- .get_go_term_dot_plot(peakAnno, useOrgDb = orgdb_obj,
             useKeyType = use_keytype, choose_idx = clusts[[x]],
-            plot_title_text = plot_title_text, bar_or_dot = bar_or_dot)
+            plot_title_text = plot_title_text, bar_or_dot = bar_or_dot,
+            font.size = txt_size)
     })
 
     if(!one_file) go_pl
     else{
-        pdf(fname)
-        lapply(go_pl, function(x) print(x))
-        dev.off()
+        grDevices::pdf(file = fname, width = 10, height = 5, onefile = TRUE)
+        lapply(go_pl, gridExtra::grid.arrange)
+        grDevices::dev.off()
     }
     return(go_pl)
 }
@@ -162,7 +162,7 @@ per_cluster_go_term_enrichments <- function(sname = NULL, clusts = NULL,
 ## choose_idx is the indices from the df corresponding to the cluster
 .get_go_term_dot_plot <- function(peakAnno, useOrgDb, useKeyType,
     choose_idx, plot_title_text,
-    bar_or_dot = "dot", font.size = 10){
+    bar_or_dot = "dot", font.size = 12){
     # any_NAs <- which(is.na(as.data.frame(peakAnno)[choose_idx, ]$ENSEMBL))
     # plot_title_text <- paste(plot_title_text, length(any_NAs), "NAs")
     ##

@@ -2,7 +2,7 @@
 % Please edit documentation in R/seqArchRplus_motif_heatmaps.R
 \name{plot_motif_heatmaps}
 \alias{plot_motif_heatmaps}
-\title{Plot heatmaps of motifs occuring in seqArchR clusters}
+\title{Plot heatmaps of motifs occurring in seqArchR clusters}
 \usage{
 plot_motif_heatmaps(
   sname,
@@ -24,7 +24,7 @@ plot_motif_heatmaps(
 \item{seqs}{The sequences as a DNAStringSet object}
 
 \item{flanks}{Flank size. The same flank is used upstream and downstream.
-A vector of values is also accepted when more than oone flanks should be
+A vector of values is also accepted when more than one flanks should be
 visualized.}
 
 \item{clusts}{List of sequence Ids in each cluster.}
@@ -48,7 +48,7 @@ specify the number of cores. Default is 1 (serial)}
 Nothing. PNG images are written to disk using the provided filenames.
 }
 \description{
-Plot heatmaps of motifs occuring in seqArchR clusters
+Plot heatmaps of motifs occurring in seqArchR clusters
 }
 \examples{
 

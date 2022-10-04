@@ -4,11 +4,13 @@
 #' @title Plot per cluster sequence logos
 #'
 #' @param sname The sample name
-#' @param seqs The raw sequences as a DNAStringSet. These are also available
-#' as part of the seqArchR result object.
+#' @param seqs The raw sequences as a \code{\link[Biostrings]{DNAStringSet}}.
+#' These are also available as part of the seqArchR result object.
 #' @param clusts List of sequence ids in each cluster.
 #' @param pos_lab The position labels
-#' @param bits_yax The yaxis limits. See argument in seqArchR
+#' @param bits_yax The yaxis limits. Possible values are "full", and "auto".
+#' See argument in \code{\link[seqArchR]{plot_ggseqlogo_of_seqs}} for more
+#' details
 #' @param strand_sep Logical. Whether sequences are to be separated by strand.
 #' @param one_plot Logical. Whether all sequence logos should be combined
 #' into one grid (with ncol = 1)?
@@ -57,7 +59,7 @@
 #'                                    seqs = raw_seqs,
 #'                                    clusts = use_clusts,
 #'                                    pos_lab = -45:45,
-#'                                    bits_yax = "max",
+#'                                    bits_yax = "auto",
 #'                                    strand_sep = FALSE,
 #'                                    one_plot = TRUE,
 #'                                    dir_path = tempdir(),
@@ -76,7 +78,7 @@ per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
                 "`strand_sep` is TRUE"
             )
         }
-        strand_sep_pl <- strand_sep_seqlogos(
+        strand_sep_pl <- .strand_sep_seqlogos(
             sname = sname, seqs = seqs,
             clusts = clusts, info_df = info_df,
             pos_lab = pos_lab, bits_yax = bits_yax,
@@ -177,7 +179,7 @@ per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
 
 
 
-strand_sep_seqlogos <- function(sname, seqs, clusts, info_df, pos_lab,
+.strand_sep_seqlogos <- function(sname, seqs, clusts, info_df, pos_lab,
                                 bits_yax, dir_path, txt_size = 12,
                                 save_png = FALSE) {
     cli::cli_h1(paste0("All clusters' strand-separated sequence logos"))

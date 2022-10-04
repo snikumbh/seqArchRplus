@@ -294,40 +294,40 @@ tc_gr <- readRDS(system.file("extdata", "example_tc_gr.rds",
 
 
 ## get clusters ordered by median IQW values
-seqArchR_clusts_ord <- seqArchRplus::order_clusters_iqw(
-    sname = "sample1", clusts = use_clusts,
-    info_df = info_df, order_by_median = TRUE
-)
+seqArchR_clusts_ord <- seqArchRplus::order_clusters_iqw(sname = "sample1", 
+                                                        clusts = use_clusts,
+                                                        info_df = info_df, 
+                                                        order_by_median = TRUE
+                                    )
 ##
 use_clusts <- seqArchR_clusts_ord
 ##
-seqArchRplus::seqs_acgt_image(
-    sname = "sample1",
-    seqs = raw_seqs,
-    seqs_ord = unlist(use_clusts),
-    pos_lab = -45:45, dir_path = use_dir
-)
+seqArchRplus::seqs_acgt_image(sname = "sample1",
+                                seqs = raw_seqs,
+                                seqs_ord = unlist(use_clusts),
+                                pos_lab = -45:45, dir_path = use_dir
+                            )
 ##
 seqArchRplus::write_seqArchR_cluster_track_bed(
-    sname = "sample1",
-    clusts = use_clusts,
-    info_df = info_df,
-    use_q_bound = FALSE,
-    one_zip_all = TRUE,
-    org_name = "OrganismName",
-    dir_path = use_dir,
-    include_in_report = FALSE,
-    strand_sep = FALSE
-)
+                    sname = "sample1",
+                    clusts = use_clusts,
+                    info_df = info_df,
+                    use_q_bound = FALSE,
+                    one_zip_all = TRUE,
+                    org_name = "OrganismName",
+                    dir_path = use_dir,
+                    include_in_report = FALSE,
+                    strand_sep = FALSE
+                )
 ##
 iqw_tpm_pl <- seqArchRplus::iqw_tpm_plots(
-    sname = "sample1",
-    dir_path = use_dir,
-    info_df = info_df,
-    iqw = TRUE, tpm = TRUE, cons = FALSE,
-    clusts = use_clusts,
-    txt_size = use_txt_size
-)
+                    sname = "sample1",
+                    dir_path = use_dir,
+                    info_df = info_df,
+                    iqw = TRUE, tpm = TRUE, cons = FALSE,
+                    clusts = use_clusts,
+                    txt_size = use_txt_size
+                )
 
 
 annotations_oneplot_pl <-
@@ -344,83 +344,83 @@ annotations_oneplot_pl <-
         txt_size = use_txt_size
     )
 
-annotations_list_pl <-
-    seqArchRplus::per_cluster_annotations(
-        sname = "sample1",
-        clusts = use_clusts,
-        tc_gr = tc_gr,
-        cager_obj = NULL,
-        qLow = 0.1, qUp = 0.9,
-        txdb_obj = TxDb.Dmelanogaster.UCSC.dm6.ensGene,
-        tss_region = c(-500, 100),
-        orgdb_obj = NULL, dir_path = use_dir,
-        one_plot = FALSE,
-        txt_size = 12
-    )
+## Obtain the per cluster annotations as a list for combining later by setting 
+## the 'one_plot' argument to FALSE
 
-seqlogos_oneplot_pl <-
-    seqArchRplus::per_cluster_seqlogos(
-        sname = "sample1",
-        seqs = raw_seqs,
-        clusts = use_clusts,
-        pos_lab = -45:45, bits_yax = "max",
-        strand_sep = FALSE, one_plot = TRUE,
-        dir_path = use_dir,
-        txt_size = use_txt_size
-    )
+# annotations_list_pl <- seqArchRplus::per_cluster_annotations(
+#                             sname = "sample1",
+#                             clusts = use_clusts,
+#                             tc_gr = tc_gr,
+#                             cager_obj = NULL,
+#                             qLow = 0.1, qUp = 0.9,
+#                             txdb_obj = TxDb.Dmelanogaster.UCSC.dm6.ensGene,
+#                             tss_region = c(-500, 100),
+#                             orgdb_obj = NULL, dir_path = use_dir,
+#                             one_plot = FALSE,
+#                             txt_size = 12
+#                         )
 
-## Obtain the sequence logos as a list for combining later
-seqlogos_list_pl <-
-    seqArchRplus::per_cluster_seqlogos(
-        sname = "sample1",
-        seqs = raw_seqs,
-        clusts = use_clusts,
-        pos_lab = -45:45, bits_yax = "max",
-        strand_sep = FALSE, one_plot = FALSE,
-        dir_path = use_dir,
-        txt_size = 12
-    )
+seqlogos_oneplot_pl <- seqArchRplus::per_cluster_seqlogos(
+                            sname = "sample1",
+                            seqs = raw_seqs,
+                            clusts = use_clusts,
+                            pos_lab = -45:45, bits_yax = "auto",
+                            strand_sep = FALSE, one_plot = TRUE,
+                            dir_path = use_dir,
+                            txt_size = use_txt_size
+                        )
 
-stranded_seqlogos_pl <-
-    seqArchRplus::per_cluster_seqlogos(
-        sname = "sample1",
-        seqs = raw_seqs,
-        clusts = use_clusts,
-        pos_lab = -45:45, bits_yax = "max",
-        info_df = info_df,
-        strand_sep = TRUE, one_plot = FALSE,
-        dir_path = use_dir,
-        txt_size = 12
-    )
+## Obtain the sequence logos as a list for combining later by setting the 
+## 'one_plot' argument to FALSE
+
+# seqlogos_list_pl <- seqArchRplus::per_cluster_seqlogos(
+                        #     sname = "sample1",
+                        #     seqs = raw_seqs,
+                        #     clusts = use_clusts,
+                        #     pos_lab = -45:45, bits_yax = "auto",
+                        #     strand_sep = FALSE, one_plot = FALSE,
+                        #     dir_path = use_dir,
+                        #     txt_size = 12
+                        # )
+
+## Obtain strand-separated sequence logos corresponding to each cluster
+stranded_seqlogos_pl <- seqArchRplus::per_cluster_seqlogos(
+                            sname = "sample1",
+                            seqs = raw_seqs,
+                            clusts = use_clusts,
+                            pos_lab = -45:45, bits_yax = "auto",
+                            info_df = info_df,
+                            strand_sep = TRUE, one_plot = FALSE,
+                            dir_path = use_dir,
+                            txt_size = 12
+                        )
 
 ## Get larger flank FASTA sequences (larger than those used for seqArchR)
-use_seqs <- Biostrings::readDNAStringSet(
-    filepath = system.file("extdata",
-        "example_promoters200.fa.gz",
-        package = "seqArchRplus",
-        mustWork = TRUE
-    )
-)
+use_seqs <- Biostrings::readDNAStringSet(filepath = system.file("extdata",
+                                            "example_promoters200.fa.gz",
+                                            package = "seqArchRplus",
+                                            mustWork = TRUE
+                                        )
+                                        )
 
 
-seqArchRplus::plot_motif_heatmaps(
-    sname = "sample1", seqs = use_seqs,
-    flanks = c(50, 100, 200),
-    clusts = use_clusts,
-    motifs = c("WW", "SS", "TATAA", "CG", "Y"),
-    dir_path = use_dir,
-    fheight = 800, fwidth = 1600
-)
+seqArchRplus::plot_motif_heatmaps(sname = "sample1", seqs = use_seqs,
+                                    flanks = c(200),
+                                    clusts = use_clusts,
+                                    motifs = c("WW", "SS", "TATAA", "CG", "Y"),
+                                    dir_path = use_dir,
+                                    fheight = 800, fwidth = 1600
+                                )
 
 pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")
 
 per_cl_strand_pl <- seqArchRplus::per_cluster_strand_dist(
-    sname = "sample1",
-    clusts = use_clusts,
-    info_df = info_df,
-    dir_path = use_dir,
-    colrs = pair_colrs[4:5]
-)
+                                        sname = "sample1",
+                                        clusts = use_clusts,
+                                        info_df = info_df,
+                                        dir_path = use_dir,
+                                        colrs = pair_colrs[4:5]
+                                    )
 ```
 
 ### Some additional notes
@@ -471,10 +471,12 @@ seqArchRplus::generate_all_plots(
 
 # Conclusion
 
+Promoter sequences can be identified using CAGE or variations of CAGE 
+experiment.
 seqArchRplus enables many of the downstream analyses steps for studying the 
-de novo identified sequence clusters/architectures using seqArchR or clusters 
-obtained by any other clustering technique.
-These promoter sequences can be identified using CAGE or variations of CAGE.
+de novo identified sequence clusters/architectures using seqArchR or any other 
+clustering technique.
+
 
 
 # Session Info

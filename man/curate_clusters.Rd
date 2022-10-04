@@ -160,9 +160,10 @@ seqArchR_clusts <- seqArchRplus::curate_clusters(sname = "sample1",
 need_change <- list(c(2))
 change_to <- list(c(1))
 
-## This fetches us clusters with custom/curated collation in _arbitrary_ order
-## See the next function call to order_clusters_iqw that orders these clusters
-## by their median/mean IQW
+## This fetches us clusters with custom/curated collation in _arbitrary_
+## order. See the next function call to order_clusters_iqw that orders
+## these clusters by their median/mean IQW
+
 seqArchR_clusts <- seqArchRplus::curate_clusters(sname = "sample1",
     use_aggl = use_aggl, use_dist = use_dist,
     seqArchR_result = seqArchR_result, iter = 5,

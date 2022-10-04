@@ -1,13 +1,13 @@
 
 
-#' @title Plot heatmaps of motifs occuring in seqArchR clusters
+#' @title Plot heatmaps of motifs occurring in seqArchR clusters
 #'
 #' @param sname The sample name
 #'
 #' @param seqs The sequences as a DNAStringSet object
 #'
 #' @param flanks Flank size. The same flank is used upstream and downstream.
-#' A vector of values is also accepted when more than oone flanks should be
+#' A vector of values is also accepted when more than one flanks should be
 #' visualized.
 #'
 #' @param clusts List of sequence Ids in each cluster.
@@ -166,7 +166,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 
     clust_pl_fname
 }
-
+## =============================================================================
 
 
 ## Using seqPattern and cowplot
@@ -229,7 +229,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 #'          package = "seqArchRplus", mustWork = TRUE))
 #'
 #' plot_motif_heatmaps2(sname = "sample1", seqs = raw_seqs,
-#'                     flanks = c(10, 20, 50),
+#'                     flanks = c(50),
 #'                     clusts = use_clusts,
 #'                     motifs = c("WW", "SS"),
 #'                     dir_path = tempdir())

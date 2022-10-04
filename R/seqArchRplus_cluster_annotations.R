@@ -173,33 +173,33 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
     ##
     clust_labels <- make_cluster_labels(clust = clusts, use_prefix, use_suffix)
 
-
-    ## Using BiocParallel
-    ## Based on: https://support.bioconductor.org/p/110570/
-    # id <- BiocParallel::ipcid()
-    # clustwise_anno <- BiocParallel::bplapply(clusts, function(x, id) {
-    #     BiocParallel::ipclock(id)
+    ## Without BiocParallel
+    # clustwise_anno <- lapply(clusts, function(x) {
     #     foo_anno <- ChIPseeker::annotatePeak(tc_gr[x, ],
     #         tssRegion = tss_region,
     #         TxDb = txdb_obj,
     #         annoDb = orgdb_obj
     #     )
-    #     BiocParallel::ipcunlock(id)
     #     foo_anno
-    # }, id, BPPARAM = bpparam)
-    # BiocParallel::ipcremove(id)
+    # })
+    # names(clustwise_anno) <- seq(1, length(clusts))
+    # return(clustwise_anno) ## to check
+    # ## without dplyr?
+    # df_list <- lapply(clustwise_anno, function(x) x@annoStat)
 
-    ## Without BiocParallel
-    clustwise_anno <- lapply(clusts, function(x) {
-        foo_anno <- ChIPseeker::annotatePeak(tc_gr[x, ],
-            tssRegion = tss_region,
-            TxDb = txdb_obj,
-            annoDb = orgdb_obj
-        )
-        foo_anno
+    ##
+    peakAnno <- ChIPseeker::annotatePeak(tc_gr,
+        tssRegion = tss_region,
+        TxDb = txdb_obj,
+        annoDb = orgdb_obj
+    )
+    ##
+
+    clustwise_anno <- lapply(clusts, function(x){
+        .get_anno_stat(peakAnno, x)
     })
-
     names(clustwise_anno) <- seq(1, length(clusts))
+    ##
 
     colrs <- RColorBrewer::brewer.pal(n = 9, name = "Paired")
     ## Note: Generally, speed is not an issue when the number of clusters is
@@ -208,13 +208,12 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
     ## generally faster.
     ##
 
-    ## without dplyr?
-    df_list <- lapply(clustwise_anno, function(x) x@annoStat)
 
-    sam <- do.call("rbind", df_list)
-    per_df_nrows <- unlist(lapply(df_list, nrow))
+
+    sam <- do.call("rbind", clustwise_anno)
+    per_df_nrows <- unlist(lapply(clustwise_anno, nrow))
     ## Add a column clust that we need downstream
-    sam$clust <- rep(seq_along(df_list), times = per_df_nrows)
+    sam$clust <- rep(seq_along(clustwise_anno), times = per_df_nrows)
 
     sam <- sam[, c(3, 1, 2)]
     rownames(sam) <- seq_len(sum(per_df_nrows))
@@ -247,6 +246,8 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
                 size = txt_size,
                 hjust = 0.85
             ))
+        ind_print_plot <- ind_print_plot +
+            ggplot2::labs(x = "Proportion", y = "Cluster")
         ##
         ggplot2::ggsave(
             filename = fname, plot = ind_print_plot,
@@ -261,18 +262,6 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
             levels = seq_along(clusts)
         ))
 
-        ## Using BiocParallel
-        # annobar_list <- BiocParallel::bplapply(sam_split, function(anno_df) {
-        #     ##
-        #     anno_df$Feature <- factor(anno_df$Feature,
-        #         levels = levels(sam$Feature)
-        #     )
-        #     anno_pl <- .get_prop_anno_listplot(anno_df,
-        #         txt_size = txt_size,
-        #         colrs = colrs
-        #     )
-        # }, BPPARAM = bpparam)
-
         ## Without BiocParallel
         annobar_list <- lapply(sam_split, function(anno_df) {
             ##
@@ -283,6 +272,8 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
                 txt_size = txt_size,
                 colrs = colrs
             )
+            anno_pl <- anno_pl +
+                ggplot2::labs(x = "Proportion", y = "Cluster")
         })
 
         return(annobar_list)
@@ -318,19 +309,43 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
             axis.ticks.length.x.bottom = unit(0.1, units = "cm"),
             axis.text.x.bottom = element_text(size = txt_size),
             axis.title.x.bottom = element_text(size = txt_size),
+            axis.title.y.left = element_text(size = txt_size),
             legend.position = "bottom",
             legend.text = element_text(size = txt_size)
         ) +
         ggplot2::scale_y_discrete(expand = expansion(add = c(0.75, 0))) +
         ggplot2::scale_x_continuous(expand = expansion(mult = 0.01)) +
         ggplot2::guides(fill = guide_legend(ncol = 7, byrow = FALSE)) +
-        ggplot2::ylab(NULL) +
-        ggplot2::xlab("Percentage (%)")
+        NULL
     ##
     clustwise_annobar
 }
 ## =============================================================================
 
+.get_anno_stat <- function(peakAnno, idx){
+
+    anno_terms1 <- as.data.frame(peakAnno)[idx,]$annotation
+    anno_terms_splits <- strsplit(anno_terms1, " ")
+    anno_terms <- unlist(lapply(anno_terms_splits, function(x){
+        if(is.na(x[1])){ "NA";
+        }else if(grepl("Intron", x[1]) || grepl("Exon", x[1])){
+            if(x[4] == 1){
+                paste("1st", x[1])
+            }else{
+                paste("Other", x[1])
+            }
+        }else if(grepl("Promoter", x[1])){
+            x[1]
+        }else{ paste(x[1], x[2]) }
+    }))
+    ##
+    wordFreqTable <- table(anno_terms)
+    ##
+    wordFreqDF <- data.frame(Feature = rownames(wordFreqTable),
+        Frequency = as.vector(100*wordFreqTable/sum(wordFreqTable)))
+    wordFreqDF
+}
+## =============================================================================
 
 .get_prop_anno_listplot <- function(anno_df, txt_size, colrs) {
     ##
@@ -357,7 +372,7 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
             legend.direction = "horizontal"
         ) +
         ggplot2::guides(fill = guide_legend(ncol = 7, byrow = FALSE)) +
-        ggplot2::labs(x = "Percentage (%)", y = "Cluster") +
+        # ggplot2::labs(x = "Percentage (%)", y = "Cluster") +
         NULL
     return(pl)
 }

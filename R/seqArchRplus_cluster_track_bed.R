@@ -331,8 +331,6 @@ write_seqArchR_cluster_track_bed <- function(sname, clusts = NULL, info_df,
             ## This narrowing can fail when IQWs are larger than the range
             ## widths
             new_gr <- GenomicRanges::narrow(df_gr,
-                # start = as.integer( GenomicRanges::mcols(df_gr)[, colIdx[1]] ),
-                # end = as.integer( GenomicRanges::mcols(df_gr)[, colIdx[2]] )
                 start = as.vector(given_df[, colIdx[1]]),
                 end = as.vector(given_df[, colIdx[2]])
                 )
