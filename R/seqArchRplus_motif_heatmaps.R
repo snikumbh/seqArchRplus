@@ -74,8 +74,9 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
     ##
     all_motifs_str <- paste0(motifs, collapse = "_")
 
-    ###
-    result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
+    ##
+    if(!is.null(dir_path))
+        result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
     ##
     ## Iterate over different flanks
     sam <- lapply(flanks, function(x) {
@@ -108,16 +109,22 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
             BPPARAM = bpparam
         )
         ##
-        fname_suffix <- paste0(paste(fl_up, "up", fl_down, "down",
-            "motifHeatmaps", all_motifs_str,
-            sep = "_"
-        ), ".png")
-        fname <- file.path(result_dir_path, fname_suffix)
+        if(!is.null(dir_path)){
+            fname_suffix <- paste0(paste(fl_up, "up", fl_down, "down",
+                "motifHeatmaps", all_motifs_str,
+                sep = "_"
+            ), ".png")
+            fname <- file.path(result_dir_path, fname_suffix)
+        }
 
         clust_lens <- lengths(clusts)
 
         ##
-        grDevices::png(fname, height = fheight, width = fwidth, units = funits)
+
+
+        if(!is.null(dir_path)){
+            grDevices::png(fname, height = fheight, width = fwidth, units = funits)
+        }
         pl_hms <- heatmaps::plotHeatmapList(
             patt_hm_list500,
             box.width = 1.3,
@@ -133,8 +140,12 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
             cex.legend = 0.8,
             legend.pos = "r"
         )
-        grDevices::dev.off()
-        cli::cli_alert_success(paste0("Written to: ", fname))
+        if(!is.null(dir_path)){
+            grDevices::dev.off()
+            cli::cli_alert_success(paste0("Written to: ", fname))
+        }
+
+
     })
     ##
 }
