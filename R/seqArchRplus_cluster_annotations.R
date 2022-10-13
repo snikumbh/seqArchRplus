@@ -168,8 +168,11 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
     if(parallelize)
         bpparam <- .handle_multicore(crs = n_cores, parallelize = parallelize)
     ##
-    result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
-    fname <- file.path(result_dir_path, paste0("Clusterwise_annotations.pdf"))
+    if(!is.null(dir_path)){
+        result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
+        fname <- file.path(result_dir_path,
+                        paste0("Clusterwise_annotations.pdf"))
+    }
     ##
     clust_labels <- make_cluster_labels(clust = clusts, use_prefix, use_suffix)
 
@@ -207,8 +210,6 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
     ## So we can use the base::rbind instead of the dplyr::bind_rows which is
     ## generally faster.
     ##
-
-
 
     sam <- do.call("rbind", clustwise_anno)
     per_df_nrows <- unlist(lapply(clustwise_anno, nrow))
@@ -249,13 +250,13 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
         ind_print_plot <- ind_print_plot +
             ggplot2::labs(x = "Proportion", y = "Cluster")
         ##
-        ggplot2::ggsave(
-            filename = fname, plot = ind_print_plot,
-            device = "pdf", width = 15, height = 20, units = "in",
-            dpi = 300
-        )
-
-        return(clustwise_annobar)
+        if(!is.null(dir_path))
+            ggplot2::ggsave(
+                filename = fname, plot = ind_print_plot,
+                device = "pdf", width = 15, height = 20, units = "in",
+                dpi = 300
+            )
+        return(ind_print_plot)
     } else {
         ## return individual plots as a list
         sam_split <- split(sam, f = factor(sam$clust,
@@ -263,8 +264,10 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
         ))
 
         ## Without BiocParallel
-        annobar_list <- lapply(sam_split, function(anno_df) {
+        annobar_list <- lapply(seq_along(sam_split), function(x) {
             ##
+            anno_df <- sam_split[[x]]
+            use_clust_label <- clust_labels[x]
             anno_df$Feature <- factor(anno_df$Feature,
                 levels = levels(sam$Feature)
             )
@@ -273,7 +276,7 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
                 colrs = colrs
             )
             anno_pl <- anno_pl +
-                ggplot2::labs(x = "Proportion", y = "Cluster")
+                ggplot2::labs(x = "Proportion", y = use_clust_label)
         })
 
         return(annobar_list)
