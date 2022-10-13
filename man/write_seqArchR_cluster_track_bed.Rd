@@ -13,7 +13,7 @@ write_seqArchR_cluster_track_bed(
   use_as_names = NULL,
   one_zip_all = FALSE,
   org_name = NULL,
-  dir_path = NULL,
+  dir_path,
   include_in_report = FALSE,
   strand_sep = FALSE
 )
@@ -43,8 +43,9 @@ relevant only when include_in_report is TRUE. Default is FALSE}
 
 \item{org_name}{Organism name}
 
-\item{dir_path}{The path where a special folder named `Cluster_BED_tracks`
-(default) is created and all BED files are written inside it}
+\item{dir_path}{The /path/to/the/directory where a special folder named
+`Cluster_BED_tracks` (by default) is created and all BED files are written
+inside it. This is a required argument, and cannot be NULL}
 
 \item{include_in_report}{Logical. Specify TRUE when this function is invoked
 to write BED files to disk *and* provide downloadable links in the HTML
