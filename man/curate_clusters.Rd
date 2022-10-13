@@ -17,7 +17,7 @@ curate_clusters(
   need_change = NULL,
   change_to = NULL,
   final = FALSE,
-  dir_path
+  dir_path = NULL
 )
 }
 \arguments{
@@ -61,25 +61,36 @@ no re-assignment is to be performed.}
 
 \item{final}{Logical, set to TRUE or FALSE}
 
-\item{dir_path}{The path to the directory where files will be written}
+\item{dir_path}{The /path/to/the/directory where files will be written.
+Default is NULL.}
 }
 \value{
-This function returns the input sequence clusters as a list and writes a
-PDF file to disk showing the dendrogram + sequence logos to help
+This function returns a list holding (a) 'curation_plot': plot showing the
+dendrogram + sequence logos, and (b) 'clusters_list': the sequence clusters
+as a list.
+
+to help
 perform curation and document it.
 
 
-When `final = FALSE`, the clusters ordered according to the hclust
-result/dendrogram are returned. The PDF file shows only the dendrogram +
-sequence logos of clusters (clusters ordered by \code{hclust} ordering)
+When `final = FALSE`, the `curation_plot' shows the dendrogram + sequence
+logos of clusters (ordered by \code{hclust} ordering).
+The 'clusters_list' holds the hclust ordered clusters.
+If the `dir_path`
+is specified, a PDF file showing the same figure is also written at the
+location using the default filename
+`<Sample_name>_dend_arch_list_reg_top50_euclid_complete_<K>clusters.pdf`.
 
-When `final = TRUE`, the return value of the function is the clusters
-with re-assignments executed.
-The PDF file showing the dendrogram + sequence logos now has an additional
-panel showing the sequence logos upon collation of clusters as specified by
-the re-assignments. Also the cluster IDs in the dendrograms have colors
-showing the re-assignments, i.e., elements that were re-assigned to different
- clusters, also have appropriate color changes reflected.
+When `final = TRUE`, 'clusters_list' holds the clusters with
+re-assignments executed, and 'curation_plot' of dendrogram + sequence logos
+now has an additional panel showing the sequence logos upon collation of
+clusters as specified by the re-assignments.
+Also the cluster IDs in the dendrograms have colors showing the
+re-assignments, i.e., elements that were re-assigned to different clusters,
+also have appropriate color changes reflected.
+
+When `dir_path` is provided, the curation plot is written to disk using
+the same filename as before except for suffix 'final' attched to it.
 }
 \description{
 seqArchR result stores the clusters obtained at every iteration.
@@ -89,33 +100,37 @@ clusters. This function enables minor curation of the clusters obtained
 from the hierarchical clustering step.
 }
 \details{
-This function helps the user work through the curation in at least three
+This function helps the user work through the curation in at most three
 steps.
 
-1. This function uses hierarchical clustering to obtain a clustering result.
+1. This function performs hierarchical clustering on the seqArchR clusters
+(of the specified iteration) to obtain a clustering result.
 The resulting clustering is visualized by a dendrogram, color-coded cluster
 assignments, and corresponding sequence logos. Using this visualization,
 the user can identify/estimate the (nearly right) number of clusters to cut
-the dendrogram. The first call uses K = 2.
+the dendrogram. The **first call** uses K = 2.
 
-2. Re-call the function with the identified value of K. Look at the
-visualization to determine if it is good enough, i.e., it requires only
-minor re-assignments).
+2. Visually examine and count the tentative number of clusters (K) deemed
+right. Because these architectures are now arranged by the hierarchical
+clustering order, identifying this tentative value of K is much easier.
+Call the function this **second** time with the identified value of K.
+Look at the visualization now generated to determine if it is good enough,
+i.e., it requires only minor re-assignments.
 
 3. Identify cases of cluster assignments that you wish to re-assign to
 different clusters. These can be noted as a list and supplied in a
 subsequent call to the function.
 
-4. In the final call to the function, set `final = TRUE`, supply the re-
+4. In the **final call** to the function, set `final = TRUE`, supply the re-
 assignments as two lists `need_change` and `change_to`.
 
-More on re-assignments using \code{need_change} and \code{change_to}:
-If any element is to be put into a new cluster, use a numeral 0 in change_to.
-This can be done in either scenario: when any element is re-assigned as a
-singleton cluster of itself, or as clustered with some other element coming
-from some other existing cluster. Consider, for instance, among some 33
-clusters identified by seqArchR, the following re-assignments are
-executed.
+More on re-assignments using arguments \code{need_change} and
+\code{change_to}: If any element is to be put into a new cluster, use a
+numeral 0 in change_to. This can be done in either scenario: when any
+element is re-assigned as a singleton cluster of itself, or as clustered
+with some other element coming from some other existing cluster. Consider,
+for instance, among some 33 clusters identified by seqArchR, the following
+re-assignments are executed.
 
 Original_clustering <- list(c(1), c(2,3), c(4,5), c(6, 7))
 need_change <- list(c(5), c(2), c(3, 6))
@@ -124,8 +139,7 @@ change_to <- list(1, 0, 0)
 In the above, element 5 is re-assigned to the cluster containing element 1.
 Element 2 is re-assigned to a new, singleton cluster of itself, while
 elements 3 and 6 (which initially can belong to same/any two clusters) are
-collated together. Note that it is important to combine 21 and 30 using
-\code{c()}.
+collated together. Note that it is important to use \code{c()}.
 
 Also see examples below.
 }

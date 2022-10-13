@@ -38,36 +38,41 @@
 #'
 #' @param final Logical, set to TRUE or FALSE
 #'
-#' @param dir_path The path to the directory where files will be written
+#' @param dir_path The /path/to/the/directory where files will be written.
+#' Default is NULL.
 #'
 #' @details
-#' This function helps the user work through the curation in at least three
+#' This function helps the user work through the curation in at most three
 #' steps.
 #'
-#' 1. This function uses hierarchical clustering to obtain a clustering result.
+#' 1. This function performs hierarchical clustering on the seqArchR clusters
+#' (of the specified iteration) to obtain a clustering result.
 #' The resulting clustering is visualized by a dendrogram, color-coded cluster
 #' assignments, and corresponding sequence logos. Using this visualization,
 #' the user can identify/estimate the (nearly right) number of clusters to cut
-#' the dendrogram. The first call uses K = 2.
+#' the dendrogram. The **first call** uses K = 2.
 #'
-#' 2. Re-call the function with the identified value of K. Look at the
-#' visualization to determine if it is good enough, i.e., it requires only
-#' minor re-assignments).
+#' 2. Visually examine and count the tentative number of clusters (K) deemed
+#' right. Because these architectures are now arranged by the hierarchical
+#' clustering order, identifying this tentative value of K is much easier.
+#' Call the function this **second** time with the identified value of K.
+#' Look at the visualization now generated to determine if it is good enough,
+#' i.e., it requires only minor re-assignments.
 #'
 #' 3. Identify cases of cluster assignments that you wish to re-assign to
 #' different clusters. These can be noted as a list and supplied in a
 #' subsequent call to the function.
 #'
-#' 4. In the final call to the function, set `final = TRUE`, supply the re-
+#' 4. In the **final call** to the function, set `final = TRUE`, supply the re-
 #' assignments as two lists `need_change` and `change_to`.
 #'
-#' More on re-assignments using \code{need_change} and \code{change_to}:
-#' If any element is to be put into a new cluster, use a numeral 0 in change_to.
-#' This can be done in either scenario: when any element is re-assigned as a
-#' singleton cluster of itself, or as clustered with some other element coming
-#' from some other existing cluster. Consider, for instance, among some 33
-#' clusters identified by seqArchR, the following re-assignments are
-#' executed.
+#' More on re-assignments using arguments \code{need_change} and
+#' \code{change_to}: If any element is to be put into a new cluster, use a
+#' numeral 0 in change_to. This can be done in either scenario: when any
+#' element is re-assigned as a singleton cluster of itself, or as clustered
+#' with some other element coming from some other existing cluster. Consider,
+#' for instance, among some 33 clusters identified by seqArchR, the following
+#' re-assignments are executed.
 #'
 #' Original_clustering <- list(c(1), c(2,3), c(4,5), c(6, 7))
 #' need_change <- list(c(5), c(2), c(3, 6))
@@ -76,29 +81,39 @@
 #' In the above, element 5 is re-assigned to the cluster containing element 1.
 #' Element 2 is re-assigned to a new, singleton cluster of itself, while
 #' elements 3 and 6 (which initially can belong to same/any two clusters) are
-#' collated together. Note that it is important to combine 21 and 30 using
-#' \code{c()}.
+#' collated together. Note that it is important to use \code{c()}.
 #'
 #' Also see examples below.
 #'
 #'
 #' @return
-#' This function returns the input sequence clusters as a list and writes a
-#' PDF file to disk showing the dendrogram + sequence logos to help
+#' This function returns a list holding (a) 'curation_plot': plot showing the
+#' dendrogram + sequence logos, and (b) 'clusters_list': the sequence clusters
+#' as a list.
+#'
+#' to help
 #' perform curation and document it.
 #'
 #'
-#' When `final = FALSE`, the clusters ordered according to the hclust
-#' result/dendrogram are returned. The PDF file shows only the dendrogram +
-#' sequence logos of clusters (clusters ordered by \code{hclust} ordering)
+#' When `final = FALSE`, the `curation_plot' shows the dendrogram + sequence
+#' logos of clusters (ordered by \code{hclust} ordering).
+#' The 'clusters_list' holds the hclust ordered clusters.
+#' If the `dir_path`
+#' is specified, a PDF file showing the same figure is also written at the
+#' location using the default filename
+#' `<Sample_name>_dend_arch_list_reg_top50_euclid_complete_<K>clusters.pdf`.
 #'
-#' When `final = TRUE`, the return value of the function is the clusters
-#' with re-assignments executed.
-#' The PDF file showing the dendrogram + sequence logos now has an additional
-#' panel showing the sequence logos upon collation of clusters as specified by
-#' the re-assignments. Also the cluster IDs in the dendrograms have colors
-#' showing the re-assignments, i.e., elements that were re-assigned to different
-#'  clusters, also have appropriate color changes reflected.
+#' When `final = TRUE`, 'clusters_list' holds the clusters with
+#' re-assignments executed, and 'curation_plot' of dendrogram + sequence logos
+#' now has an additional panel showing the sequence logos upon collation of
+#' clusters as specified by the re-assignments.
+#' Also the cluster IDs in the dendrograms have colors showing the
+#' re-assignments, i.e., elements that were re-assigned to different clusters,
+#' also have appropriate color changes reflected.
+#'
+#' When `dir_path` is provided, the curation plot is written to disk using
+#' the same filename as before except for suffix 'final' attched to it.
+#'
 #'
 #'
 #' @importFrom stats cutree median
@@ -155,7 +170,7 @@ curate_clusters <- function(sname, use_aggl = "ward.D", use_dist = "euclid",
                             seqArchR_result, iter, pos_lab = NULL,
                             regularize = TRUE, topn = 50, use_cutk = 2,
                             need_change = NULL, change_to = NULL,
-                            final = FALSE, dir_path) {
+                            final = FALSE, dir_path = NULL) {
     cli::cli_h1(paste0("seqArchR result clusters curation"))
     cli::cli_h2(paste0("Sample: ", sname))
     ##
@@ -169,18 +184,25 @@ curate_clusters <- function(sname, use_aggl = "ward.D", use_dist = "euclid",
         }
     }
 
-    result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
+    if(!is.null(dir_path)){
+        result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
+    }
 
     reg_suffix <- ""
     reg_suffix <- ifelse(regularize, paste0("reg_top", topn, "_"), "")
     aggl_suffix <- paste0(use_aggl, "_")
     dist_suffix <- paste0(use_dist, "_")
-    fname <- file.path(result_dir_path, paste0(
-        sname, "_dend_arch_list_",
-        reg_suffix, dist_suffix, aggl_suffix, use_cutk,
-        "clusters", fname_suffix
-    ))
-    ## extension .pdf is added in the .plot_dend_arch function downstream
+
+    if(!is.null(dir_path)){
+        fname <- file.path(result_dir_path, paste0(
+            sname, "_dend_arch_list_",
+            reg_suffix, dist_suffix, aggl_suffix, use_cutk,
+            "clusters", fname_suffix
+        ))
+        ## extension .pdf is added in the .plot_dend_arch function downstream
+    }else{
+        fname <- NULL
+    }
 
     clusts_reord <- seqArchR::collate_seqArchR_result(
         result = seqArchR_result, iter = iter, clust_method = "hc",
@@ -235,8 +257,8 @@ curate_clusters <- function(sname, use_aggl = "ward.D", use_dist = "euclid",
             labels_track_height = 0.25, rect = TRUE,
             rect_fill = TRUE, color_labels_by_k = TRUE
         )
-
-        return(ordered_arch_pl2)
+        return(list(curation_plot = sam_foo2,
+                    clusters_list = clust_hc_ord_list))
     } else {
         temp_clusts <- stats::cutree(clusts_reord, k = use_cutk)
         names(temp_clusts) <- NULL
@@ -274,8 +296,8 @@ curate_clusters <- function(sname, use_aggl = "ward.D", use_dist = "euclid",
             rawSeqs = seqArchR::seqs_str(seqArchR_result),
             palette = FALSE, plot_png = FALSE
         )
-
-        return(seqs_clusters_as_list)
+        return(list(curation_plot = sam_foo2,
+                    clusters_list = seqs_clusters_as_list))
     }
 }
 ## =============================================================================
@@ -439,19 +461,21 @@ curate_clusters <- function(sname, use_aggl = "ward.D", use_dist = "euclid",
             ncol = 2, align = "hv",
             rel_widths = c(0.40, 1), rel_heights = c(1, 1)
         )
-        ## pdf
-        cowplot::ggsave2(paste0(fname, ".pdf"),
-            plot = sam_foo2,
-            width = use_wd, height = use_ht,
-            units = "cm", dpi = 300
-        )
-        ## png
-        if (plot_png) {
-            cowplot::ggsave2(paste0(fname, ".png"),
+        if(!is.null(fname)){
+            ## pdf
+            cowplot::ggsave2(paste0(fname, ".pdf"),
                 plot = sam_foo2,
-                width = 40, height = use_ht,
+                width = use_wd, height = use_ht,
                 units = "cm", dpi = 300
             )
+            ## png
+            if (plot_png) {
+                cowplot::ggsave2(paste0(fname, ".png"),
+                    plot = sam_foo2,
+                    width = 40, height = use_ht,
+                    units = "cm", dpi = 300
+                )
+            }
         }
     } else {
 
@@ -488,19 +512,21 @@ curate_clusters <- function(sname, use_aggl = "ward.D", use_dist = "euclid",
             rel_heights = c(1, 1, 1),
             align = "hv"
         )
-        ## pdf
-        cowplot::ggsave2(paste0(fname, ".pdf"),
-            plot = sam_foo2,
-            width = use_wd + 20, height = use_ht,
-            units = "cm", dpi = 300
-        )
-        ## png
-        if (plot_png) {
-            cowplot::ggsave2(paste0(fname, ".png"),
+        if(!is.null(fname)){
+            ## pdf
+            cowplot::ggsave2(paste0(fname, ".pdf"),
                 plot = sam_foo2,
-                width = 60, height = use_ht,
+                width = use_wd + 20, height = use_ht,
                 units = "cm", dpi = 300
             )
+            ## png
+            if (plot_png) {
+                cowplot::ggsave2(paste0(fname, ".png"),
+                    plot = sam_foo2,
+                    width = 60, height = use_ht,
+                    units = "cm", dpi = 300
+                )
+            }
         }
     }
 
