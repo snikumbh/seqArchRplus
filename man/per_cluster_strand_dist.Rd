@@ -9,8 +9,8 @@ per_cluster_strand_dist(
   sname,
   clusts,
   info_df,
-  dir_path,
-  colrs = "Paired",
+  dir_path = NULL,
+  colrs = c("#FB8072", "#80B1D3"),
   txt_size = 14,
   fwidth = 20,
   fheight = 3
@@ -26,7 +26,8 @@ per_cluster_strand_dist(
 \item{dir_path}{Specify the path to the directory on disk where plots
 will be saved}
 
-\item{colrs}{Specify colors used for two strands}
+\item{colrs}{Specify colors used for two strands. By default, the fourth
+and fifth color from the palette 'Set3' are used}
 
 \item{txt_size}{Size of the text in the plots (includes plot title,
 y-axis title, axis texts, legend title and text)}

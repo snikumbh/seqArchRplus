@@ -8,7 +8,8 @@
 #' @param info_df The information data.frame
 #' @param dir_path Specify the path to the directory on disk where plots
 #' will be saved
-#' @param colrs Specify colors used for two strands
+#' @param colrs Specify colors used for two strands. By default, the fourth
+#' and fifth color from the palette 'Set3' are used
 #' @param txt_size Size of the text in the plots (includes plot title,
 #' y-axis title, axis texts, legend title and text)
 #' @param fwidth Width of the individual plots in file
@@ -46,19 +47,20 @@
 #'                                              colrs = pair_colrs)
 #'
 #' @author Sarvesh Nikumbh
-per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
-                                    colrs = "Paired", txt_size = 14,
+per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path = NULL,
+                                    colrs = c("#FB8072", "#80B1D3"),
+                                    txt_size = 14,
                                     fwidth = 20, fheight = 3) {
     cli::cli_h1(paste0("All clusters' strand distributions"))
     cli::cli_h2(paste0("Sample: ", sname))
     ##
-    result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
-
-
-    fname <- file.path(
-        result_dir_path,
-        paste0("Per_cluster_strand_distributions.pdf")
-    )
+    if(!is.null(dir_path)){
+        result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
+        fname <- file.path(
+            result_dir_path,
+            paste0("Per_cluster_strand_distributions.pdf")
+        )
+    }
 
 
     chr_set <- unique(info_df$chr)
@@ -129,17 +131,12 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path,
             )
         return(pl)
     })
-    grDevices::pdf(file = fname, width = fwidth, height = fheight,
-        onefile = TRUE)
-    lapply(plot_list, gridExtra::grid.arrange)
-    grDevices::dev.off()
-
-    ## This approach produces pages with text stating "page x of X" at the top.
-    ## We do not want this. And, I don't know of a way to disable it.
-    # ml <- gridExtra::marrangeGrob(plot_list,
-    #     nrow = 1,
-    #     ncol = 1)
-    # ggplot2::ggsave(fname2, ml, width = 20, height = 2)
-    plot_list
+    if(!is.null(dir_path)){
+        grDevices::pdf(file = fname, width = fwidth, height = fheight,
+            onefile = TRUE)
+        lapply(plot_list, gridExtra::grid.arrange)
+        grDevices::dev.off()
+    }
+    return(plot_list)
 }
 ## =============================================================================
