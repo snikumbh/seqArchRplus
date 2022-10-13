@@ -131,7 +131,7 @@ Also see examples below.
 }
 \examples{
 
-\donttest{
+
 library(Biostrings)
 raw_seqs <- Biostrings::readDNAStringSet(
                           filepath = system.file("extdata",
@@ -171,7 +171,7 @@ seqArchR_clusts <- seqArchRplus::curate_clusters(sname = "sample1",
     use_cutk = 5,
     need_change = need_change, change_to = change_to,
     final = TRUE, dir_path = tempdir())
-}
+
 
 
 }
