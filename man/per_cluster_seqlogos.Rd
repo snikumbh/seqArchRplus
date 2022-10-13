@@ -15,7 +15,7 @@ per_cluster_seqlogos(
   info_df = NULL,
   txt_size = 12,
   save_png = FALSE,
-  dir_path
+  dir_path = NULL
 )
 }
 \arguments{
@@ -44,7 +44,8 @@ into one grid (with ncol = 1)?}
 \item{save_png}{Logical. Set TRUE if you would like to save the
 architectures sequence logos as PNG files}
 
-\item{dir_path}{The path to the directory where plot will be saved.}
+\item{dir_path}{The /path/to/the/directory where plot will be saved. Default
+is NULL}
 }
 \value{
 If `one_plot` is TRUE, one plot as a grid of all sequence logos is
@@ -52,9 +53,13 @@ returned.
 
 If `one_plot` is FALSE, a set of ggplot2-based sequence logos for all
 clusters is saved to disk with the default filename
-`Architectures_0-max.pdf`. This is a multi-page PDF document with the
-sequence logo for each cluster on a separate page. Also, the list of plots
-is returned.
+`Architectures_0-max.pdf` in the location provided by `dir_path`. This is
+a multi-page PDF document with the sequence logo for each cluster on a
+separate page. Also, the list of plots is returned.
+
+With `strand_sep = TRUE`, the `one_plot` option is not available. In other
+words, only a list of plots is returned. When `dir_path` is not NULL, the
+default filename used is `Architectures_0-max_strand_separated.pdf`.
 }
 \description{
 Plot per cluster sequence logos

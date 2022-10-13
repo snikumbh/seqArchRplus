@@ -12,6 +12,7 @@
 #' See argument in \code{\link[seqArchR]{plot_ggseqlogo_of_seqs}} for more
 #' details
 #' @param strand_sep Logical. Whether sequences are to be separated by strand.
+#'
 #' @param one_plot Logical. Whether all sequence logos should be combined
 #' into one grid (with ncol = 1)?
 #'
@@ -22,7 +23,8 @@
 #' @param save_png Logical. Set TRUE if you would like to save the
 #' architectures sequence logos as PNG files
 #'
-#' @param dir_path The path to the directory where plot will be saved.
+#' @param dir_path The /path/to/the/directory where plot will be saved. Default
+#' is NULL
 #'
 #'
 #' @details Plots the sequence logos of all clusters
@@ -32,9 +34,13 @@
 #'
 #' If `one_plot` is FALSE, a set of ggplot2-based sequence logos for all
 #' clusters is saved to disk with the default filename
-#' `Architectures_0-max.pdf`. This is a multi-page PDF document with the
-#' sequence logo for each cluster on a separate page. Also, the list of plots
-#' is returned.
+#' `Architectures_0-max.pdf` in the location provided by `dir_path`. This is
+#' a multi-page PDF document with the sequence logo for each cluster on a
+#' separate page. Also, the list of plots is returned.
+#'
+#' With `strand_sep = TRUE`, the `one_plot` option is not available. In other
+#' words, only a list of plots is returned. When `dir_path` is not NULL, the
+#' default filename used is `Architectures_0-max_strand_separated.pdf`.
 #'
 #' @importFrom seqArchR plot_ggseqlogo_of_seqs plot_arch_for_clusters
 #' collate_seqArchR_result get_seqs_clust_list seqs_str collate_clusters
@@ -70,7 +76,7 @@ per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
                                     pos_lab = NULL, bits_yax = "max",
                                     strand_sep = FALSE, one_plot = TRUE,
                                     info_df = NULL, txt_size = 12,
-                                    save_png = FALSE, dir_path) {
+                                    save_png = FALSE, dir_path = NULL) {
     if (strand_sep) {
         if (is.null(info_df)) {
             stop(
@@ -89,11 +95,13 @@ per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
     }
     cli::cli_h1(paste0("All clusters' sequence logos"))
     cli::cli_h2(paste0("Sample: ", sname))
-    ##
-    result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
-    ##
+
     message("Generating architectures for clusters of sequences...")
-    fname <- file.path(result_dir_path, paste0("Architectures_0-max.pdf"))
+    ##
+    if(!one_plot && !is.null(dir_path)){
+        result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
+        fname <- file.path(result_dir_path, paste0("Architectures_0-max.pdf"))
+    }
     ##
     T_F_titles <- TRUE
     if (one_plot) T_F_titles <- FALSE
@@ -130,12 +138,16 @@ per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
         comb_one_pl <- cowplot::plot_grid(plotlist = arch_list, ncol = 1)
         return(comb_one_pl)
     } else {
-        grDevices::pdf(file = fname, width = 20, height = 2, onefile = TRUE)
-        lapply(arch_list, gridExtra::grid.arrange)
-        grDevices::dev.off()
-        cli::cli_alert_success(paste0("Written to file: ", fname))
+        if(!is.null(dir_path)){
+            grDevices::pdf(file = fname, width = 20, height = 2, onefile = TRUE)
+            lapply(arch_list, gridExtra::grid.arrange)
+            grDevices::dev.off()
+            cli::cli_alert_success(paste0("Written to file: ", fname))
+        }
         ## save PNGs
         if (save_png) {
+            if(is.null(dir_path))
+                stop("Argument 'dir_path' cannot be NULL")
             .save_PNGs(
                 dir_path = result_dir_path, plot_list = arch_list,
                 txt_size = txt_size
@@ -180,19 +192,19 @@ per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
 
 
 .strand_sep_seqlogos <- function(sname, seqs, clusts, info_df, pos_lab,
-                                bits_yax, dir_path, txt_size = 12,
+                                bits_yax, dir_path = NULL, txt_size = 12,
                                 save_png = FALSE) {
     cli::cli_h1(paste0("All clusters' strand-separated sequence logos"))
     cli::cli_h2(paste0("Sample: ", sname))
     ##
-    result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
-    ##
-
-    ## STRAND SEPARTATED SEQUENCE LOGOS (AUTO LIMITS)
-    fname <- file.path(
-        result_dir_path,
-        paste0("Architectures_0-max_strand_separated.pdf")
-    )
+    if(!is.null(dir_path)){
+        result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
+        ## STRAND SEPARTATED SEQUENCE LOGOS (AUTO LIMITS)
+        fname <- file.path(
+            result_dir_path,
+            paste0("Architectures_0-max_strand_separated.pdf")
+        )
+    }
 
 
     per_cl_idx_by_strand <- lapply(clusts, function(x) {
@@ -283,9 +295,11 @@ per_cluster_seqlogos <- function(sname, seqs = NULL, clusts,
     ## Making a plot_grid and plotting is tedious; the PDF height has to be set
     ## by trial and error to a very large value. Instead, we decide to plot this
     ## a pair on one page
-    grDevices::pdf(file = fname, width = 20, height = 4.5, onefile = TRUE)
-    lapply(plots_p_n, gridExtra::grid.arrange)
-    grDevices::dev.off()
+    if(!is.null(dir_path)){
+        grDevices::pdf(file = fname, width = 20, height = 4.5, onefile = TRUE)
+        lapply(plots_p_n, gridExtra::grid.arrange)
+        grDevices::dev.off()
+    }
 
     ## save PNGs
     if (save_png) {
