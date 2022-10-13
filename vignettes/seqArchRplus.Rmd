@@ -1,5 +1,5 @@
 ---
-title: "Downstream analysis of clusters of promoter sequence architectures using seqArchRplus"
+title: "seqArchRplus for downstream analysis of clusters of promoter sequence architectures"
 author: 
 - name: Sarvesh Nikumbh
   affiliation: MRC London Institute of Medical Sciences and Imperial College London
@@ -7,10 +7,10 @@ date: "`r Sys.Date()`"
 package: seqArchRplus
 output:
   BiocStyle::html_document:
-    toc_float: true
+    toc: true
   BiocStyle::pdf_document: default
 vignette: >
-  %\VignetteIndexEntry{Downstream analysis of clusters of promoter sequence architectures using seqArchRplus}
+  %\VignetteIndexEntry{seqArchRplus for downstream analysis of clusters of promoter sequence architectures}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -43,16 +43,17 @@ Identifying and studying these different promoter architectures further is thus
 vital.
 
 
-While the R/Bioconductor package Biocpkg("seqArchR") enables de novo 
+While the R/Bioconductor package `r Biocpkg("seqArchR")` enables de novo 
 identification of clusters of promoter sequence architectures, this package, 
-Biocpkg("seqArchRplus"), enables performing various steps in their downstream bioinformatic analyses and produce publication-ready plots (building on 
-various other Bioconductor packages).
+`r Biocpkg("seqArchRplus")`, enables performing various steps in their 
+downstream bioinformatic analyses and produce publication-ready plots 
+(building on various other Bioconductor packages).
 The many steps in the downstream analyses of promoter sequence architectures
-enabled by seqArchRplus are:
+enabled by `r Biocpkg("seqArchRplus")` are:
 
-- Curate the final set of clusters from seqArchR. 
+- Curate the final set of clusters from `r Biocpkg("seqArchR")`. 
 See the 
-[`seqArchR` vignette](http://bioconductor.org/packages/release/bioc/vignettes/seqArchR/inst/doc/seqArchR.html)
+[``r Biocpkg("seqArchR")`` vignette](http://bioconductor.org/packages/release/bioc/vignettes/seqArchR/inst/doc/seqArchR.html)
 , or the preprint to understand in detail why this may be required 
 
 - Order the sequence architectures by the interquantile widths (IQWs) of the 
@@ -76,19 +77,19 @@ transcription tag clusters for each architecture-based clusters
     - distributions of promoters on different chromosomes and strands
     - GO terms enriched for each cluster/architecture
 
-- Produce BED track files of seqArchR clusters for visualization in a genome
+- Produce BED track files of `r Biocpkg("seqArchR")` clusters for visualization in a genome
 browser or IGV
 Examples of most of these capabilities are provided in this vignette.
 
 
-We hope that using seqArchRplus (together with seqArchR) will be useful in 
+We hope that using `r Biocpkg("seqArchRplus")` (together with `r Biocpkg("seqArchR")`) will be useful in 
 swiftly, but comprehensively, analyzing promoters identified using CAGE for 
 any organism, and enable insights and hypotheses generation with ease. 
-So far, we have tested seqArchR and seqArchRplus on promoters in drosophila 
+So far, we have tested `r Biocpkg("seqArchR")` and `r Biocpkg("seqArchRplus")` on promoters in drosophila 
 (Schor et al. 2017 and modENCODE), zebrafish (Nepal et al. 2013), mice (Fantom),
 humans (ENCODE), and also in plants (barley and maize).
 
-We already have a plan for a feature in the future version of seqArchRplus: 
+We already have a plan for a feature in the future version of `r Biocpkg("seqArchRplus")`: 
 generate HTML reports that help you navigate this wealth of information with 
 ease.
 
@@ -96,7 +97,7 @@ ease.
 
 # Installation
 
-## Installing the latest stable version from Bioconductor
+## Latest stable version from Bioconductor
 
 ```{r seqArchRplus-install, echo=TRUE, eval=FALSE}
 ## When available on Bioconductor
@@ -106,7 +107,7 @@ if (!require("BiocManager", quietly = TRUE)) {
 BiocManager::install("seqArchRplus")
 ```
 
-## Installing the latest 'devel' version from GitHub
+## Latest 'devel' version from GitHub
 
 ```{r install-from-github, echo=TRUE, eval=FALSE}
 ## From Github
@@ -123,14 +124,16 @@ and file a [new issue](https://github.com/snikumbh/seqArchRplus/issues/new).
 
 
 
-# Using seqArchRplus for downstream analysis of promoter sequences
+# seqArchRplus for downstream analysis of promoter sequences
 
 ```{r setup-two, echo=TRUE}
 # Load seqArchRplus
-library(seqArchRplus)
+# library(seqArchRplus)
+devtools::load_all()
 library(seqArchR)
 library(Biostrings)
 library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
+library(org.Dm.eg.db)
 library(ChIPseeker)
 
 # Set seed for reproducibility
@@ -155,18 +158,20 @@ set.seed(1234)
 <!-- Using seqArchRplus helps answer these questions by generating numerous  -->
 <!-- visualisations for you.  -->
 
-To begin using seqArchRplus, you require a set of promoters sequences and their 
-clustering information. 
-This lets you visualize the cluster-wise sequence logos, distribution of 
-chromosome and strand locations, GO term-enrichments, motif occurrence heatmaps.
+To begin using `r Biocpkg("seqArchRplus")`, you require a set of promoters sequences (as 
+a DNAStringSet object) and their clustering information (as a simple list 
+storing the sequence IDs belonging to each cluster). 
+With this, you can already visualize the cluster-wise sequence logos, 
+distribution of chromosome and strand locations, GO term-enrichments, motif 
+occurrence heatmaps.
 When you have additional information such as the IQWs (shape information), 
-seqArchRplus can use these to order the clusters in the visualizations.
-seqArchRplus can supplement this visualization with the distribution of 
+`r Biocpkg("seqArchRplus")` can use these to order the clusters in the visualizations.
+This visualization can be supplemented with the distribution of 
 per-cluster TPM values and/or conservation scores etc. when provided.
 
 If your workflow involves CAGEr (for pre-processing raw CAGE data) and 
-seqArchR (for clusters), they can be seamlessly used to utilize the full scope 
-of seqArchRplus.
+`r Biocpkg("seqArchR")` (for clusters), they can be seamlessly used to utilize the full scope 
+of `r Biocpkg("seqArchRplus")`.
 In this case, it will be helpful if you have
 
 - the CAGEr object or information on the tag clusters from 
@@ -174,145 +179,25 @@ In this case, it will be helpful if you have
 specifically, the width of the tag clusters, total TPM value of the cluster and 
 that of the dominant CTSS in the cluster
 
-- the seqArchR result object.
-
-If you are not using the result from seqArchR, you can skip section {#curate-seqArchR-result} and jump to section {#generating-plots}.
+- the `r Biocpkg("seqArchR")` result object.
 
 
-## Curating raw clusters from seqArchR result {#curate-seqArchR-result}
-
-Raw clusters from seqArchR result (say, the final iteration) often require 
-curation. 
-
-The seqArchR result does have a final `clustSol` (the clustering solution) 
-where the clusters from the final iteration are collated. 
-seqArchR uses hierarchical clustering for this purpose. 
-However, hierarchical clustering, with a chosen agglomeration and distance 
-method, does not necessarily output the best suitable collated set of clusters. 
-Therefore, some small amount of manual curation (re-assignments) may be 
-required to reach the ideal collated set of clusters as the final solution. 
-This is achieved with the help of the `seqArchRplus::curate_clusters` function.
-
-The basic idea of the curate_clusters function is available in 
-`help(seqArchRplus::curate_clusters)`. 
-A more elaborate description is as follows.
-It takes as input an agglomeration method and also a distance method (see more 
-arguments in help/documentation). 
-On the first call to the function, a PDF file with the associated dendrogram 
-resulting from the hierarchical clustering is shown together with the per 
-cluster sequence logos. 
-This should help in identifying if the chosen agglomeration and distance 
-methods worked well (are clusters with similar sequence logos also together 
-in the dendrogram?).
-If this is satisfactory (chosen agglomeration and distance method have done 
-well already and only few curations will be required), count the number of 
-overall clusters that you can visually see. 
-Generally, if (estimated) 3-4 (even 5-6) clusters out of 30-40 require 
-curation, I would consider it as a satisfactory outcome from the hierarchical 
-clustering output.
-Now, in the second call to `curate_clusters`, specify the number of clusters 
-based on your count.
-View the resulting clustering in the new PDF file produced as output.
-This time the dendrogram shows this clustering with colors and grey-scaled 
-boxes drawn around the clusters.
-Now you can exactly note which clusters need curation. 
-Say, sequence clusters 39, 41 and 47 are combined into one, and sequence 
-clusters 36-38 are combined into another cluster. 
-Then, you may want to move sequence cluster 39 to the cluster of 36-38.
-To do this, set the `need_change` argument of `curate_clusters` to `c(39)` and 
-`change_to` argument to `c(36)`. 
-Any one of the destination cluster members can be specified in `change_to`. 
-Similarly, any other such curations can be added. 
-Specify all such curations together in one go like this: 
-`need_change <- list(c(39), c(24, 27), c(17))` and 
-`change_to <- list(36, 21, 0)` -- sequence cluster 39 is moved to the cluster 
-containing sequence cluster 36, 24 and 27 are moved to that of 21, and 17 to a 
-totally new cluster of itself.
-
-```{r curation-example, echo=TRUE, eval=TRUE}
-
-sn <- "RAL28_10_12"
-use_aggl <- "complete"
-use_dist <- "euclid"
-
-use_dir <- tempdir()
-
-seqArchR_result <- readRDS(system.file("extdata", "seqArchR_result.rds",
-      package = "seqArchRplus", mustWork = TRUE))
-
-## get seqArchR clusters custom curated
-seqArchR_clusts <- seqArchRplus::curate_clusters(
-    sname = sn,
-    use_aggl = use_aggl, use_dist = use_dist,
-    seqArchR_result = seqArchR_result, iter = 5,
-    pos_lab = NULL, regularize = FALSE, topn = 50,
-    use_cutk = 2, final = FALSE, dir_path = use_dir
-)
-
-
-## Suppose we identify K = 5 upon visual inspection.
-set_cutk <- 5
-
-
-## Form the lists need_change and change_to for re-assignments
-need_change <- list(c(2))
-change_to <- list(c(1))
-
-
-seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(
-    sname = sn,
-    use_aggl = use_aggl, use_dist = use_dist,
-    seqArchR_result = seqArchR_result, iter = 5,
-    use_cutk = set_cutk, #***
-
-    need_change = need_change,
-    change_to = change_to,
-    final = FALSE, #***
-
-    dir_path = use_dir
-)
-
-## Satisfied? now set final = TRUE
-seqArchR_clusts[[sn]] <- seqArchRplus::curate_clusters(
-    sname = sn,
-    use_aggl = use_aggl, use_dist = use_dist,
-    seqArchR_result = seqArchR_result, iter = 5,
-    pos_lab = NULL, regularize = FALSE, topn = 50,
-    use_cutk = set_cutk, #***
-    need_change = need_change,
-    change_to = change_to,
-    final = TRUE, #***
-
-    dir_path = tempdir()
-)
-## This fetches us clusters with custom/curated collation in _arbitrary_ order.
-## See below for the function call to `order_clusters_iqw` that orders these 
-## clusters by their median/mean interquantile width
-```
-
-
-
-
-
-## Generating individual plots via individual functions {#generating-plots}
-
-The following subsections demonstrate how the seqArchRplus functions can be 
-used to generate the various visualizations.
-
-<!-- One can use the different individual functions from seqArchRplus to generate all  -->
-<!-- the plots as demonstrated in the following subsections. -->
-
-### Prepare input data
+### Input data
 
 In this vignette, we use the example data provided with the package. 
-The raw CAGE data for Drosophila melanogaster (Schor et al. 2017) were 
-pre-processed with CAGEr to obtain promoter sequences. 
-These were then processed with seqArchR to cluster the promoter DNA sequences.
+The raw CAGE data for different developmental timepoints in Drosophila 
+melanogaster (Schor et al. 2017) were pre-processed with CAGEr to obtain 
+promoter sequences. 
+These were then processed with `r Biocpkg("seqArchR")` to cluster the promoter DNA sequences.
+Only a subset of the complete data is provided with the package and used here 
+to enable demonstration of package utility.
+In particular, the data included is for the timepoint 10-12h after egg laying.
 
 Specifically, the following files are provided: 
 
-1. raw DNA sequences stored as a gzipped FASTA file
-  (filename: `example_promoters45.fa.gz`)
+1. promoter sequences stored as a gzipped FASTA file: two kinds, with 45 and 
+200 bp flanks around the TSS (filenames: `example_promoters45.fa.gz` and 
+`example_promoters200.fa.gz`)
 2. clustering information (filename: `example_clust_info.rds`)
 3. GRanges object obtained from CAGEr which holds information on the 
 tag clusters (promoters) with additional information such as the position of 
@@ -320,6 +205,7 @@ dominant TSS, TPM value for the dominant TSS, position of quantile boundaries
 (filename: `example_tc_gr.rds`)
 4. BED file with same information as the GRanges object (filename: 
 `example_info_df.rds`)
+5. `r Biocpkg("seqArchR")` result object (filename: `seqArchR_result.rds`)
 
 ```{r prepare-fetch-data, eval=TRUE}
 ## 1. Raw DNA sequences
@@ -333,20 +219,186 @@ raw_seqs <- Biostrings::readDNAStringSet(
 
 ## 2. Clustering information (arbitrary order/unordered)
 unord_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
-    package = "seqArchRplus", mustWork = TRUE
-))
+                            package = "seqArchRplus", mustWork = TRUE
+                        ))
 
 ## 3. GRanges object
 tc_gr <- readRDS(system.file("extdata", "example_tc_gr.rds",
-    package = "seqArchRplus", mustWork = TRUE
-))
+                    package = "seqArchRplus", mustWork = TRUE
+                ))
 
 ## 4. BED file
 bed_info_fname <- system.file("extdata", "example_info_df.bed.gz",
-    package = "seqArchRplus", mustWork = TRUE
-)
+                                package = "seqArchRplus", mustWork = TRUE
+                            )
 info_df <- read.delim(file = bed_info_fname, sep = "\t", header = TRUE)
+
+## 5. seqArchR result
+seqArchR_result <- readRDS(system.file("extdata", "seqArchR_result.rds",
+      package = "seqArchRplus", mustWork = TRUE))
 ```
+
+If you are not using the result from `r Biocpkg("seqArchR")` or are already using a curated 
+set of clusters, you can skip the following subsection and jump to section 
+\@ref(generating-plots) for a demonstration of generating all plots.
+
+### Curating raw clusters from `r Biocpkg("seqArchR")` result {#curate-seqArchR-result}
+
+Raw clusters from `r Biocpkg("seqArchR")` result (say, the final iteration) often require 
+curation. 
+
+The `r Biocpkg("seqArchR")` result does have a final `clustSol` (the clustering solution) 
+where the clusters from the final iteration are collated. 
+`r Biocpkg("seqArchR")` uses hierarchical clustering for this purpose. 
+However, hierarchical clustering, with a chosen agglomeration and distance 
+method, does not necessarily output the best suitable collated set of clusters. 
+Therefore, some small amount of manual curation (re-assignments) may be 
+required to reach the ideal collated set of clusters as the final solution. 
+This is achieved with the help of the `seqArchRplus::curate_clusters` function.
+
+The basic idea of the curate_clusters function is available in 
+`help(seqArchRplus::curate_clusters)`. 
+A more elaborate description is as follows.
+It takes as input an agglomeration method and also a distance method (see more 
+arguments in \code{help(curate_clusters)}). 
+On the first call to the function, a plot with the associated dendrogram 
+resulting from the hierarchical clustering is shown together with the per 
+cluster sequence logos. 
+This should help in identifying if the chosen agglomeration and distance 
+methods worked well (i.e., are clusters with similar sequence logos also 
+together in the dendrogram?).
+If this is satisfactory (i.e., chosen agglomeration and distance method have 
+done well already and only few curations will be required), count the number of 
+overall clusters that you can visually see. 
+Generally, if (estimated) 3-4 (even 5-6) clusters out of 30-40 require 
+curation, I would consider it as a satisfactory outcome from the hierarchical 
+clustering output.
+Now, in the second call to `curate_clusters`, specify the number of clusters 
+based on your count.
+View the resulting clustering in the new plot produced as output.
+This time the dendrogram shows this clustering with colors and grey-scaled 
+boxes drawn around the clusters.
+Now you can exactly note which clusters need curation. 
+
+Imagine a hypothetical scenario where a total of 16 raw clusters are obtained 
+from the final `r Biocpkg("seqArchR")` iteration.
+Collating them into 4 clusters using hierarchical clustering results in:
+
+- collated cluster 1: 1, 7, 9
+- collated cluster 2: 2, 3, 4, 8, 10
+- collated cluster 3: 11, 12, 13
+- collated cluster 4: 5, 6, 14, 15, 16
+
+But, due to very minor differences in the sequence logos, you may want to move 
+raw cluster 9 from collated cluster 1 to collated cluster 3 (that of raw 
+clusters 11-13).
+To do this, set the `need_change` argument of `curate_clusters` to `c(9)` and 
+`change_to` argument to `c(11)`. 
+Any one of the destination cluster members can be specified in `change_to`. 
+Similarly, any other such curations can be added. 
+Specify all such curations together in one go like this: 
+
+- `need_change <- list(c(9), c(4, 7), c(16))` and 
+- `change_to <- list(11, 14, 0)`
+
+Here, (a) raw cluster 9 is moved to the collated cluster containing raw cluster
+11; (b) 4 and 7 are moved to that of 14; and (c) 16 is moved to a totally new 
+cluster of itself.
+The result is the re-assigned clusters.
+
+Below, this procedure of curation is re-iterated with the help of actual 
+function calls and resulting figures using a reduced example data available 
+with the package.
+
+
+```{r curation-call-1, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="Figure showing a combined panel of dendrogram + sequence logos at the first step of curation", fig.wide=TRUE, fig.height=3.5}
+
+sn <- "RAL28_10_to_12h"
+use_aggl <- "complete"
+use_dist <- "euclid"
+
+## get seqArchR clusters custom curated
+seqArchR_curated_clusts <- curate_clusters(sname = sn,
+                                use_aggl = use_aggl, use_dist = use_dist,
+                                seqArchR_result = seqArchR_result, iter = 5,
+                                pos_lab = NULL, regularize = TRUE, topn = 50,
+                                use_cutk = 2, final = FALSE, dir_path = NULL
+                            )
+seqArchR_curated_clusts$curation_plot
+```
+
+The motive of Figure \@ref(fig:curation-call-1) is to look at the clusters ordered by 
+the hierarchical clustering step. 
+This way, counting the tentative number of clusters (K) is easier.
+
+In Figure \@ref(fig:curation-call-1), we can see that the first and the second 
+clusters can be collated together. 
+Therefore, to demonstrate curation, we will set K=5 clusters and perform this 
+minor curation as shown below. 
+
+```{r curation-set-k, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="Figure showing a combined panel of dendrogram + sequence logos at the second step of curation", fig.wide=TRUE, fig.height=3.5}
+## Let us set K=5 for this example, and combine clusters 1 and 2 into one.
+set_cutk <- 5
+
+## Form the lists `need_change` and `change_to` for re-assignments
+need_change <- list(c(2))
+change_to <- list(c(1))
+
+seqArchR_curated_clusts <- curate_clusters(sname = sn,
+                                use_aggl = use_aggl, use_dist = use_dist,
+                                seqArchR_result = seqArchR_result, iter = 5,
+                                regularize = TRUE, topn = 50,
+                                use_cutk = set_cutk, #***
+                                need_change = need_change,
+                                change_to = change_to,
+                                final = FALSE, #***
+                                dir_path = NULL
+                            )
+seqArchR_curated_clusts$curation_plot
+```
+
+Notice that each dendrogram branch (and leaf node) has been assigned a different 
+color because we set K=5.
+We are now ready to make the final call to `curate_clusters` and obtain the 
+curated clusters' list.
+
+```{r curation-final-call, echo=TRUE, eval=TRUE, warning=FALSE, fig.cap="Figure showing three panels  combined: dendrogram + original sequence logos + collated cluster sequence logos at the final step of curation", fig.wide=TRUE, fig.height=4, fig.width=15}
+## Satisfied with the re-assignments? now set final = TRUE
+seqArchR_curated_clusts <- curate_clusters(sname = sn,
+                                use_aggl = use_aggl, use_dist = use_dist,
+                                seqArchR_result = seqArchR_result, iter = 5,
+                                pos_lab = NULL, regularize = FALSE, topn = 50,
+                                use_cutk = set_cutk, #***
+                                need_change = need_change,
+                                change_to = change_to,
+                                final = TRUE, #***
+                                dir_path = NULL
+                            )
+seqArchR_curated_clusts$curation_plot
+```
+Notice that the re-assigned clusters (1 and 2) now have different colors than 
+the corresponding dendrogram branches.
+
+
+```{r show-clusts}
+str(seqArchR_curated_clusts$clusters_list)
+
+```
+
+This fetches us clusters in _arbitrary_ order, i.e., not related to the IQWs 
+of the clusters.
+[See below for the function call `order_clusters_iqw()` that orders these 
+clusters by their median/mean interquantile widths (section \@ref(iqw-ord)).]
+This curated set of clusters can now be used for further downstream analyses.
+
+## Generating individual plots via individual functions {#generating-plots}
+
+The following subsections demonstrate how the `r Biocpkg("seqArchRplus")` functions can be 
+used to generate the various visualizations.
+
+<!-- One can use the different individual functions from seqArchRplus to generate all  -->
+<!-- the plots as demonstrated in the following subsections. -->
+
 
 ### Visualize architectures for each promoter cluster as sequence logos
 
@@ -392,9 +444,7 @@ seqlogos_list_pl <- per_cluster_seqlogos(
 Obtaining strand-separated sequence logos is demonstrated in section 
 \@ref(strand-seqlogos).
 
-
-
-### Visualize the distribution of IQW and TPM values for each cluster
+### Visualize the distribution of IQW and TPM values for each cluster {#iqw-ord}
 
 The function `iqw_tpm_plots` orders the clusters by their IQW values 
 (when quantitative information on promoter shape is available, for instance, the 
@@ -404,13 +454,12 @@ The input clusters are ordered from sharp (top) to broad (bottom).
 
 ```{r iqw-tpm-plot, eval=TRUE, attr.source='.numberLines'}
 ##
-iqw_tpm_pl <- iqw_tpm_plots(
-                                sname = "RAL28_10_12",
-                                dir_path = use_dir,
-                                info_df = info_df,
-                                iqw = TRUE, tpm = TRUE, cons = FALSE,
-                                clusts = unord_clusts,
-                                txt_size = 20
+iqw_tpm_pl <- iqw_tpm_plots(sname = "RAL28_10_12",
+                            dir_path = NULL,
+                            info_df = info_df,
+                            iqw = TRUE, tpm = TRUE, cons = FALSE,
+                            clusts = unord_clusts,
+                            txt_size = 15
                             )
 iqw_tpm_pl
 ```
@@ -458,7 +507,9 @@ pair).
 Similarly, W-boxes (WW) that occur at ~30 bp upstream of the TSS are an important 
 TSS-determining feature in Zebrafish maternal stage promoters.
 Occurrences of various dinucleotides can be visualized as heatmaps using the 
-function `plot_motif_heatmaps`.
+function `plot_motif_heatmaps` (based on Biocpkg("heatmaps"))) or 
+`plot_motif_heatmaps2` (based on Biocpkg("seqPattern").
+We demonstrate only `plot_motif_heatmaps` here.
 
 ```{r motif-heatmaps, eval=TRUE, attr.source='.numberLines'}
 ## Get larger flank FASTA sequences (larger than those used for seqArchR)
@@ -484,7 +535,7 @@ In each cluster, the promoters (more specifically, the transcription start
 sites) can be annotated by their genomic feature, i.e., whether the start site 
 is located within a promoter region of a gene, the 5' UTR, 3' UTR, exon, intron 
 or is intergenic.
-_seqArchRplus_ enables visualizing these annotation proportions per cluster as 
+`r Biocpkg("seqArchRplus")` enables visualizing these annotation proportions per cluster as 
 stacked bar plots via the function `per_cluster_annotations`.
 When the argument `one_plot` is set to TRUE, this function returns all stacked 
 bars combined within a single plot (see example below).
@@ -503,13 +554,13 @@ annotations_oneplot_pl <-
         tss_region = c(-500, 100),
         orgdb_obj = NULL, dir_path = NULL,
         one_plot = TRUE,
-        txt_size = 15
+        txt_size = 12
     )
 annotations_oneplot_pl
 ## Obtain the per cluster annotations as a list for combining later by setting 
 ## the 'one_plot' argument to FALSE
 
-# annotations_list_pl <- seqArchRplus::per_cluster_annotations(
+# annotations_list_pl <- per_cluster_annotations(
 #                             sname = "RAL28_10_12",
 #                             clusts = unord_clusts,
 #                             tc_gr = tc_gr,
@@ -517,7 +568,7 @@ annotations_oneplot_pl
 #                             qLow = 0.1, qUp = 0.9,
 #                             txdb_obj = TxDb.Dmelanogaster.UCSC.dm6.ensGene,
 #                             tss_region = c(-500, 100),
-#                             orgdb_obj = NULL, dir_path = use_dir,
+#                             orgdb_obj = NULL, dir_path = NULL,
 #                             one_plot = FALSE,
 #                             txt_size = 12
 #                         )
@@ -531,7 +582,7 @@ negative strand, and visualize them separately as shown below.
 Note that this is the same function `per_cluster_seqlogos` with the argument 
 `strand_sep` set to TRUE.
 
-```{r stranded-seqlogos, eval=TRUE, attr.source='.numberLines', fig.height=14, warning=FALSE}
+```{r stranded-seqlogos, eval=TRUE, attr.source='.numberLines', fig.height=10, warning=FALSE}
 ## Obtain strand-separated sequence logos corresponding to each cluster
 stranded_seqlogos_pl <- per_cluster_seqlogos(
                             sname = "RAL28_10_12",
@@ -550,10 +601,10 @@ one_plot
 
 ### Per cluster chromosome- and strand-wise distribution of promoters
 
-The seqArchRplus function `per_cluster_strand_dist` can enable visualizing as 
+The `r Biocpkg("seqArchRplus")` function `per_cluster_strand_dist` can enable visualizing as 
 barplots how promoters in each cluster are distributed on different chromosomes 
 and strands.
-```{r stranded-chrom-prop, eval=TRUE, attr.source='.numberLines', fig.height=14}
+```{r stranded-chrom-prop, eval=TRUE, attr.source='.numberLines', fig.height=7}
 
 pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")
 ## Obtain strand-separated sequence logos corresponding to each cluster
@@ -570,12 +621,49 @@ one_plot
 
 ### Per cluster GO term enrichments
 
+GO terms enriched per cluster can be obtained using the 
+`r Biocpkg("seqArchRplus")` `per_cluster_go_term_enrichments()`.
+This function returns a list of plots showing the GO terms enriched.
+
+```{r go-enrichment, eval=TRUE, attr.source='.numberLines', fig.height=15, fig.width=15, fig.wide=TRUE}
+
+go_enrich_pl <- per_cluster_go_term_enrichments(
+                            sname = "RAL28_10_12",
+                            clusts = seqArchR_clusts_ord,
+                            tc_gr = tc_gr, 
+                            txdb_obj = TxDb.Dmelanogaster.UCSC.dm6.ensGene,
+                            dir_path = NULL,
+                            one_file = FALSE, #***
+                            tss_region = c(-500,100),
+                            orgdb_obj = "org.Dm.eg.db"
+                        )
+
+one_plot <- cowplot::plot_grid(plotlist = go_enrich_pl, ncol = 2)
+one_plot
+```
+
+### Large panels combining together multiple plots
+
+```{r large-panels, eval=TRUE, attr.source='.numberLines', fig.wide=TRUE, fig.height=8, fig.width=20, fig.cap="Multiple plots combined as panels to geenrate one large figure."}
+## Remove y-axis text/tick labels
+annot_new_pl <- annotations_oneplot_pl + ggplot2::ylab(NULL) + 
+                        ggplot2::theme(axis.text.y = element_blank())
+
+panel_pl <- cowplot::plot_grid(iqw_tpm_pl, seqlogos_oneplot_pl, 
+                            annot_new_pl, ncol = 3, axis = "tblh", 
+                            align = "h")
+panel_pl
+```
+
+In a multi-sample study where the samples designate either different 
+timepoints or cell types, all such (large) figures can be generated for all 
+sampleas to produce a list of such plots. 
 
 ### Clusters as track BED files for visualization in the genome browser
 
 We recommend viewing the promoters in the genome browser or IGV to 
 observe additional details such as the position of the dominant TSS etc.
-The relevant seqArchRplus function that writes to disk this information 
+The relevant `r Biocpkg("seqArchRplus")` function that writes to disk this information 
 as browser track BED files is `write_seqArchR_cluster_track_bed`.
 
 ```{r track-bed, eval=TRUE, attr.source='.numberLines'}
@@ -587,7 +675,7 @@ write_seqArchR_cluster_track_bed(
                     use_q_bound = FALSE,
                     one_zip_all = TRUE,
                     org_name = "Dmelanogaster",
-                    dir_path = use_dir,
+                    dir_path = tempdir(),
                     include_in_report = FALSE,
                     strand_sep = FALSE
                 )
@@ -595,22 +683,16 @@ write_seqArchR_cluster_track_bed(
 
 ### Some additional notes
 
-You may notice that the functions used in the above code block for generating 
-individual plots take as input a cluster list. 
-Here, we used the clusters upon first ordering them by their shape/IQWs (see 
-how we define `use_clusts <- seqArchR_clusts_ord[[sn]]`, and then pass 
-`use_clusts` to all functions.
-Depending upon the use case, one may use arbitrarily ordered (any other order) 
-clusters here. 
-One can use these to look at their annotations, and if some clusters happen to 
+Depending upon the use case, one may use any ordering for the input clusters 
+for all functions.
+Looking at their annotations, if some clusters happen to 
 to occur predominantly in 5' UTR or 3' UTR or exons or introns etc., such 
-clusters can be sequestered from further downstream analyses.
-
-
+clusters can be sequestered from further downstream analyses if suitable for 
+the end goal.
 
 ## Generating all plots at once
 
-You can let seqArchRplus generate all plots using default settings like so.
+You can let `r Biocpkg("seqArchRplus")` generate all plots using default settings like so.
 
 ```{r generate-all-plots, eval=FALSE}
 
@@ -643,9 +725,9 @@ generate_all_plots(
 
 Promoter sequences can be identified using CAGE or variations of CAGE 
 experiment.
-Clusters of promoter sequences (identified by seqArchR or otherwise) can be 
-further analyzed with seqArchRplus.
-This. vignette. demonstrated many of the downstream analyses steps for studying 
+Clusters of promoter sequences (identified by `r Biocpkg("seqArchR")` or otherwise) can be 
+further analyzed with `r Biocpkg("seqArchRplus")`.
+This vignette demonstrated many of the downstream analyses steps for studying 
 these promoter sequence clusters/architectures.
 
 
