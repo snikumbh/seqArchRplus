@@ -6,12 +6,13 @@
 \usage{
 iqw_tpm_plots(
   sname,
-  dir_path,
   info_df,
   clusts,
   iqw = TRUE,
   tpm = TRUE,
   cons = TRUE,
+  order_by_median = TRUE,
+  dir_path = NULL,
   txt_size = 12,
   use_suffix = NULL,
   use_prefix = "C",
@@ -20,8 +21,6 @@ iqw_tpm_plots(
 }
 \arguments{
 \item{sname}{Sample name}
-
-\item{dir_path}{The path to the directory where files will be written.}
 
 \item{info_df}{A DataFrame object holding information on the tag clusters.
 Expected columns (names) are 'chr', 'start', 'end', 'IQW', 'domTPM', and
@@ -39,6 +38,12 @@ are to be plotted.}
 \item{cons}{Logical. Specify TRUE if boxplots of conservation scores
 (PhastCons scores) for all clusters. If this is TRUE, an additional column
 named 'cons' is expected in the `info_df`.}
+
+\item{order_by_median}{Logical. Whether to order to clusters by their
+median (when TRUE) or mean (when FALSE) interquantile widths.}
+
+\item{dir_path}{The /path/to/the/directory where files will be written.
+Default is NULL.}
 
 \item{txt_size}{Specify text size to be used in the plots.}
 
@@ -63,7 +68,7 @@ and `cons` are set to TRUE. This is also set as the plot title if `wTitle`
 is set to TRUE.
 
 All plots are arranged by the IQWs (smallest on top, largest at the bottom),
-even iff `iqw` is set to FALSE.
+even if `iqw` is set to FALSE.
 }
 \examples{
 

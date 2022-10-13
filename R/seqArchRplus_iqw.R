@@ -5,8 +5,6 @@
 #'
 #' @param sname Sample name
 #'
-#' @param dir_path The path to the directory where files will be written.
-#'
 #' @param info_df A DataFrame object holding information on the tag clusters.
 #' Expected columns (names) are 'chr', 'start', 'end', 'IQW', 'domTPM', and
 #' 'strand'.
@@ -24,6 +22,12 @@
 #' (PhastCons scores) for all clusters. If this is TRUE, an additional column
 #' named 'cons' is expected in the `info_df`.
 #'
+#' @param order_by_median Logical. Whether to order to clusters by their
+#' median (when TRUE) or mean (when FALSE) interquantile widths.
+#'
+#' @param dir_path The /path/to/the/directory where files will be written.
+#' Default is NULL.
+#'
 #' @param txt_size Specify text size to be used in the plots.
 #'
 #' @param wTitle Logical. If TRUE, the returned plot will contain a default
@@ -38,7 +42,7 @@
 #' is set to TRUE.
 #'
 #' All plots are arranged by the IQWs (smallest on top, largest at the bottom),
-#' even iff `iqw` is set to FALSE.
+#' even if `iqw` is set to FALSE.
 #'
 #' @return The plot(s) as a ggplot2 object. The order of the plots is IQW,
 #' followed by TPM values (when specified), followed by conservation scores
@@ -81,14 +85,12 @@
 #'
 #'
 #' @author Sarvesh Nikumbh
-iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
-                            tpm = TRUE, cons = TRUE, txt_size = 12,
-                            use_suffix = NULL, use_prefix = "C",
-                            wTitle = TRUE) {
+iqw_tpm_plots <- function(sname, info_df, clusts, iqw = TRUE,
+                            tpm = TRUE, cons = TRUE, order_by_median = TRUE,
+                            dir_path = NULL, txt_size = 12, use_suffix = NULL,
+                            use_prefix = "C", wTitle = TRUE) {
     cli::cli_h1(paste0("IQW-ordered boxplots"))
     cli::cli_h2(paste0("Sample: ", sname))
-
-    result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
 
     info_df$clust_ID <- .get_clust_id_column(info_df, clusts)
     ##
@@ -108,7 +110,12 @@ iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
     cli::cli_h2(paste("Plotting:", iqw_str, tpm_str, cons_str, "plots"))
 
     title_str <- paste0("Sample", sname, iqw_str, tpm_str, cons_str, "_plot")
-    fname <- file.path(result_dir_path, paste0(title_str, ".pdf"))
+    if(!is.null(dir_path)){
+        result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
+        fname <- file.path(result_dir_path, paste0(title_str, ".pdf"))
+    }else{
+        fname <- NULL
+    }
     ##
     plots <- c(iqw, tpm, cons)
     which_plots <- which(plots)
@@ -129,9 +136,9 @@ iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
         ## drawn now. Therefore, no need for y-axis text.
         set_yax_txt <- ifelse(which(which_plots == x) == 1, TRUE, FALSE)
         ##
-        temp_pl <- .get_iqw_ord_plot(
+        temp_pl <- .get_iqw_ord_plot(sname = sname,
             iqw = set_iqw, tpm = set_tpm,
-            phast = set_cons,
+            phast = set_cons, order_by_median = order_by_median,
             y_axis_text = set_yax_txt,
             use_notch = FALSE, txt_size = txt_size,
             info_df = info_df, seqs_clust = clusts,
@@ -174,15 +181,31 @@ iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
 ## =============================================================================
 
 
-.get_iqw_ord_plot <- function(iqw = FALSE, tpm = FALSE, phast = FALSE,
+.get_iqw_ord_plot <- function(sname = sname, iqw = FALSE,
+                                tpm = FALSE, phast = FALSE,
                                 use_notch = FALSE, y_axis_text = TRUE,
                                 txt_size = 12, info_df, seqs_clust,
+                                order_by_median = TRUE,
                                 use_suffix = "X", use_prefix = "C") {
-    clust_labels <- make_cluster_labels(
-        clust = seqs_clust,
-        use_prefix = use_prefix,
-        use_suffix = use_suffix
-    )
+
+
+    if(y_axis_text){
+        ## The clusters will be directly ordered by ggplot,
+        ## so order the cluster labels here
+        seqs_clust_ord <- order_clusters_iqw(sname = sname,
+            clusts = seqs_clust,
+            info_df = info_df,
+            order_by_median = order_by_median
+        )
+        clust_labels <- make_cluster_labels(
+            clust = seqs_clust_ord,
+            use_prefix = use_prefix,
+            use_suffix = use_suffix
+        )
+    }else{
+        clust_labels <- NULL
+    }
+
     clr <- RColorBrewer::brewer.pal(3, "Dark2")
     ##
     if (iqw) {
@@ -190,7 +213,7 @@ iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
             info_df,
             aes(
                 y = forcats::fct_reorder(clust_ID, IQW,
-                    .fun = median,
+                    .fun = ifelse(order_by_median, median, mean),
                     .desc = TRUE
                 ),
                 x = IQW
@@ -209,7 +232,7 @@ iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
             info_df,
             aes(
                 y = forcats::fct_reorder(clust_ID, IQW,
-                    .fun = median,
+                    .fun = ifelse(order_by_median, median, mean),
                     .desc = TRUE
                 ),
                 x = domTPM
@@ -227,7 +250,7 @@ iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
             info_df,
             aes(
                 y = forcats::fct_reorder(clust_ID, IQW,
-                    .fun = median,
+                    .fun = ifelse(order_by_median, median, mean),
                     .desc = TRUE
                 ),
                 x = phast
@@ -250,10 +273,14 @@ iqw_tpm_plots <- function(sname, dir_path, info_df, clusts, iqw = TRUE,
         )
     }
     pl <- pl + ylab("Clusters") +
-        scale_y_discrete(
-            labels = rev(clust_labels),
-            expand = expansion(add = c(0.55, 0.55))
-        ) +
+        if(y_axis_text){
+            scale_y_discrete(
+                labels = rev(clust_labels),
+                expand = expansion(add = c(0.55, 0.55))
+            )
+        }else{
+            NULL
+        } +
         theme_bw() +
         theme(
             axis.title = element_text(colour = "black", size = txt_size),
