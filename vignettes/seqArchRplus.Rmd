@@ -128,8 +128,7 @@ and file a [new issue](https://github.com/snikumbh/seqArchRplus/issues/new).
 
 ```{r setup-two, echo=TRUE}
 # Load seqArchRplus
-# library(seqArchRplus)
-devtools::load_all()
+library(seqArchRplus)
 library(seqArchR)
 library(Biostrings)
 library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
