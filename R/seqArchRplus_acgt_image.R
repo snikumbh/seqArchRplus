@@ -9,9 +9,11 @@
 #' @param xt_freq The frequency of xticks
 #' @param yt_freq The frequency of yticks
 #' @param f_height,f_width The height and width for the PNG image.
-#' @param dir_path Specify the /path/to/directory to store results
+#' @param dir_path Specify the /path/to/directory to store results.
+#' Default is NULL.
 #'
-#' @return Nothing. PNG images are written to disk using the provided filename.
+#' @return Nothing. PNG images are written to disk at the provided `dir_path`
+#' using the filename '<sample_name>_ClusteringImage.png'.
 #' @export
 #'
 #' @examples
@@ -36,12 +38,16 @@
 #' @author Sarvesh Nikumbh
 seqs_acgt_image <- function(sname, seqs, seqs_ord, pos_lab, xt_freq = 5,
                             yt_freq = 500, f_height = 1200,
-                            f_width = 600, dir_path) {
-    result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
-    fname <- file.path(
-        result_dir_path,
-        paste0(sname, "_ClusteringImage.png")
-    )
+                            f_width = 600, dir_path = NULL) {
+    if(!is.null(dir_path)){
+        result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
+        fname <- file.path(
+            result_dir_path,
+            paste0(sname, "_ClusteringImage.png")
+        )
+    }else{
+        fname <- NULL
+    }
     seqArchR::viz_seqs_acgt_mat(as.character(seqs[unlist(seqs_ord)]),
         pos_lab = pos_lab,
         xt_freq = 5,

@@ -13,7 +13,7 @@ seqs_acgt_image(
   yt_freq = 500,
   f_height = 1200,
   f_width = 600,
-  dir_path
+  dir_path = NULL
 )
 }
 \arguments{
@@ -31,10 +31,12 @@ seqs_acgt_image(
 
 \item{f_height, f_width}{The height and width for the PNG image.}
 
-\item{dir_path}{Specify the /path/to/directory to store results}
+\item{dir_path}{Specify the /path/to/directory to store results.
+Default is NULL.}
 }
 \value{
-Nothing. PNG images are written to disk using the provided filename.
+Nothing. PNG images are written to disk at the provided `dir_path`
+using the filename '<sample_name>_ClusteringImage.png'.
 }
 \description{
 Visualize all sequences as an image
