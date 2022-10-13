@@ -113,9 +113,11 @@ per_cluster_go_term_enrichments <- function(sname = NULL, clusts = NULL,
     cli::cli_h2(paste0("Sample: ", sname))
     ## Check all needed arguments supplied
 
-    result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
-    fname <- file.path(result_dir_path,
-        paste0("Clusterwise_GO_term_enrichments.pdf"))
+    if(!is.null(dir_path)){
+        result_dir_path <- .handle_per_sample_result_dir(sname, dir_path)
+        fname <- file.path(result_dir_path,
+            paste0("Clusterwise_GO_term_enrichments.pdf"))
+    }
 
     ## Prepare tc_gr
     tc_gr2 <- .handle_tc_cager(tc_gr, cager_obj, sname, qLow, qUp)
