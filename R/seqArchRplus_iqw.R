@@ -238,7 +238,7 @@ iqw_tpm_plots <- function(sname, info_df, clusts, iqw = TRUE,
                 x = domTPM
             )
         ) +
-            geom_boxplot(
+            ggplot2::geom_boxplot(
                 outlier.size = 1, width = 0.5, notch = use_notch,
                 color = "black", fill = clr[2]
             ) +
@@ -273,13 +273,11 @@ iqw_tpm_plots <- function(sname, info_df, clusts, iqw = TRUE,
         )
     }
     pl <- pl + ylab("Clusters") +
-        if(y_axis_text){
+        { if(y_axis_text)
             scale_y_discrete(
                 labels = rev(clust_labels),
                 expand = expansion(add = c(0.55, 0.55))
             )
-        }else{
-            NULL
         } +
         theme_bw() +
         theme(
