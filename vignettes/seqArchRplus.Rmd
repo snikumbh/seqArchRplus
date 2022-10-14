@@ -116,7 +116,7 @@ and file a [new issue](https://github.com/snikumbh/seqArchRplus/issues/new).
 
 # seqArchRplus for downstream analysis of promoter sequences
 
-```{r setup-two, echo=TRUE}
+```{r setup-two, echo=TRUE,include=TRUE,results="hide",message=FALSE,warning=FALSE}
 # Load seqArchRplus
 library(seqArchRplus)
 library(seqArchR)
@@ -649,7 +649,7 @@ one_plot
 ```{r large-panels, eval=TRUE, attr.source='.numberLines', fig.wide=TRUE, fig.height=8, fig.width=20, fig.cap="Multiple plots combined as panels to geenrate one large figure."}
 ## Remove y-axis text/tick labels
 annot_new_pl <- annotations_oneplot_pl + ggplot2::ylab(NULL) + 
-                        ggplot2::theme(axis.text.y = element_blank())
+                        ggplot2::theme(axis.text.y = ggplot2::element_blank())
 
 panel_pl <- cowplot::plot_grid(iqw_tpm_pl, seqlogos_oneplot_pl, 
                             annot_new_pl, ncol = 3, axis = "tblh", 
