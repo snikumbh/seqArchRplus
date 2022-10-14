@@ -118,8 +118,7 @@ and file a [new issue](https://github.com/snikumbh/seqArchRplus/issues/new).
 
 ```{r setup-two, echo=TRUE}
 # Load seqArchRplus
-# library(seqArchRplus)
-devtools::load_all()
+library(seqArchRplus)
 library(seqArchR)
 library(Biostrings)
 library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
@@ -231,7 +230,11 @@ seqArchR_result <- readRDS(system.file("extdata", "seqArchR_result.rds",
 ```
 
 ```{r add-seqs-seqArchR-result, echo=FALSE}
-seqArchR_result$rawSeqs <- rawSeqs
+## the sequence in example_promoters45.fa.gz and the seqArchR result 
+## are the same. Hence, we can reduce seqArchR_result.rds size by assigning 
+## them here instead
+if(!("rawSeqs" %in% names(seqArchR_result)))
+    seqArchR_result$rawSeqs <- raw_seqs
 ```
 
 
