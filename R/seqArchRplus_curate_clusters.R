@@ -137,6 +137,12 @@
 #' seqArchR_result <- readRDS(system.file("extdata", "seqArchR_result.rds",
 #'          package = "seqArchRplus", mustWork = TRUE))
 #'
+#' ## The example seqArchR result generally holds the raw sequences, but in
+#' this case, the result object is devoid of them in order to reduce size of
+#' example data
+#' if(!("rawSeqs" %in% names(seqArchR_result)))
+#'     seqArchR_result$rawSeqs <- raw_seqs
+#'
 #' use_aggl <- "complete"
 #' use_dist <- "euclid"
 #'
