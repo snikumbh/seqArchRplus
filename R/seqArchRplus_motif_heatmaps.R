@@ -123,7 +123,8 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 
 
         if(!is.null(dir_path)){
-            grDevices::png(fname, height = fheight, width = fwidth, units = funits)
+            grDevices::png(fname, height = fheight, width = fwidth,
+                            units = funits)
         }
         pl_hms <- heatmaps::plotHeatmapList(
             patt_hm_list500,
