@@ -8,9 +8,36 @@
 ## seqArchRplus' github page:
 ## https://github.com/snikumbh/seqArchRplus/tree/example-data-raw
 ##
+
+
+
 read_path <- file.path(".")
-write_path <- file.path("../inst/extdata")
+write_path <- file.path("../extdata")
 sample_name <- "dm6_samarth_schor_et_al_TC_sample_RAL28_10_to_12_sample12"
+
+gh2 <- "https://github.com/"
+ghsuffix <- file.path("snikumbh/seqArchRplus/raw/example-data-raw/data-raw")
+
+flist <- list(
+    file.path(gh2, ghsuffix, paste0(sample_name, "_minTPM1.bed")),
+    file.path(gh2, ghsuffix, paste0(sample_name, "_minTPM1.rds")),
+    file.path(gh2, ghsuffix, paste0(sample_name,
+        "_minTPM1_flank_up500_flank_down500.fa")),
+    file.path(gh2, ghsuffix,"schor2017_archRresult.rds")
+)
+
+dest_path <- c(
+    file.path(read_path, paste0(sample_name, "_minTPM1.bed")),
+    file.path(read_path, paste0(sample_name, "_minTPM1.rds")),
+    file.path(read_path, paste0(sample_name,
+        "_minTPM1_flank_up500_flank_down500.fa")),
+    file.path(read_path,"schor2017_archRresult.rds")
+)
+
+
+foo <- lapply(seq_along(flist), function(x){
+    download.file(url = flist[[x]], destfile = dest_path[x])
+})
 
 
 
@@ -63,7 +90,7 @@ sam_upd <- lapply(seq_along(pick_clusts), function(x) {
 )
 
 ## Uncomment to write to disk
-saveRDS(sam_upd, file = "../inst/extdata/example_clust_info.rds")
+saveRDS(sam_upd, file = file.path(write_path, "example_clust_info.rds"))
 
 
 ## Write fasta files to disk
@@ -108,7 +135,11 @@ new_seqClustLabels <- lapply(seq_along(old_labels), function(x){
 new_result$seqsClustLabels[[5]] <- unlist(new_seqClustLabels)
 
 ## Handle raw sequences
-new_result$rawSeqs <- seqArchR_result$rawSeqs[pick_idx]
+# new_result$rawSeqs <- seqArchR_result$rawSeqs[pick_idx]
+new_result$rawSeqs <- NULL
 
 ## Uncomment to write to disk
 saveRDS(new_result, file =  file.path(write_path, "seqArchR_result.rds"))
+
+## clean up
+bar <- file.remove(dest_path)
