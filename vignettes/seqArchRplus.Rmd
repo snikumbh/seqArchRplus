@@ -9,6 +9,7 @@ output:
   BiocStyle::html_document:
     toc: true
   BiocStyle::pdf_document: default
+bibliography: seqArchRplus.bib
 vignette: >
   %\VignetteIndexEntry{seqArchRplus facilitates downstream analysis of clusters of promoter sequence architectures}
   %\VignetteEngine{knitr::rmarkdown}
@@ -28,17 +29,22 @@ knitr::opts_chunk$set(
 # Introduction
 
 Analysis of the promoterome of any organism entails analyzing data from an 
-experiment like CAGE (Cap analysis of gene expression) that provides 
-information on genome-wide transcription start sites at single nucleotide 
-resolution.
-These promoters can then be further studied to identify different classes among 
-them based on different attributes, for instance, their shape (broad or 
-focused/sharp promoters), gene function (tissue specific vs. housekeeping) etc.
-These different promoter classes are orchestrated by different proteins 
-together with sequence elements at near-fixed positions in the promoter that 
-determine the position of the transcription start site.
-These are termed as promoter architectures.
-It has been shown --- .
+experiment like CAGE (Cap analysis of gene expression) [@Kodzius:2006] that 
+provides information on genome-wide transcription start sites at single 
+nucleotide resolution.
+These promoters can then be further studied to identify different 
+classes [@Carninci:2006] among them based on different attributes, for instance, 
+their shape (broad or focused/sharp promoters), gene function (tissue 
+specific vs. housekeeping) etc.
+These different promoter classes harbour a variety of promoter architectures 
+orchestrated by different proteins together with sequence elements at 
+near-fixed positions in the promoter that determine the position of the 
+transcription start site.
+The different promoter architectures are known to be used differentially by 
+genes either in different tissues or at different developmental timepoints.
+For instance, [@haberle2014shifting] have shown a dynamic interchange of 
+promoter architecture within the same genomic region between maternal and 
+zygotic stages of zebrafish development.
 Identifying and studying these different promoter architectures further is thus 
 vital.
 
@@ -53,14 +59,14 @@ enabled by `r Biocpkg("seqArchRplus")` are:
 
 - Curate the final set of clusters from `r Biocpkg("seqArchR")`. 
 See the 
-[``r Biocpkg("seqArchR")`` vignette](http://bioconductor.org/packages/release/bioc/vignettes/seqArchR/inst/doc/seqArchR.html)
+[`r Biocpkg("seqArchR")` vignette](http://bioconductor.org/packages/release/bioc/vignettes/seqArchR/inst/doc/seqArchR.html)
 , or the preprint to understand in detail why this may be required 
 
 - Order the sequence architectures by the interquantile widths (IQWs) of the 
 tag clusters (_aka_ promoter shape).
 See 
 [`CAGEr` vignette](https://www.bioconductor.org/packages/release/bioc/vignettes/CAGEr/inst/doc/CAGEexp.html) 
-for more information on tag clusters and their IQWs.
+for more information on tag clusters and their IQWs
 
 - Visualize distributions of IQW, TPM (Tags per million) and conservation 
 scores (or other when available) per cluster
@@ -88,9 +94,9 @@ We hope that using `r Biocpkg("seqArchRplus")` (together with
 analyzing promoters identified using CAGE for any organism, and enable 
 insights and hypotheses generation with ease. 
 So far, we have tested `r Biocpkg("seqArchR")` and `r Biocpkg("seqArchRplus")` 
-on promoters in drosophila (Schor et al. 2017 and modENCODE), zebrafish 
-(Nepal et al. 2013), mice (Fantom), humans (ENCODE), and also in plants 
-(barley and maize).
+on promoters in drosophila from [@schor2017promoter] and modENCODE 
+[@chen2014comparative], zebrafish [@nepal2013dynamic], mice (Fantom 
+[@Consortium:2014hz]), humans (ENCODE), and also in plants (barley and maize).
 
 We already have a plan for a feature in the future version of 
 `r Biocpkg("seqArchRplus")`: generate HTML reports that help you navigate this 
@@ -130,22 +136,6 @@ set.seed(1234)
 ```
 
 ## Setting up
-
-<!-- As noted earlier, seqArchRplus comes into play when you already have clusters of  -->
-<!-- promoter sequences. -->
-<!-- Such promoter clusters can be obtained using either seqArchR, which looks at  -->
-<!-- the promoters' sequence information for clustering them, or any other method. -->
-<!-- Downstream analyses of such clusters often involve answering questions such as  -->
-<!-- - What is distribution of the shapes of promoters in each cluster? -->
-<!-- - What are the enriched GO terms (if any) for each cluster? -->
-<!-- - How are the promoter clusters distributed across the genome (chromosomes- and  -->
-<!-- strand-wise)? -->
-<!-- - How do the dinucleotide occurrence patterns look? -->
-<!-- - How can I quickly visualize the promoters from different clusters in the  -->
-<!-- genome browser or IGV? -->
-
-<!-- Using seqArchRplus helps answer these questions by generating numerous  -->
-<!-- visualisations for you.  -->
 
 To begin using `r Biocpkg("seqArchRplus")`, you require a set of promoters 
 sequences (as a DNAStringSet object) and their clustering information (as a 
