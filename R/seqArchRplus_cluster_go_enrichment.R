@@ -175,7 +175,7 @@ per_cluster_go_term_enrichments <- function(sname = NULL, clusts = NULL,
         error = function(e) e)
 
     if(is(foo_go, 'simpleError')){
-        message("ontology ALL errored, hence using BP")
+        message("ontology ALL failed, hence using BP")
         foo_go <- tryCatch(clusterProfiler::enrichGO(gene =
                 as.data.frame(peakAnno)[choose_idx, useKeyType],
             keyType = useKeyType,
@@ -185,7 +185,7 @@ per_cluster_go_term_enrichments <- function(sname = NULL, clusts = NULL,
 
     use_label <- "N/A"
     if(is(foo_go, 'simpleError')){
-        message("ontology ALL and BP both errored, hence N/A")
+        message("ontology ALL and BP both failed, hence N/A")
         foo_go <- NULL
         use_label <- "All and BP errored, hence N/A"
     }
