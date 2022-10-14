@@ -131,8 +131,6 @@
 #' use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
 #'          package = "seqArchRplus", mustWork = TRUE))
 #'
-#'
-#'
 #' raw_seqs <- Biostrings::readDNAStringSet(
 #'                           filepath = system.file("extdata",
 #'                             "example_promoters45.fa.gz",
