@@ -7,7 +7,7 @@ Authors@R:
     person("Sarvesh", "Nikumbh", , "sarvesh.nikumbh@gmail.com", 
     role = c("aut", "cre", "cph"),
     comment = c(ORCID = "0000-0003-3163-4447"))
-Description: seqArchRplus enables downstream analyses of promoter
+Description: seqArchRplus facilitates downstream analyses of promoter
     sequence architectures/clusters identified by seqArchR (or any other 
     tool/method). With additional available information such as the TPM values 
     and interquantile widths (IQWs) of the CAGE tag clusters, seqArchRplus 
@@ -59,13 +59,8 @@ Suggests:
     covr,
     knitr (>= 1.22),
     org.Dm.eg.db,
-    pdftools,
     rmarkdown (>= 1.12),
-    slickR,
-    svglite,
-    testthat (>= 3.0.2),
     TxDb.Dmelanogaster.UCSC.dm6.ensGene,
-    vdiffr (>= 0.3.0),
     xfun
 VignetteBuilder: 
     knitr
