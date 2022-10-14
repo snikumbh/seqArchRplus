@@ -234,29 +234,3 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix) {
 }
 ## =============================================================================
 
-
-## 1. Get PFM matrix with custom background frequencies for the DNA_BASES
-## 2. Use TFBSTools::toICM to convert to information content matrix
-## 3. Visualize with ggseqlogo
-
-# enrichment_seqlogos <- function(seqs, clusts){
-#
-#     nonuni_bg_seqlogos <- lapply(seq_along(clusts), function(x){
-#         print(paste0("Clust ", x))
-#         seqs_bg <- Biostrings::letterFrequency(seqs[clusts[[x]]],
-#                             letters = Biostrings::DNA_BASES, as.prob = TRUE)
-#         seqs_bg <- colSums(seqs_bg)/nrow(seqs_bg)
-#         print(seqs_bg)
-#         pfm_mat <- Biostrings::consensusMatrix(seqs[clusts[[x]]],
-#                                         baseOnly = TRUE)[1:4,]
-#
-#         seqs_pfm <- TFBSTools::PFMatrix(bg = seqs_bg,
-#                                         profileMatrix = pfm_mat)
-#
-#         seqs_pwm <- TFBSTools::toPWM(seqs_pfm, bg = seqs_bg, type = "prob")
-#
-#         pl <- ggseqlogo::ggseqlogo(data = seqs_pwm@profileMatrix)
-#         pl
-#     })
-#     return(nonuni_bg_seqlogos)
-# }
