@@ -21,8 +21,7 @@ Description: seqArchRplus facilitates downstream analyses of promoter
     Additionally, seqArchRplus can also generate HTML reports for easy viewing 
     and comparison of promoter architectures between samples/stages (future).
 License: GPL-3 | file LICENSE
-URL: https://snikumbh.github.io/seqArchRplus/,
-    https://github.com/snikumbh/seqArchRplus
+URL: https://github.com/snikumbh/seqArchRplus
 BugReports: https://github.com/snikumbh/seqArchRplus/issues
 Depends:
     R (>= 4.2.1),
@@ -68,4 +67,4 @@ biocViews: Annotation, Visualization, ReportWriting, GO, MotifAnnotation,
     Clustering
 Encoding: UTF-8
 LazyData: false
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
