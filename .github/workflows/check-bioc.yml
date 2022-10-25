@@ -39,7 +39,6 @@ env:
   run_pkgdown: 'false'
   has_RUnit: 'false'
   cache-version: 'cache-v1'
-NA
 
 jobs:
   build-check:
