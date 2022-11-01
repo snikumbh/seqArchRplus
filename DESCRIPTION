@@ -24,7 +24,7 @@ License: GPL-3 | file LICENSE
 URL: https://github.com/snikumbh/seqArchRplus
 BugReports: https://github.com/snikumbh/seqArchRplus/issues
 Depends:
-    R (>= 4.2.1),
+    R (>= 4.2),
     GenomicRanges,
     IRanges,
     S4Vectors
