@@ -217,14 +217,25 @@ info_df <- read.delim(file = bed_info_fname, sep = "\t", header = TRUE)
 ## 5. seqArchR result
 seqArchR_result <- readRDS(system.file("extdata", "seqArchR_result.rds",
       package = "seqArchRplus", mustWork = TRUE))
-```
 
-```{r add-seqs-seqArchR-result, echo=FALSE}
-## the sequence in example_promoters45.fa.gz and the seqArchR result 
-## are the same. Hence, we can reduce seqArchR_result.rds size by assigning 
-## them here instead
+## **NOTE** Only for the example seqArchR result object provided with this
+## package:
+## 
+## Any seqArchR result object has the raw DNA sequences as a part of it.
+## See details here: https://snikumbh.github.io/seqArchR/reference/seqArchR.html
+## 
+## But, in order to reduce the size of the example seqArchR result object 
+## provided with this (seqArchRplus) package, the `rawSeqs` element of the 
+## result is missing. This is reassigned below for the purposes of this 
+## vignette.
+## 
+## The seqArchR result was obtained by processing the DNA sequences in 
+## `example_promoters45.fa.gz`. Thus we reassign them to 
+## `seqArchR_result$rawSeqs` here
+##  
 if(!("rawSeqs" %in% names(seqArchR_result)))
     seqArchR_result$rawSeqs <- raw_seqs
+
 ```
 
 
