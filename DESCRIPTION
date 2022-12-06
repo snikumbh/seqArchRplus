@@ -20,7 +20,7 @@ Description: seqArchRplus facilitates downstream analyses of promoter
     distributions, motif occurrence heatmaps and GO term enrichments. 
     Additionally, seqArchRplus can also generate HTML reports for easy viewing 
     and comparison of promoter architectures between samples/stages (future).
-License: GPL-3 | file LICENSE
+License: GPL-3
 URL: https://github.com/snikumbh/seqArchRplus
 BugReports: https://github.com/snikumbh/seqArchRplus/issues
 Depends:
