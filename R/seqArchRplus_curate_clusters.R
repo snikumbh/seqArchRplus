@@ -88,8 +88,9 @@
 #'
 #' @return
 #' This function returns a list holding (a) 'curation_plot': plot showing the
-#' dendrogram + sequence logos, and (b) 'clusters_list': the sequence clusters
-#' as a list.
+#' dendrogram + sequence logos, (b) 'clust_assignments': the 
+#' cluster (re-)assignments performed, and (c) 'clusters_list': 
+#' the sequence clusters as a list.
 #'
 #' to help
 #' perform curation and document it.
@@ -303,6 +304,7 @@ curate_clusters <- function(sname, use_aggl = "ward.D", use_dist = "euclid",
             palette = FALSE, plot_png = FALSE
         )
         return(list(curation_plot = sam_foo2,
+		    clust_assignments = clust_list,
                     clusters_list = seqs_clusters_as_list))
     }
 }
