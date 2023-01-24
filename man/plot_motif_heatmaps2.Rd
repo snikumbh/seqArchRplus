@@ -51,6 +51,7 @@ specify the number of cores. Default is 1 (serial)}
 Nothing. PNG images are written to disk using the provided filenames.
 In addition, two legends are printed to separate files: the color legend
 and the clustering legend, which can be then combined with the heatmaps.
+The heatmaps themselves have the cluster numbers marked on the vertical axis.
 }
 \description{
 This function uses the seqPattern package. It is

@@ -66,8 +66,9 @@ Default is NULL.}
 }
 \value{
 This function returns a list holding (a) 'curation_plot': plot showing the
-dendrogram + sequence logos, and (b) 'clusters_list': the sequence clusters
-as a list.
+dendrogram + sequence logos, (b) 'clust_assignments': the 
+cluster (re-)assignments performed, and (c) 'clusters_list': 
+the sequence clusters as a list.
 
 to help
 perform curation and document it.

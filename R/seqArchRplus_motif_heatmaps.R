@@ -220,10 +220,14 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 #' @return Nothing. PNG images are written to disk using the provided filenames.
 #' In addition, two legends are printed to separate files: the color legend
 #' and the clustering legend, which can be then combined with the heatmaps.
+#' The heatmaps themselves have the cluster numbers marked on the vertical axis.
+#'
 #'
 #' @importFrom Biostrings width
 #' @importFrom seqPattern plotPatternDensityMap
 #' @importFrom grDevices png
+#' @importFrom ggimage as.ggplot
+#' @importFrom magick image_read
 #'
 #' @export
 #'
@@ -299,7 +303,7 @@ plot_motif_heatmaps2 <- function(sname,
         use_ticks <- cumsum(clust_lens)
 
         ##
-        use_tempdir <- dir_path #tempdir()
+        use_tempdir <- tempdir()
         use_outFile <- file.path(
             use_tempdir,
             paste0("TStamp_", format(Sys.time(), "%Y-%m-%d_%H_%M_%S"),
@@ -320,7 +324,7 @@ plot_motif_heatmaps2 <- function(sname,
             xTicksAt = use_xticksAt,
             xTicks = c(-x, 0, x),
             yTicksAt = use_yticksAt,
-            yTicks = rep("", length(use_yticksAt)),
+            yTicks = seq_along(use_yticksAt),
             useMulticore = parallelize,
             nrCores = n_cores,
             outFile = use_outFile,
@@ -342,25 +346,29 @@ plot_motif_heatmaps2 <- function(sname,
 
         ##
         ## order the files by the sequence in motifs TODO
-        # files <- c(files[-legend_file], files[legend_file])
+        ## files <- c(files[-legend_file], files[legend_file])
         files <- files[-legend_file]
         ## For the moment, keep legend file separate
         stopifnot(length(files) > 0)
 
         files <- rev(files)
         #files <- c(files, clust_pl_fname)
-        pick_pls <- lapply(files, function(f){
-                        pl <- cowplot::ggdraw() +
-                            cowplot::draw_image(f)
-                        pl
-                    })
-        ##
-        grid_pl <- cowplot::plot_grid(plotlist = pick_pls, nrow = 1, ncol = 2,
-            align = c("h")
+        pick_pls <- lapply(seq_along(files), function(f){
+            pl <- ggimage::as.ggplot(magick::image_read(files[f]))
+        })
+
+
+        grid_pl <- cowplot::plot_grid(plotlist = pick_pls,
+                                        nrow = 1, ncol = length(files),
+                                        align = c("hv")
         )
 
+        grid_pl2 <- cowplot::plot_grid(
+            ggimage::as.ggplot(magick::image_read(final_legend_fname)), grid_pl,
+            scale = c(0.75, 1), rel_widths = c(0.1, 1))
+
         ##
-        cowplot::save_plot(filename = fname_w_ext, plot = grid_pl, nrow = 1)
+        cowplot::save_plot(filename = fname_w_ext, plot = grid_pl2)
 
         ##
         cli::cli_alert_success(paste0("Motif heatmaps written to: ",
