@@ -153,7 +153,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 ## =============================================================================
 
 
-.get_cluster_legend_plot <- function(clusts, use_colors,
+.get_cluster_legend_plot <- function(clusts, use_colors, ext = ".png",
                                         result_dir_path,
                                         fwidth = 200, fheight = 800){
     # Cluster partitions
@@ -170,7 +170,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
     opts$partition <- clust_lens
     opts$colors <- nClust_colors
     clust_pl_fname <- file.path(result_dir_path,
-                                "motif_heatmaps_ClusteringLegend.png")
+                                paste0("motif_heatmaps_ClusteringLegend", ext))
     png(filename = clust_pl_fname, width = fwidth, height = fheight,
         units = "px")
     heatmaps::plot_clusters(opts)
@@ -214,10 +214,13 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 #' @param n_cores Numeric. If you wish to parallelize annotation of peaks,
 #' specify the number of cores. Default is 1 (serial)
 #'
+#' @param type Specify either of "png" or "jpg" to obtain PNG or JPEG files as
+#' output
+#'
 #' @param ... Additional arguments passed to
 #' \code{\link[seqPattern]{plotPatternDensityMap}}
 #'
-#' @return Nothing. PNG images are written to disk using the provided filenames.
+#' @return Nothing. Images are written to disk using the provided filenames.
 #' In addition, two legends are printed to separate files: the color legend
 #' and the clustering legend, which can be then combined with the heatmaps.
 #' The heatmaps themselves have the cluster numbers marked on the vertical axis.
@@ -256,10 +259,13 @@ plot_motif_heatmaps2 <- function(sname,
                             seqs, flanks = c(50), clusts,
                             use_colors = NULL, motifs, dir_path,
                             fheight = 1.5*fwidth, fwidth = 2000,
-                            n_cores = 1, ...){
+                            n_cores = 1, type = c("png", "jpg") , ...){
+
     cli::cli_h1(paste0("Motif heatmaps"))
     cli::cli_h2(paste0("Sample: ", sname))
     ##
+    use_ext <- paste0(".", match.arg(type))
+
     parallelize <- FALSE
     if (n_cores > 1) parallelize <- TRUE
     # bpparam <- .handle_multicore(crs = n_cores, parallelize = parallelize)
@@ -270,7 +276,7 @@ plot_motif_heatmaps2 <- function(sname,
 
     ##
     clust_pl_fname <- .get_cluster_legend_plot(clusts, use_colors,
-                            result_dir_path,
+                            ext = use_ext, result_dir_path,
                             fwidth = 200, fheight = 0.75*fheight)
 
 
@@ -294,7 +300,7 @@ plot_motif_heatmaps2 <- function(sname,
             "motifHeatmaps", all_motifs_str,
             sep = "_"
         )
-        use_ext <- ".png"
+
         fname <- file.path(result_dir_path, fname_suffix)
         fname_w_ext <- file.path(result_dir_path, paste0(fname_suffix, use_ext))
 
@@ -340,9 +346,8 @@ plot_motif_heatmaps2 <- function(sname,
             full.names = TRUE)
         ##
         legend_file <- grep("ColorLegend", files)
-        final_legend_fname <- paste0(fname, ".ColorLegend.png")
-        file.copy(from = files[legend_file],
-            to = final_legend_fname)
+        final_legend_fname <- paste0(fname, ".ColorLegend", use_ext)
+        file.copy(from = files[legend_file], to = final_legend_fname)
 
         ##
         ## order the files by the sequence in motifs TODO

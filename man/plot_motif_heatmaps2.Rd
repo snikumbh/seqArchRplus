@@ -15,6 +15,7 @@ plot_motif_heatmaps2(
   fheight = 1.5 * fwidth,
   fwidth = 2000,
   n_cores = 1,
+  type = c("png", "jpg"),
   ...
 )
 }
@@ -44,11 +45,14 @@ plots in pixels. Default values are 500 and 300}
 \item{n_cores}{Numeric. If you wish to parallelize annotation of peaks,
 specify the number of cores. Default is 1 (serial)}
 
+\item{type}{Specify either of "png" or "jpg" to obtain PNG or JPEG files as
+output}
+
 \item{...}{Additional arguments passed to
 \code{\link[seqPattern]{plotPatternDensityMap}}}
 }
 \value{
-Nothing. PNG images are written to disk using the provided filenames.
+Nothing. Images are written to disk using the provided filenames.
 In addition, two legends are printed to separate files: the color legend
 and the clustering legend, which can be then combined with the heatmaps.
 The heatmaps themselves have the cluster numbers marked on the vertical axis.
