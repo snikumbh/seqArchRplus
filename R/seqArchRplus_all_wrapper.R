@@ -146,7 +146,7 @@
 #'                         )
 #'
 #'
-#' generate_all_plots(sname = "sample1",
+#' all_plots <- generate_all_plots(sname = "sample1",
 #'                    bed_info_fname = bed_fname,
 #'                    seqArchR_clusts = use_clusts,
 #'                    raw_seqs = raw_seqs,
@@ -260,8 +260,10 @@ generate_all_plots <- function(sname, bed_info_fname,
         qLow = qLow, qUp = qUp,
         txdb_obj = txdb_obj,
         tss_region = tss_region,
-        orgdb_obj = NULL, dir_path = dir_path,
-        one_plot = TRUE, txt_size = txt_size
+        orgdb_obj = NULL,
+        dir_path = dir_path,
+        one_plot = TRUE, #**
+        txt_size = txt_size
     )
 
     annotations_list_pl <-
@@ -273,7 +275,8 @@ generate_all_plots <- function(sname, bed_info_fname,
             qLow = qLow, qUp = qUp,
             txdb_obj = txdb_obj,
             tss_region = tss_region,
-            orgdb_obj = NULL, dir_path = dir_path,
+            orgdb_obj = NULL,
+            dir_path = dir_path,
             one_plot = FALSE,
             txt_size = 12
         )

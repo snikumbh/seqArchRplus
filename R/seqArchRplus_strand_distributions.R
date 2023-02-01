@@ -41,10 +41,11 @@
 #'
 #' pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")[4:5]
 #' per_cl_strand_pl <- per_cluster_strand_dist(sname = "sample1",
-#'                                              clusts = use_clusts,
-#'                                              info_df = info_df,
-#'                                              dir_path = tempdir(),
-#'                                              colrs = pair_colrs)
+#'                                             clusts = use_clusts,
+#'                                             info_df = info_df,
+#'                                             dir_path = tempdir(),
+#'                                             colrs = pair_colrs
+#'                                             )
 #'
 #' @author Sarvesh Nikumbh
 per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path = NULL,
@@ -131,6 +132,7 @@ per_cluster_strand_dist <- function(sname, clusts, info_df, dir_path = NULL,
             )
         return(pl)
     })
+
     if(!is.null(dir_path)){
         grDevices::pdf(file = fname, width = fwidth, height = fheight,
             onefile = TRUE)

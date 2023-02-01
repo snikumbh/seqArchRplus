@@ -59,7 +59,7 @@
 #' \item \code{\link{viz_pwm}}
 #' }
 #'
-#'
+#' @author Sarvesh Nikumbh
 #' @docType package
 #' @name seqArchRplus
 NULL
