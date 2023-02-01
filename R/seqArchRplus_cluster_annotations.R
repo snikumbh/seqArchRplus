@@ -113,6 +113,7 @@
 #' # argument. This is useful when one may not have access to the CAGEexp
 #' # object, but only clusters' information is available in a BED file.
 #' #
+#'
 #' annotations_pl <- per_cluster_annotations(sname = "sample1",
 #'                          clusts = NULL,
 #'                          tc_gr = bed_fname,
@@ -122,7 +123,7 @@
 #'                          tss_region = c(-500,100))
 #' }
 #'
-#'
+#' @author Sarvesh Nikumbh
 per_cluster_annotations <- function(sname = NULL, clusts = NULL,
                                     tc_gr = NULL,
                                     cager_obj = NULL,
@@ -174,7 +175,7 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
                         paste0("Clusterwise_annotations.pdf"))
     }
     ##
-    clust_labels <- make_cluster_labels(clust = clusts, use_prefix, use_suffix)
+    clust_labels <- .make_cluster_labels(clust = clusts, use_prefix, use_suffix)
 
     ## Without BiocParallel
     # clustwise_anno <- lapply(clusts, function(x) {
@@ -214,7 +215,10 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
     sam <- do.call("rbind", clustwise_anno)
     per_df_nrows <- unlist(lapply(clustwise_anno, nrow))
     ## Add a column clust that we need downstream
-    sam$clust <- rep(seq_along(clustwise_anno), times = per_df_nrows)
+    # sam$clust <- rep(seq_along(clustwise_anno), times = per_df_nrows)
+
+    sam$clust <- rep(clust_labels, times = per_df_nrows)
+    sam$clust <- factor(sam$clust, levels = rev(clust_labels))
 
     sam <- sam[, c(3, 1, 2)]
     rownames(sam) <- seq_len(sum(per_df_nrows))
@@ -250,18 +254,17 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
         ind_print_plot <- ind_print_plot +
             ggplot2::labs(x = "Proportion", y = "Cluster")
         ##
-        if(!is.null(dir_path))
+        if(!is.null(dir_path)){
             ggplot2::ggsave(
                 filename = fname, plot = ind_print_plot,
                 device = "pdf", width = 15, height = 20, units = "in",
                 dpi = 300
             )
+        }
         return(ind_print_plot)
     } else {
         ## return individual plots as a list
-        sam_split <- split(sam, f = factor(sam$clust,
-            levels = seq_along(clusts)
-        ))
+        sam_split <- split(sam, f = sam$clust)
 
         ## Without BiocParallel
         annobar_list <- lapply(seq_along(sam_split), function(x) {
@@ -278,7 +281,6 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
             anno_pl <- anno_pl +
                 ggplot2::labs(x = "Proportion", y = use_clust_label)
         })
-
         return(annobar_list)
     }
 }
@@ -293,12 +295,7 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
 .get_prop_anno_oneplot <- function(anno_df, txt_size, colrs) {
     clustwise_annobar <- ggplot(
         anno_df,
-        aes(
-            y = forcats::fct_rev(
-                stats::reorder(clust, as.numeric(clust))
-            ),
-            x = Frequency, fill = Feature
-        )
+        aes(y = clust, x = Frequency, fill = Feature)
     ) +
         geom_bar(
             stat = "identity", width = 0.6,
@@ -375,7 +372,7 @@ per_cluster_annotations <- function(sname = NULL, clusts = NULL,
             legend.direction = "horizontal"
         ) +
         ggplot2::guides(fill = guide_legend(ncol = 7, byrow = FALSE)) +
-        # ggplot2::labs(x = "Percentage (%)", y = "Cluster") +
+        # # ggplot2::labs(x = "Percentage (%)", y = "Cluster") +
         NULL
     return(pl)
 }

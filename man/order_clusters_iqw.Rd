@@ -49,3 +49,6 @@ ordered_clusts <- seqArchRplus::order_clusters_iqw(
                                  order_by_median = TRUE)
 
 }
+\author{
+Sarvesh Nikumbh
+}

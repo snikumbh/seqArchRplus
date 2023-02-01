@@ -37,7 +37,6 @@ Imports:
     clusterProfiler,
     cowplot,
     factoextra,
-    forcats,
     GenomeInfoDb,
     ggplot2,
     ggimage,

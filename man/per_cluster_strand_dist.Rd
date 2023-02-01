@@ -63,10 +63,11 @@ use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
 
 pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")[4:5]
 per_cl_strand_pl <- per_cluster_strand_dist(sname = "sample1",
-                                             clusts = use_clusts,
-                                             info_df = info_df,
-                                             dir_path = tempdir(),
-                                             colrs = pair_colrs)
+                                            clusts = use_clusts,
+                                            info_df = info_df,
+                                            dir_path = tempdir(),
+                                            colrs = pair_colrs
+                                            )
 
 }
 \author{
