@@ -529,6 +529,7 @@ plot_motif_heatmaps(sname = "RAL28_10_to_12h", seqs = use_seqs,
                                     dir_path = NULL,
                                     fheight = 80, fwidth = 160
                                 )
+
 ```
 
 ### Per cluster annotations' plot
@@ -688,8 +689,8 @@ write_seqArchR_cluster_track_bed(
 
 Depending upon the use case, one may use any ordering for the input clusters 
 for all functions.
-Looking at their annotations, if some clusters happen to 
-to occur predominantly in 5' UTR or 3' UTR or exons or introns etc., such 
+Looking at their annotations, if some clusters happen to occur predominantly 
+in 5' UTR or 3' UTR or exons or introns etc., such 
 clusters can be sequestered from further downstream analyses if suitable for 
 the end goal.
 
