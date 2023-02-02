@@ -209,7 +209,12 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 #' @param dir_path The path to the directory
 #'
 #' @param fheight,fwidth Height and width of the individual heatmap
-#' plots in pixels. Default values are 500 and 300
+#' plots in pixels
+#'
+#' @param hm_scale_factor Factor to scale the color scale bar w.r.t. the
+#' heatmaps. Useful when specifying more than two motifs at once.
+#' Note that combining/specifying more than 3 or 4 motifs in one call to the
+#' function may result in a sub-optimally combined plot.
 #'
 #' @param n_cores Numeric. If you wish to parallelize annotation of peaks,
 #' specify the number of cores. Default is 1 (serial)
