@@ -259,6 +259,7 @@ plot_motif_heatmaps2 <- function(sname,
                             seqs, flanks = c(50), clusts,
                             use_colors = NULL, motifs, dir_path,
                             fheight = 1.5*fwidth, fwidth = 2000,
+                            hm_scale_factor = 0.75,
                             n_cores = 1, type = c("png", "jpg") , ...){
 
     cli::cli_h1(paste0("Motif heatmaps"))
@@ -370,11 +371,13 @@ plot_motif_heatmaps2 <- function(sname,
 
         grid_pl2 <- cowplot::plot_grid(
             ggimage::as.ggplot(magick::image_read(final_legend_fname)), grid_pl,
-            scale = c(0.75, 1), rel_widths = c(0.1, 1))
+            scale = c(hm_scale_factor, 1), rel_widths = c(0.1, 1))
 
         ##
         cowplot::save_plot(filename = fname_w_ext, plot = grid_pl2)
-
+        # cowplot::ggsave2(filename = fname_w_ext, plot = grid_pl2,
+        #     scale = 1.5, width = 4*length(files), height = 2.5*length(files),
+        #     units = "in")
         ##
         cli::cli_alert_success(paste0("Motif heatmaps written to: ",
             fname_w_ext))
