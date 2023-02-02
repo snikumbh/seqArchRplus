@@ -212,7 +212,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 #' plots in pixels
 #'
 #' @param hm_scale_factor Factor to scale the color scale bar w.r.t. the
-#' heatmaps. Useful when specifying more than two motifs at once.
+#' heatmaps. Values in (0,1]. Useful when specifying more than two motifs at once.
 #' Note that combining/specifying more than 3 or 4 motifs in one call to the
 #' function may result in a sub-optimally combined plot.
 #'
