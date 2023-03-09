@@ -1,3 +1,5 @@
+# seqArchRplus
+
 <!-- badges: start -->
 <!--  [![Bioc release status](http://www.bioconductor.org/shields/build/release/bioc/seqArchRplus.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/seqArchRplus) -->
   [![Bioc devel status](http://www.bioconductor.org/shields/build/devel/bioc/seqArchRplus.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/seqArchRplus)
@@ -8,7 +10,7 @@
   [![Bioc dependencies](https://bioconductor.org/shields/dependencies/devel/seqArchRplus.svg)](https://bioconductor.org/packages/devel/bioc/html/seqArchRplus.html#since)
   <!-- badges: end -->
 
-# seqArchRplus
+
 
 ## Downstream analyses of promoter sequence architectures and HTML report generation
 
@@ -42,5 +44,5 @@ if (!require("BiocManager", quietly = TRUE)) {
 BiocManager::install("seqArchRplus")
 ```
 
-In case of any errors or help required, please consider looking up: 
-https://github.com/snikumbh/seqArchRplus and file a new issue.
+In case of any errors or help required, please consider filing a 
+[new issue](https://github.com/snikumbh/seqArchRplus/issues/new/choose).
