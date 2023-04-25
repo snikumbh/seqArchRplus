@@ -9,32 +9,42 @@
 #' from the hierarchical clustering step.
 #'
 #' @param sname The sample name
+#'
 #' @param use_aggl The agglomeration method to be used for hierarchical
 #' clustering. This is passed on to `seqArchR::collate_seqArchR_result`.
 #' See argument `aggl_method` in \link[seqArchR]{collate_seqArchR_result}.
+#'
 #' @param use_dist The distance method to be used for hierarchical clustering.
-#' This is passed on to \link[seqArchR]{collate_seqArchR_result}. See argument
-#' `dist_method` in \link[seqArchR]{collate_seqArchR_result}.
+#' This is passed on to \code{\link[seqArchR]{collate_seqArchR_result}}.
+#' See argument `dist_method` in \link[seqArchR]{collate_seqArchR_result}.
+#'
 #' @param seqArchR_result The seqArchR result object.
+#'
 #' @param iter Specify which iteration of the seqArchR result should be used
 #' for obtaining clusters.
+#'
 #' @param pos_lab The position labels
+#'
 #' @param regularize Logical. Specify TRUE if the basis vector comparison
-#' is to be regularized. Requires you to set `topn` which is set to 50 as
+#' is to be regularized. Requires you to set \code{`topn`} which is set to 50 as
 #' default. See argument `regularize` in
-#' \link[seqArchR]{collate_seqArchR_result}.
+#' \code{\link[seqArchR]{collate_seqArchR_result}}.
+#'
 #' @param topn Numeric. The top N features (nucleotide-position pairs)
 #' that will be used for distance computation, rest will be ignored.
-#' See argument `topn` in \link[seqArchR]{collate_seqArchR_result}.
+#' See argument `topn` in \code{\link[seqArchR]{collate_seqArchR_result}}.
+#'
 #' @param use_cutk Value of K (number of clusters) for cutting the hierarchical
 #' clustering tree.
+#'
 #' @param need_change A list of elements (cluster IDs in the input clusters)
 #' that need re-assignment. Elements
+#'
 #' @param change_to A list of elements (cluster IDs in the input clusters)
 #' to be assigned to those that need re-assignment. In case there is a candidate
 #' that needs to be put into a new, independent cluster of itself, use
-#' 0 (as numeric). Both `need_change` and `change_to` should be empty lists if
-#' no re-assignment is to be performed.
+#' 0 (as numeric). Both \code{`need_change`} and \code{`change_to`} should
+#' be empty lists if no re-assignment is to be performed.
 #'
 #' @param final Logical, set to TRUE or FALSE
 #'
@@ -88,8 +98,8 @@
 #'
 #' @return
 #' This function returns a list holding (a) 'curation_plot': plot showing the
-#' dendrogram + sequence logos, (b) 'clust_assignments': the 
-#' cluster (re-)assignments performed, and (c) 'clusters_list': 
+#' dendrogram + sequence logos, (b) 'clust_assignments': the
+#' cluster (re-)assignments performed, and (c) 'clusters_list':
 #' the sequence clusters as a list.
 #'
 #' to help

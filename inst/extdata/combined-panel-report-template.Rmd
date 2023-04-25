@@ -1,0 +1,109 @@
+---
+output:
+  BiocStyle::html_document:
+    toc: yes
+    fig_caption: yes
+    number_sections: yes
+editor_options:
+    chunk_output_type: inline
+params:
+  snames: ""
+  lsnames: ""
+  snames_str: ""
+  this_dir_path: ""
+  img_ht: "1200px"
+  img_wd: "1600px"
+  page_wd: "1800px"
+title: "`r paste('Combined panels for ', params$lsnames, ' samples: ', params$snames_str)`"
+date: 'Timestamp: `r format(Sys.time())`'
+author: "`r paste0('seqArchRplus (v', utils::packageVersion('seqArchRplus'), ')')`"
+---
+
+```{r write-css, echo=FALSE, results='asis'}
+
+cat('<style type="text/css">
+    body .main-container {
+    max-width: ', params$page_wd, ' !important;
+    width: ', params$page_wd, ' !important;
+}
+body {
+    max-width: ', params$page_wd, ' !important;
+}
+</style>')
+
+```
+
+
+
+# Combined panel of IQW-TPM boxplots with cluster architectures and annotation percentages
+
+The clusters are arranged by their median interquantile widths (IQWs), with the 
+shortest one on top.
+From left to right, the graphs show the per cluster IQW distribution, TPM 
+values' distribution, the sequence logos of the architectures, and finally, 
+the percentages of annotations for them.
+
+
+
+```{r multiple-carousels-part1-child, include = TRUE, fig.wide=TRUE, echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
+
+## Make combined panel plots for per sample visualization
+## 1. IQW-TPM plots
+## 2. Sequence logo
+## 3. Annotation
+## 
+library(slickR)
+library(pdftools)
+if(knitr::is_html_output()){
+    
+    
+    pdf_files <- list.files(params$this_dir_path, pattern = "*combined_panel.pdf", 
+                            full.names = TRUE)
+    
+    ## Are the files in right order? Put them in right order
+    file_idx <- match(
+        unlist(lapply(strsplit(basename(pdf_files), split = "_combined"),
+                      function(x) x[[1]])
+               ), params$snames)
+    pdf_files[file_idx] <- pdf_files
+    
+    ## 
+    imgs <- lapply(pdf_files, function(x){
+        pdftools::pdf_convert(x, format = 'png', verbose = FALSE, dpi = 150)
+    })
+    
+    cP1 <- htmlwidgets::JS("function(slick,index) {
+                                return '<a>'+(index+1)+'</a>';
+                           }")
+    
+    img_bare <- slickR::slick_div(imgs, type = 'img', 
+            css = htmltools::css(height = params$img_ht, width = params$img_wd, 
+                                 marginLeft = 'auto', marginRight = 'auto')) + 
+        settings(arrows = TRUE, dots = FALSE)
+    
+    doms <- slickR::slick_list(img_bare)
+    
+    slickR::slickR(doms, slideId = "doms3", width = '95%', 
+            # objLinks = pdf_files,
+            height = params$img_ht, padding = 1) %synch%
+    ( slickR(params$snames, slideType = 'p') + settings(arrows = FALSE,
+                                                       dots = TRUE) )
+    
+    
+}
+```
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+# Session Info
+```{r session-info, echo=FALSE}
+
+utils::sessionInfo()
+
+```

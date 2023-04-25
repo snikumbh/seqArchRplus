@@ -187,7 +187,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 #' @title Plot heatmaps of motifs occurring in seqArchR clusters
 #'
 #' @description This function uses the seqPattern package. It is
-#'  recommended to use this function rather than `plot_motif_heatmaps`
+#'  recommended to use this function rather than `plot_motif_heatmaps'
 #'
 #' @param sname The sample name
 #'
@@ -195,9 +195,9 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 #'
 #' @param flanks Flank size. The same flank is used upstream and downstream.
 #' A vector of values is also accepted when more than oone flanks should be
-#' visualized.
+#' visualized
 #'
-#' @param clusts List of sequence Ids in each cluster.
+#' @param clusts List of sequence Ids in each cluster
 #'
 #' @param use_colors Specify colors to use
 #'
@@ -212,9 +212,9 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 #' plots in pixels
 #'
 #' @param hm_scale_factor Factor to scale the color scale bar w.r.t. the
-#' heatmaps. Values in (0,1]. Useful when specifying more than two motifs at once.
-#' Note that combining/specifying more than 3 or 4 motifs in one call to the
-#' function may result in a sub-optimally combined plot.
+#' heatmaps. Values in (0,1]. Useful when specifying more than two motifs at
+#' once. Note that combining/specifying more than 3 or 4 motifs in one call
+#' to the function may result in a sub-optimally combined plot
 #'
 #' @param n_cores Numeric. If you wish to parallelize annotation of peaks,
 #' specify the number of cores. Default is 1 (serial)
