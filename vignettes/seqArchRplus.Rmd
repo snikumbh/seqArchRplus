@@ -50,16 +50,16 @@ vital.
 
 
 While the R/Bioconductor package `r Biocpkg("seqArchR")` enables de novo 
-identification of clusters of promoter sequence architectures(@seqArchR), this package, 
-`r Biocpkg("seqArchRplus")`, enables performing various steps in their 
-downstream bioinformatic analyses and produce publication-ready plots 
+identification of clusters of promoter sequence architectures [@seqArchR], 
+this package, `r Biocpkg("seqArchRplus")`, enables performing various steps 
+in their downstream bioinformatic analyses and produce publication-ready plots 
 (building on various other Bioconductor packages).
 The many steps in the downstream analyses of promoter sequence architectures
 enabled by `r Biocpkg("seqArchRplus")` are:
 
 - Curate the final set of clusters from `r Biocpkg("seqArchR")`. 
 See the 
-[`r Biocpkg("seqArchR")` vignette](http://bioconductor.org/packages/release/bioc/vignettes/seqArchR/inst/doc/seqArchR.html)
+`r Biocpkg("seqArchR")` [vignette](http://bioconductor.org/packages/release/bioc/vignettes/seqArchR/inst/doc/seqArchR.html)
 , or the [bioRxiv preprint](https://doi.org/10.1101/2023.03.02.530868) to 
 understand in detail why this may be required 
 
