@@ -58,7 +58,9 @@ Suggests:
     covr,
     knitr (>= 1.22),
     org.Dm.eg.db,
+    pdftools,
     rmarkdown (>= 1.12),
+    slickR,
     TxDb.Dmelanogaster.UCSC.dm6.ensGene,
     xfun
 VignetteBuilder: 
