@@ -57,8 +57,9 @@ library(pdftools)
 if(knitr::is_html_output()){
     
     
-    pdf_files <- list.files(params$this_dir_path, pattern = "*combined_panel.pdf", 
-                            full.names = TRUE)
+    pdf_files <- list.files(this_dir_path,
+                        pattern = paste0("*", "combined_panel", extn),
+                        full.names = TRUE)
     
     ## Are the files in right order? Put them in right order
     file_idx <- match(

@@ -659,7 +659,7 @@ form_combined_panel(iqw_tpm_pl = iqw_tpm_pl, seqlogos_pl = seqlogos_oneplot_pl,
 
 In a multi-sample study where the samples designate either different 
 timepoints or cell types, all such (large) figures can be generated for all 
-samplas to produce a list of such plots. 
+samples to produce a list of such plots. 
 
 
 ### HTML reports with large combined panel plots
@@ -675,7 +675,7 @@ generate_html_report(snames = c("RAL28_10_to_12h", "RAL28_10_to_12h"),
 In a multi-sample study where the samples designate either different 
 timepoints or conditions, all such (large) figures can be generated for all 
 samples to produce a list of such plots which can then be visualised in an 
-HTML file that enables scrolling between the combined panel plots for one 
+HTML file that enables scrolling between the combined panel plots from one 
 sample to another.
 
 

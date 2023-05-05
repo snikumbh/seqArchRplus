@@ -17,8 +17,8 @@ generate_html_report(
 \arguments{
 \item{snames}{Sample names to be included}
 
-\item{file_type}{"PDF" (default) or "SVG". The type of files to look for
-in the sample-specific results folder}
+\item{file_type}{"PDF" (default) or "SVG" (to be supported in the future).
+The type of files to look for in the sample-specific results folder}
 
 \item{img_ht, img_wd}{The height and width (in pixels) of the images in the
 output HTML report. Default values are '1200px' (height) and
@@ -28,10 +28,10 @@ output HTML report. Default values are '1200px' (height) and
 
 \item{render_silently}{Logical. TRUE or FALSE}
 
-\item{dir_path}{Specify the /path/to/directory where sample-specific results
-folders are located. This is a required argument and cannot be NULL. A
-directory named `combined_results` is created at the given location, and the
-HTML report is written into it}
+\item{dir_path}{Specify the `/path/to/directory` where sample-specific
+results folders are located. This is a required argument and cannot be NULL.
+A directory named `combined_results` is created at the given location, and
+the HTML report is written into it}
 }
 \value{
 Nothing. Report is written to disk at the provided \code{`dir_path`
@@ -45,18 +45,10 @@ between samples
 }
 \details{
 This functionality requires suggested libraries \code{
-`slickR`} and \code{`pdftools`} installed. Note that the combined
-plot panels are arranged horizontally and therefore are best viewed in wide
-desktop monitors.
-}
-\examples{
-
-use_dir <- tempdir()
-
-
-generate_html_report(snames = c("sample1", "sample2"),
-                dir_path = use_dir)
-
+`slickR`} and \code{`pdftools`} installed.
+The function assumes requires that the candidate figure files have combined_panel
+Note that the combined plot panels are arranged horizontally and
+therefore are best viewed in wide desktop monitors.
 }
 \author{
 Sarvesh Nikumbh
