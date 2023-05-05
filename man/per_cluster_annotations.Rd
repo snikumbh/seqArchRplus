@@ -141,6 +141,7 @@ annotations_pl <- per_cluster_annotations(sname = "sample1",
 # argument. This is useful when one may not have access to the CAGEexp
 # object, but only clusters' information is available in a BED file.
 #
+
 annotations_pl <- per_cluster_annotations(sname = "sample1",
                          clusts = NULL,
                          tc_gr = bed_fname,
@@ -150,5 +151,7 @@ annotations_pl <- per_cluster_annotations(sname = "sample1",
                          tss_region = c(-500,100))
 }
 
-
+}
+\author{
+Sarvesh Nikumbh
 }

@@ -114,21 +114,27 @@
 
 
 
-.get_clust_id_column <- function(info_df, clusts) {
+.get_clust_id_column <- function(info_df, clusts, use_prefix, use_suffix) {
     ## Add new column noting the cluster IDs from seqArchR result
     clust_lab <- rep("0", length(unlist(clusts)))
-    clust_names <- sort(as.character(seq_along(clusts)))
+    ##
+    clust_labels <- .make_cluster_labels(clusts, use_prefix, use_suffix)
 
     for (i in seq_along(clusts)) {
-        clust_lab[clusts[[i]]] <- clust_names[i]
+        clust_lab[clusts[[i]]] <- clust_labels[i]
     }
+
+    ## Return as a factor because this is directly used as y-axis labels
+    ## Reverse the levels order so that the clusters are placed top-to-botom
+    clust_lab <- factor(clust_lab, levels = rev(clust_labels))
+
     clust_lab
 }
 ## =============================================================================
 
-make_cluster_labels <- function(clust, use_prefix, use_suffix) {
+.make_cluster_labels <- function(clust, use_prefix, use_suffix) {
     clust_lens <- lengths(clust)
-    clust_labels <- paste(paste0(" (", clust_lens, ") "),
+    clust_labels <- paste(paste0("(", clust_lens, ") "),
         use_prefix, seq_along(clust), use_suffix,
         sep = ""
     )
@@ -219,7 +225,7 @@ make_cluster_labels <- function(clust, use_prefix, use_suffix) {
         return(TRUE)
     return(FALSE)
 }
-
+## =============================================================================
 
 .get_cage_tc_cager <- function(cager_obj, sname, qLow, qUp) {
     any_null <- any(unlist(lapply(list(qLow, qUp), is.null)))

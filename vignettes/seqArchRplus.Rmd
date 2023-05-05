@@ -50,17 +50,18 @@ vital.
 
 
 While the R/Bioconductor package `r Biocpkg("seqArchR")` enables de novo 
-identification of clusters of promoter sequence architectures, this package, 
-`r Biocpkg("seqArchRplus")`, enables performing various steps in their 
-downstream bioinformatic analyses and produce publication-ready plots 
+identification of clusters of promoter sequence architectures [@seqArchR], 
+this package, `r Biocpkg("seqArchRplus")`, enables performing various steps 
+in their downstream bioinformatic analyses and produce publication-ready plots 
 (building on various other Bioconductor packages).
 The many steps in the downstream analyses of promoter sequence architectures
 enabled by `r Biocpkg("seqArchRplus")` are:
 
 - Curate the final set of clusters from `r Biocpkg("seqArchR")`. 
 See the 
-[`r Biocpkg("seqArchR")` vignette](http://bioconductor.org/packages/release/bioc/vignettes/seqArchR/inst/doc/seqArchR.html)
-, or the preprint to understand in detail why this may be required 
+`r Biocpkg("seqArchR")` [vignette](http://bioconductor.org/packages/release/bioc/vignettes/seqArchR/inst/doc/seqArchR.html)
+, or the [bioRxiv preprint](https://doi.org/10.1101/2023.03.02.530868) to 
+understand in detail why this may be required 
 
 - Order the sequence architectures by the interquantile widths (IQWs) of the 
 tag clusters (_aka_ promoter shape).
@@ -529,6 +530,7 @@ plot_motif_heatmaps(sname = "RAL28_10_to_12h", seqs = use_seqs,
                                     dir_path = NULL,
                                     fheight = 80, fwidth = 160
                                 )
+
 ```
 
 ### Per cluster annotations' plot
@@ -647,20 +649,35 @@ one_plot
 
 ### Large panels combining multiple plots
 
-```{r large-panels, eval=TRUE, attr.source='.numberLines', fig.wide=TRUE, fig.height=8, fig.width=20, fig.cap="Multiple plots combined as panels to geenrate one large figure."}
-## Remove y-axis text/tick labels
-annot_new_pl <- annotations_oneplot_pl + ggplot2::ylab(NULL) + 
-                        ggplot2::theme(axis.text.y = ggplot2::element_blank())
+```{r large-panels, eval=TRUE, attr.source='.numberLines', fig.wide=TRUE, fig.height=8, fig.width=20, fig.cap="Multiple plots combined as panels to generate one large figure."}
 
-panel_pl <- cowplot::plot_grid(iqw_tpm_pl, seqlogos_oneplot_pl, 
-                            annot_new_pl, ncol = 3, axis = "tblh", 
-                            align = "h")
-panel_pl
+
+form_combined_panel(iqw_tpm_pl = iqw_tpm_pl, seqlogos_pl = seqlogos_oneplot_pl, 
+                    annot_pl = annotations_oneplot_pl)
+
 ```
 
 In a multi-sample study where the samples designate either different 
 timepoints or cell types, all such (large) figures can be generated for all 
-sampleas to produce a list of such plots. 
+samples to produce a list of such plots. 
+
+
+### HTML reports with large combined panel plots
+
+```{r html-report, eval=TRUE, attr.source='.numberLines', fig.wide=TRUE, fig.height=8, fig.width=20, fig.cap="Multiple plots combined as panels to geenrate one large figure.", eval=FALSE}
+
+
+generate_html_report(snames = c("RAL28_10_to_12h", "RAL28_10_to_12h"), 
+                        file_type = "PDF", dir_path = tempdir())
+
+```
+
+In a multi-sample study where the samples designate either different 
+timepoints or conditions, all such (large) figures can be generated for all 
+samples to produce a list of such plots which can then be visualised in an 
+HTML file that enables scrolling between the combined panel plots from one 
+sample to another.
+
 
 ### Clusters as track BED files for visualization in the genome browser
 
@@ -688,8 +705,8 @@ write_seqArchR_cluster_track_bed(
 
 Depending upon the use case, one may use any ordering for the input clusters 
 for all functions.
-Looking at their annotations, if some clusters happen to 
-to occur predominantly in 5' UTR or 3' UTR or exons or introns etc., such 
+Looking at their annotations, if some clusters happen to occur predominantly 
+in 5' UTR or 3' UTR or exons or introns etc., such 
 clusters can be sequestered from further downstream analyses if suitable for 
 the end goal.
 

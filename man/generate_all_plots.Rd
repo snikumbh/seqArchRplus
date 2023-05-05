@@ -180,7 +180,7 @@ raw_seqs_mh <- Biostrings::readDNAStringSet(
                         )
 
 
-generate_all_plots(sname = "sample1",
+all_plots <- generate_all_plots(sname = "sample1",
                    bed_info_fname = bed_fname,
                    seqArchR_clusts = use_clusts,
                    raw_seqs = raw_seqs,

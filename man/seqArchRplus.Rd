@@ -48,13 +48,15 @@ browser or IGV
 
 - (future) Generate HTML reports that help you navigate this wealth of
 information with ease, and enable insights and hypotheses generation
+}
+\section{Functions for data preparation and manipulation}{
 
-#' @section Functions for data preparation and manipulation:
 \itemize{
 \item \code{\link{prepare_data_from_FASTA}}
 \item \code{\link{get_one_hot_encoded_seqs}}
 }
 }
+
 \section{Functions for visualizations}{
 
 \itemize{
@@ -66,3 +68,6 @@ information with ease, and enable insights and hypotheses generation
 }
 }
 
+\author{
+Sarvesh Nikumbh
+}

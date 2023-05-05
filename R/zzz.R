@@ -13,7 +13,7 @@ sklearn <- NULL
                 "Chromosomes",
                 "Strand",
                 "clust",
-                "clust_ID",
+                "Clusters",
                 "start",
                 "seqnames",
                 "strand",

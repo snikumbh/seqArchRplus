@@ -9,12 +9,12 @@
 #' @title Write seqArchR cluster information in BED files viewable as browser
 #' tracks
 #'
-#' @description Writes the seqArchR clusters are BED tracks for viewing in IGV
+#' @description Writes the seqArchR clusters as BED tracks for viewing in IGV
 #' or any genome browser
 #'
 #' @param sname Sample name
 #'
-#' @param clusts List of sequence ids in each cluster.
+#' @param clusts List of sequence ids in each cluster
 #'
 #' @param info_df The data.frame holding information to be written to the BED
 #' file. Expected columns are "chr", "start", "end", "names", "strand",
@@ -27,7 +27,7 @@
 #' cluster boundaries. Default is TRUE
 #'
 #' @param use_as_names Specify the column name from info_df which you would like
-#' to use as names for display with the track. By default, `use_names` is NULL,
+#' to use as names for display with the track. This is NULL by default,
 #' and the sequence/tag cluster IDs are used as names.
 #'
 #' @param one_zip_all Logical. Specify TRUE when the facility to download BED
@@ -46,10 +46,10 @@
 #' parameter `result='asis'`. By setting this to FALSE, BED files are written
 #' to disk, but no downloadable links are provided. Note: This should be TRUE,
 #' when `one_zip_all` argument is set to TRUE (see below). Requires the package
-#' `xfun`.
+#' `xfun`
 #'
 #' @param strand_sep Logical. Specify TRUE if records for each strand are to
-#' be written in separate BED files.
+#' be written in separate BED files
 #'
 #' @details
 #'
@@ -64,13 +64,13 @@
 #' These are "chr", "start", "end", "name", "score" (see more info below),
 #'  "strand", "dominant_ctss".
 #' By default, the sequence/tag cluster IDs are used as names.
-#' If `use_as_names` is specified, information from that column in the
+#' If \code{`use_as_names`} is specified, information from that column in the
 #' `info_df` is used as "name".
 #'
 #' If conservation score (e.g., PhastCons) is available, it is used as the
 #' score, otherwise the TPM value of the dominant CTSS (domTPM) is used.
 #' The final two columns (when dominantCTSS column is present), are the
-#'  'thickStart' and 'thickEnd' values corresponding to the BED format.
+#'  'thickStart' and `thickEnd' values corresponding to the BED format.
 #'  The 'thickEnd' column is the dominant_ctss position.
 #'
 #' Importantly, the lower and upper quantile boundaries are used as the start
@@ -79,12 +79,13 @@
 #'
 #'
 #' @return
-#' When `include_in_report = FALSE`, the cluster information is written to disk
-#' as BED track files that can be viewed in the genome browser or IGV.
+#' When \code{`include_in_report = FALSE`}, the cluster information is written
+#' to disk as BED track files that can be viewed in the genome browser or IGV.
 #' Otherwise, a str object holding HTML text is returned that can be included
-#' in the report as downloadable links for each cluster BED file (use `cat`).
-#' When `one_zip_all = TRUE`, a link to download all files zipped into one is
-#' also provided to enable convenience.
+#' in the report as downloadable links for each cluster BED file (use
+#' \code{`cat`} function).
+#' When \code{`one_zip_all = TRUE`}, a link to download all files zipped into
+#' one is also provided to enable convenience.
 #'
 #' @export
 #'

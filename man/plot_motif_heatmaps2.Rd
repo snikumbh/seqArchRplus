@@ -14,7 +14,9 @@ plot_motif_heatmaps2(
   dir_path,
   fheight = 1.5 * fwidth,
   fwidth = 2000,
+  hm_scale_factor = 0.75,
   n_cores = 1,
+  type = c("png", "jpg"),
   ...
 )
 }
@@ -25,9 +27,9 @@ plot_motif_heatmaps2(
 
 \item{flanks}{Flank size. The same flank is used upstream and downstream.
 A vector of values is also accepted when more than oone flanks should be
-visualized.}
+visualized}
 
-\item{clusts}{List of sequence Ids in each cluster.}
+\item{clusts}{List of sequence Ids in each cluster}
 
 \item{use_colors}{Specify colors to use}
 
@@ -39,22 +41,31 @@ For example, TATAA, CG, WW, SS etc.}
 \item{dir_path}{The path to the directory}
 
 \item{fheight, fwidth}{Height and width of the individual heatmap
-plots in pixels. Default values are 500 and 300}
+plots in pixels}
+
+\item{hm_scale_factor}{Factor to scale the color scale bar w.r.t. the
+heatmaps. Values in (0,1]. Useful when specifying more than two motifs at
+once. Note that combining/specifying more than 3 or 4 motifs in one call
+to the function may result in a sub-optimally combined plot}
 
 \item{n_cores}{Numeric. If you wish to parallelize annotation of peaks,
 specify the number of cores. Default is 1 (serial)}
+
+\item{type}{Specify either of "png" or "jpg" to obtain PNG or JPEG files as
+output}
 
 \item{...}{Additional arguments passed to
 \code{\link[seqPattern]{plotPatternDensityMap}}}
 }
 \value{
-Nothing. PNG images are written to disk using the provided filenames.
+Nothing. Images are written to disk using the provided filenames.
 In addition, two legends are printed to separate files: the color legend
 and the clustering legend, which can be then combined with the heatmaps.
+The heatmaps themselves have the cluster numbers marked on the vertical axis.
 }
 \description{
 This function uses the seqPattern package. It is
- recommended to use this function rather than `plot_motif_heatmaps`
+ recommended to use this function rather than `plot_motif_heatmaps'
 }
 \examples{
 

@@ -1,3 +1,0 @@
-## seqArchRplus generate reports
-##
-

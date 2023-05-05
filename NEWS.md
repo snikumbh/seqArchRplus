@@ -1,3 +1,11 @@
+# seqArchRplus 0.99.10
+
+## New
+* (User-facing) Alternative function `plot_motif_heatmaps2()` combines the 
+  heatmap scale with the heatmaps. Also, can choose to output PNG or JPEG 
+  files
+
+
 # seqArchRplus 0.99.0
 
 ## New

@@ -54,7 +54,6 @@
 #' scale_x_log10 theme_bw
 #' @importFrom cli cli_h1 cli_h1 cli_alert_warning cli_alert_info
 #' @importFrom stats reorder
-#' @importFrom forcats fct_reorder
 #'
 #' @export
 #'
@@ -92,7 +91,6 @@ iqw_tpm_plots <- function(sname, info_df, clusts, iqw = TRUE,
     cli::cli_h1(paste0("IQW-ordered boxplots"))
     cli::cli_h2(paste0("Sample: ", sname))
 
-    info_df$clust_ID <- .get_clust_id_column(info_df, clusts)
     ##
     if (!any(iqw, tpm, cons)) {
         cli::cli_alert_warning(paste0(
@@ -188,37 +186,21 @@ iqw_tpm_plots <- function(sname, info_df, clusts, iqw = TRUE,
                                 order_by_median = TRUE,
                                 use_suffix = "X", use_prefix = "C") {
 
+    ## Order the clusters, and set cluster labels accordingly.
+    seqs_clust_ord <- order_clusters_iqw(sname = sname,
+        clusts = seqs_clust,
+        info_df = info_df,
+        order_by_median = order_by_median
+    )
 
-    if(y_axis_text){
-        ## The clusters will be directly ordered by ggplot,
-        ## so order the cluster labels here
-        seqs_clust_ord <- order_clusters_iqw(sname = sname,
-            clusts = seqs_clust,
-            info_df = info_df,
-            order_by_median = order_by_median
-        )
-        clust_labels <- make_cluster_labels(
-            clust = seqs_clust_ord,
-            use_prefix = use_prefix,
-            use_suffix = use_suffix
-        )
-    }else{
-        clust_labels <- NULL
-    }
+    info_df$Clusters <- .get_clust_id_column(info_df,
+            clusts = seqs_clust_ord, use_prefix, use_suffix)
+
 
     clr <- RColorBrewer::brewer.pal(3, "Dark2")
     ##
     if (iqw) {
-        pl <- ggplot(
-            info_df,
-            aes(
-                y = forcats::fct_reorder(clust_ID, IQW,
-                    .fun = ifelse(order_by_median, median, mean),
-                    .desc = TRUE
-                ),
-                x = IQW
-            )
-        ) +
+        pl <- ggplot(info_df, aes(y = Clusters, x = IQW)) +
             ggplot2::geom_boxplot(
                 outlier.size = 1, width = 0.5,
                 notch = use_notch, color = "black",
@@ -228,16 +210,7 @@ iqw_tpm_plots <- function(sname, info_df, clusts, iqw = TRUE,
     }
     ##
     if (tpm) {
-        pl <- ggplot(
-            info_df,
-            aes(
-                y = forcats::fct_reorder(clust_ID, IQW,
-                    .fun = ifelse(order_by_median, median, mean),
-                    .desc = TRUE
-                ),
-                x = domTPM
-            )
-        ) +
+        pl <- ggplot(info_df, aes(y = Clusters, x = domTPM)) +
             ggplot2::geom_boxplot(
                 outlier.size = 1, width = 0.5, notch = use_notch,
                 color = "black", fill = clr[2]
@@ -246,16 +219,7 @@ iqw_tpm_plots <- function(sname, info_df, clusts, iqw = TRUE,
             ylab("Clusters")
     }
     if (phast) {
-        pl <- ggplot(
-            info_df,
-            aes(
-                y = forcats::fct_reorder(clust_ID, IQW,
-                    .fun = ifelse(order_by_median, median, mean),
-                    .desc = TRUE
-                ),
-                x = phast
-            )
-        ) +
+        pl <- ggplot(info_df, aes(y = Clusters, x = phast)) +
             geom_boxplot(
                 outlier.size = 1, width = 0.5, notch = use_notch,
                 color = "black", fill = clr[3]
@@ -273,12 +237,6 @@ iqw_tpm_plots <- function(sname, info_df, clusts, iqw = TRUE,
         )
     }
     pl <- pl + ylab("Clusters") +
-        { if(y_axis_text)
-            scale_y_discrete(
-                labels = rev(clust_labels),
-                expand = expansion(add = c(0.55, 0.55))
-            )
-        } +
         theme_bw() +
         theme(
             axis.title = element_text(colour = "black", size = txt_size),
@@ -349,6 +307,7 @@ iqw_tpm_plots <- function(sname, info_df, clusts, iqw = TRUE,
 #'                                  info_df = info_df,
 #'                                  order_by_median = TRUE)
 #'
+#' @author Sarvesh Nikumbh
 order_clusters_iqw <- function(sname, clusts, info_df,
                                 order_by_median = TRUE) {
     cli::cli_h1(paste0("Order clusters by IQW"))
