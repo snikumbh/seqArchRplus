@@ -37,13 +37,14 @@ Imports:
     clusterProfiler,
     cowplot,
     factoextra,
-    forcats,
     GenomeInfoDb,
     ggplot2,
+    ggimage,
     graphics,
     grDevices,
     gridExtra,
     heatmaps,
+    magick,
     methods,
     RColorBrewer,
     scales,
@@ -69,4 +70,4 @@ biocViews: Annotation, Visualization, ReportWriting, GO, MotifAnnotation,
     Clustering
 Encoding: UTF-8
 LazyData: false
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3

@@ -39,7 +39,7 @@
 #' @examples
 #'
 #' ## Need these packages to run these examples
-#' if(require("slickR", 'pdftools")){
+#' if(require("slickR", "pdftools")){
 #'
 #' ## Make IQW-TPM plots
 #'
@@ -88,7 +88,10 @@
 #'                                    txt_size = 14)
 #'
 #' ## Need the TxDb object to run these examples
+#'
+#' annotations_pl <- NULL
 #' if(require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")){
+#'
 #'     annotations_pl <- per_cluster_annotations(sname = "sample1",
 #'                          clusts = NULL,
 #'                          tc_gr = bed_fname,
@@ -96,11 +99,9 @@
 #'                          one_plot = FALSE,
 #'                          dir_path = use_dir,
 #'                          tss_region = c(-500,100))
-#' }else{
-#'     annotations_pl <- NULL
 #' }
 #'
-#' # Combine them together
+#' ## Combine them together
 #' if(!is.null(annotations_pl)){
 #'     panel_pl <- form_combined_panel(iqw_tpm_pl = iqw_tpm_pl,
 #'                     seqlogos_pl = seqlogos_oneplot_pl,
@@ -112,10 +113,10 @@
 #'  }
 #'
 #'  cowplot::save_plot(filename = file.path(use_dir,
-#'                                         paste0("sample1_combined_panel.pdf"),
+#'                                  paste0("sample1_combined_panel.pdf")),
 #'                    plot = panel_pl)
 #'
-#' # Call function to generate HTML report
+#' ## Call function to generate HTML report
 #' generate_html_report(snames = c("sample1", "sample1"),
 #'                 dir_path = use_dir)
 #' }

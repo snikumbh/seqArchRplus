@@ -50,6 +50,92 @@ The function assumes requires that the candidate figure files have combined_pane
 Note that the combined plot panels are arranged horizontally and
 therefore are best viewed in wide desktop monitors.
 }
+\examples{
+
+## Need these packages to run these examples
+if(require("slickR", "pdftools")){
+
+## Make IQW-TPM plots
+
+bed_fname <- system.file("extdata", "example_info_df.bed.gz",
+         package = "seqArchRplus", mustWork = TRUE)
+
+info_df <- read.delim(file = bed_fname,
+         sep = "\t", header = TRUE,
+         col.names = c("chr", "start", "end", "width",
+                 "dominant_ctss", "domTPM",
+                 "strand", "score", "nr_ctss",
+                 "q_0.1", "q_0.9", "IQW", "tpm"))
+
+use_clusts <- readRDS(system.file("extdata", "example_clust_info.rds",
+         package = "seqArchRplus", mustWork = TRUE))
+
+use_dir <- tempdir()
+
+iqw_tpm_pl <- iqw_tpm_plots(sname = "sample1",
+                            dir_path = use_dir,
+                            info_df = info_df,
+                            iqw = TRUE,
+                            tpm = TRUE,
+                            cons = FALSE,
+                            clusts = use_clusts,
+                            txt_size = 14)
+
+## Make sequence logos
+library(Biostrings)
+raw_seqs <- Biostrings::readDNAStringSet(
+                          filepath = system.file("extdata",
+                            "example_promoters45.fa.gz",
+                            package = "seqArchRplus",
+                            mustWork = TRUE)
+                        )
+
+
+seqlogo_oneplot_pl <- per_cluster_seqlogos(sname = "sample1",
+                                   seqs = raw_seqs,
+                                   clusts = use_clusts,
+                                   pos_lab = -45:45,
+                                   bits_yax = "auto",
+                                   strand_sep = FALSE,
+                                   one_plot = TRUE,
+                                   dir_path = use_dir,
+                                   txt_size = 14)
+
+## Need the TxDb object to run these examples
+
+annotations_pl <- NULL
+if(require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")){
+
+    annotations_pl <- per_cluster_annotations(sname = "sample1",
+                         clusts = NULL,
+                         tc_gr = bed_fname,
+                         txdb_obj = TxDb.Dmelanogaster.UCSC.dm6.ensGene,
+                         one_plot = FALSE,
+                         dir_path = use_dir,
+                         tss_region = c(-500,100))
+}
+
+## Combine them together
+if(!is.null(annotations_pl)){
+    panel_pl <- form_combined_panel(iqw_tpm_pl = iqw_tpm_pl,
+                    seqlogos_pl = seqlogos_oneplot_pl,
+                    annot_pl = annotations_oneplot_pl)
+ }else{
+    panel_pl <- form_combined_panel(iqw_tpm_pl = iqw_tpm_pl,
+                    seqlogos_pl = seqlogos_oneplot_pl)
+
+ }
+
+ cowplot::save_plot(filename = file.path(use_dir,
+                                 paste0("sample1_combined_panel.pdf")),
+                   plot = panel_pl)
+
+## Call function to generate HTML report
+generate_html_report(snames = c("sample1", "sample1"),
+                dir_path = use_dir)
+}
+
+}
 \author{
 Sarvesh Nikumbh
 }
