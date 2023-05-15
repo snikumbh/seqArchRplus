@@ -136,8 +136,8 @@ generate_html_report <- function(snames, file_type = "PDF",
 
         ## Fail if the sample-specific results folders are not available.
         if(any(!dir.exists(this_dir_path))){
-            stop("Did not find sample-specific results folder(s):",
-                which(!dir.exists(this_dir_path)), call. = FALSE)
+            stop("Did not find sample-specific results folder(s): ",
+                snames[which(!dir.exists(this_dir_path))], call. = FALSE)
         }
 
 
