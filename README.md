@@ -1,8 +1,7 @@
 # seqArchRplus
 
 <!-- badges: start -->
-<!--  [![Bioc release status](http://www.bioconductor.org/shields/build/release/bioc/seqArchRplus.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/seqArchRplus) -->
-  [![Bioc devel status](http://www.bioconductor.org/shields/build/devel/bioc/seqArchRplus.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/seqArchRplus)
+[![Bioc release status](http://www.bioconductor.org/shields/build/release/bioc/seqArchRplus.svg)](https://bioconductor.org/checkResults/release/bioc-LATEST/seqArchRplus)
   [![Bioc downloads rank](https://bioconductor.org/shields/downloads/devel/seqArchRplus.svg)](http://bioconductor.org/packages/stats/bioc/seqArchRplus/)
   [![Bioc support](https://bioconductor.org/shields/posts/seqArchRplus.svg)](https://support.bioconductor.org/tag/seqArchRplus)
   [![Bioc history](https://bioconductor.org/shields/years-in-bioc/seqArchRplus.svg)](https://bioconductor.org/packages/release/bioc/html/seqArchRplus.html#since)
@@ -29,7 +28,7 @@ The second include per cluster chromosome-wise and strand
 distributions, motif occurrence heatmaps and GO (Gene Ontology) term 
 enrichments. 
 Additionally, seqArchRplus can also generate HTML reports for easy viewing and 
-comparison of promoter architectures between samples/stages (future).
+comparison of promoter architectures between samples/stages.
 
 
 ## Installation 
