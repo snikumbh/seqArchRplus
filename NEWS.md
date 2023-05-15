@@ -1,3 +1,11 @@
+
+
+# seqArchRplus 1.1.2
+
+## New
+* (User-facing) Ability to generate HTML reports to view large combined panels 
+  for multiple processed samples as scrollable carousels
+
 # seqArchRplus 0.99.10
 
 ## New
