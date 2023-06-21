@@ -1,4 +1,9 @@
 
+# seqArchRplus 1.1.3
+
+## New
+* (User-facing) Enables choosing the out device type for motif heatmaps
+
 
 # seqArchRplus 1.1.2
 
