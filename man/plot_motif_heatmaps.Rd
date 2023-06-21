@@ -15,7 +15,9 @@ plot_motif_heatmaps(
   fheight = 500,
   fwidth = 500,
   funits = "px",
-  n_cores = 1
+  n_cores = 1,
+  res = 150,
+  dev = "png"
 )
 }
 \arguments{
@@ -38,14 +40,21 @@ For example, TATAA, CG, WW, SS etc.}
 
 \item{dir_path}{The path to the directory}
 
-\item{fheight, fwidth, funits}{Height and width of the PDF file, and the units
-in which they are specified}
+\item{fheight, fwidth, funits}{Height and width of the image file, and the units
+in which they are specified. Units are inches for PDF and SVG, and pixels
+for PNG and TIFF devices}
 
-\item{n_cores}{Numeric. If you wish to parallelize annotation of peaks,
+\item{n_cores}{Numeric. If you wish to parallelize,
 specify the number of cores. Default is 1 (serial)}
+
+\item{res}{Numeric. The resolution in ppi to be used for producing PNG or
+TIFF files. Default is 150}
+
+\item{dev}{Specify the device type. One of 'png', 'tiff', 'pdf', or 'svg'.
+Default is 'png'}
 }
 \value{
-Nothing. PNG images are written to disk using the provided filenames.
+Nothing. Images are written to disk using the provided filenames.
 }
 \description{
 Plot heatmaps of motifs occurring in seqArchR clusters
@@ -68,7 +77,7 @@ plot_motif_heatmaps(sname = "sample1", seqs = raw_seqs,
                     clusts = use_clusts,
                     motifs = c("WW", "SS", "TATAA", "CG", "Y"),
                     dir_path = tempdir(),
-                    fheight = 800, fwidth = 1600)
+                    fheight = 800, fwidth = 2400)
 
 }
 \author{

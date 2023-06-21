@@ -21,14 +21,21 @@
 #'
 #' @param dir_path The path to the directory
 #'
-#' @param fheight,fwidth,funits Height and width of the PDF file, and the units
-#'  in which they are specified
+#' @param fheight,fwidth,funits Height and width of the image file, and the units
+#'  in which they are specified. Units are inches for PDF and SVG, and pixels
+#'  for PNG and TIFF devices
 #'
-#' @param n_cores Numeric. If you wish to parallelize annotation of peaks,
+#' @param n_cores Numeric. If you wish to parallelize,
 #' specify the number of cores. Default is 1 (serial)
 #'
+#' @param dev Specify the device type. One of 'png', 'tiff', 'pdf', or 'svg'.
+#' Default is 'png'
 #'
-#' @return Nothing. PNG images are written to disk using the provided filenames.
+#' @param res Numeric. The resolution in ppi to be used for producing PNG or
+#' TIFF files. Default is 150
+#'
+#'
+#' @return Nothing. Images are written to disk using the provided filenames.
 #'
 #' @importFrom Biostrings width
 #'
@@ -52,16 +59,19 @@
 #'                     clusts = use_clusts,
 #'                     motifs = c("WW", "SS", "TATAA", "CG", "Y"),
 #'                     dir_path = tempdir(),
-#'                     fheight = 800, fwidth = 1600)
+#'                     fheight = 800, fwidth = 2400)
 #'
 #' @author Sarvesh Nikumbh
 plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
                                 use_colors = NULL, motifs, dir_path,
                                 fheight = 500, fwidth = 500, funits = "px",
-                                n_cores = 1) {
+                                n_cores = 1, res = 150,
+                                dev = "png") {
     cli::cli_h1(paste0("Motif heatmaps"))
     cli::cli_h2(paste0("Sample: ", sname))
     ##
+    dev_type <- match.arg(dev, choices = c("png", "tiff", "pdf", "svg"))
+
     parallelize <- FALSE
     if (n_cores > 1) parallelize <- TRUE
     bpparam <- .handle_multicore(crs = n_cores, parallelize = parallelize)
@@ -113,7 +123,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
             fname_suffix <- paste0(paste(fl_up, "up", fl_down, "down",
                 "motifHeatmaps", all_motifs_str,
                 sep = "_"
-            ), ".png")
+            ), ".", dev_type)
             fname <- file.path(result_dir_path, fname_suffix)
         }
 
@@ -123,9 +133,26 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 
 
         if(!is.null(dir_path)){
-            grDevices::png(fname, height = fheight, width = fwidth,
-                            units = funits)
+
+            if(dev_type == "png")
+                ## width and height are in px
+                grDevices::png(fname, height = fheight, width = fwidth,
+                            units = funits, res = res)
+            if(dev_type == "tiff"){
+                ## width and height are in px
+                grDevices::tiff(fname, height = fheight, width = fwidth,
+                    units = funits, res = res)
+            }
+            if(dev_type == "pdf"){
+                ## width and height are in inches
+                grDevices::pdf(fname, height = fheight, width = fwidth)
+            }
+            if(dev_type == "svg"){
+                ## width and height are in inches
+                grDevices::png(fname, height = fheight, width = fwidth)
+            }
         }
+
         pl_hms <- heatmaps::plotHeatmapList(
             patt_hm_list500,
             box.width = 1.3,
@@ -216,7 +243,7 @@ plot_motif_heatmaps <- function(sname, seqs, flanks = c(50), clusts,
 #' once. Note that combining/specifying more than 3 or 4 motifs in one call
 #' to the function may result in a sub-optimally combined plot
 #'
-#' @param n_cores Numeric. If you wish to parallelize annotation of peaks,
+#' @param n_cores Numeric. If you wish to parallelize,
 #' specify the number of cores. Default is 1 (serial)
 #'
 #' @param type Specify either of "png" or "jpg" to obtain PNG or JPEG files as

@@ -68,6 +68,10 @@
 #' motif heatmap file will contain separate heatmaps for each of the specified
 #' motifs in the `motifs` argument
 #'
+#' @param motif_heatmaps_res The resolution for the motif heatmaps. Default is
+#'  300 ppi
+#' @param motif_heatmaps_dev The device to be used for plotting. Default is
+#' "png". Other options available are "tiff", "pdf", and "svg"
 #'
 #' @param dir_path The path to the directory where files are saved
 #'
@@ -163,6 +167,8 @@
 #'                    raw_seqs_mh = raw_seqs_mh,
 #'                    motifs = c("WW", "SS", "TATAA", "CG"),
 #'                    motif_heatmaps_flanks = c(50, 100, 200),
+#'                    motif_heatmaps_res = 150,
+#'                    motif_heatmaps_dev = "png",
 #'                    dir_path = tempdir(),
 #'                    txt_size = 25)
 #'
@@ -187,6 +193,8 @@ generate_all_plots <- function(sname, bed_info_fname,
                                 raw_seqs_mh = NULL,
                                 motifs = c("WW", "SS", "TATAA", "CG"),
                                 motif_heatmaps_flanks = c(50, 100, 200),
+                                motif_heatmaps_res = 300,
+                                motif_heatmaps_dev = "png",
                                 dir_path,
                                 txt_size = 25) {
     iqw_tpm_pl <-
@@ -331,7 +339,10 @@ generate_all_plots <- function(sname, bed_info_fname,
         clusts = use_clusts,
         motifs = motifs,
         dir_path = dir_path,
-        fheight = 800, fwidth = 1600
+        fheight = 800, fwidth = 2400,
+        funits = "px",
+        res = motif_heatmaps_res,
+        dev = motif_heatmaps_dev
     )
 
     pair_colrs <- RColorBrewer::brewer.pal(n = 5, name = "Set3")

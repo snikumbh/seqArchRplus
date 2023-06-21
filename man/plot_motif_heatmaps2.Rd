@@ -48,7 +48,7 @@ heatmaps. Values in (0,1]. Useful when specifying more than two motifs at
 once. Note that combining/specifying more than 3 or 4 motifs in one call
 to the function may result in a sub-optimally combined plot}
 
-\item{n_cores}{Numeric. If you wish to parallelize annotation of peaks,
+\item{n_cores}{Numeric. If you wish to parallelize,
 specify the number of cores. Default is 1 (serial)}
 
 \item{type}{Specify either of "png" or "jpg" to obtain PNG or JPEG files as
